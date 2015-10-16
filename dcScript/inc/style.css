@@ -1,0 +1,39 @@
+/* -- BEGIN LICENSE BLOCK -----------------------------------------------------
+ * This file is part of plugin dcScript for Dotclear 2.
+ * Copyright © 2014-2015 Gvx
+ * Licensed under the GPL version 2.0 license.
+ * (http://www.gnu.org/licenses/old-licenses/gpl-2.0.html)
+ * -- END LICENSE BLOCK -----------------------------------------------------*/
+
+/* --== Code mirror ==-- */
+.CodeMirror {
+	font-size: 1.3em;
+	/*height: auto;*/
+	height: 32em;
+	border: thin solid silver;
+	margin-bottom: 1em;
+}
+.cm-trailingspace {
+	background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAACCAYAAAB/qH1jAAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH3QUXCToH00Y1UgAAACFJREFUCNdjPMDBUc/AwNDAAAFMTAwMDA0OP34wQgX/AQBYgwYEx4f9lQAAAABJRU5ErkJggg==);
+	background-position: bottom left;
+	background-repeat: repeat-x;
+}
+div.CodeMirror span.CodeMirror-matchingbracket {
+	color: #f00; font-weight: bold;
+}
+
+/* --== dcScript ==-- */
+input[type="submit"][disabled="disabled"],
+input[type="reset"][disabled="disabled"],
+a.button.disabled {
+	opacity: 0.5; cursor: default;
+}
+input[type="submit"], a.button {
+	margin: 1em;
+}
+
+/* --== no javascript ==-- */
+body.no-js #tab-2,
+body.no-js #tab-3 {
+	display: none;
+}

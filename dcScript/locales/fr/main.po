@@ -1,0 +1,147 @@
+# Language: Français
+# Module: dcScript - 2.0.0-r0029
+# Date: 2015-10-03 10:31:05
+# Translated with translater 2013.05.11
+
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Project-Id-Version: dcScript 2.0.0-r0029\n"
+"POT-Creation-Date: \n"
+"PO-Revision-Date: 2015-10-03T10:31:05+00:00\n"
+"Last-Translator: Gilles Grandveaux\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: _config.php:22
+msgid "Unable to save the configuration"
+msgstr "Impossible de sauver la configuration"
+
+#: _config.php:25
+msgid "Redirection not found"
+msgstr "Redirection introuvable"
+
+#: _config.php:37
+msgid "Enable %s on this blog"
+msgstr "Activer %s pour ce blog"
+
+#: _config.php:40
+msgid "Enable the plugin on this blog."
+msgstr "Activer le plugin pour ce blog"
+
+#: _config.php:44
+msgid "Active codes"
+msgstr "Codes actifs"
+
+#: _config.php:49
+#: inc/class.dcScript.php:44
+msgid "Enable header code"
+msgstr "Activer le code du header"
+
+#: _config.php:51
+msgid "Enable public header code."
+msgstr "Activer le code du header public"
+
+#: _config.php:56
+#: inc/class.dcScript.php:45
+msgid "Enable footer code"
+msgstr "Activer le code du footer"
+
+#: _config.php:58
+msgid "Enable public footer code."
+msgstr "Activer le code du footer public"
+
+#: _config.php:66
+#: inc/class.dcScript.php:48
+msgid "Extension Backup Files"
+msgstr "Extension des fichiers de sauvegarde"
+
+#: _config.php:69
+msgid "Default extension backup files."
+msgstr "Extension par defaut des fichiers de sauvegarde"
+
+#: _prepend.php:24
+msgid "Conflict: dcCore or other plugin, and %s plugin."
+msgstr "Conflit entre dcCore ou un autre plugin et %s"
+
+#: inc/class.dcScript.php:10
+msgid "dcScript"
+msgstr "dcScript"
+
+#: inc/class.dcScript.php:11
+msgid "Add script for DC 2.7+"
+msgstr "Ajouter des script a doctlear v2.7+"
+
+#: inc/class.dcScript.php:43
+#: inc/class.dcScript.php:51
+msgid "Enable plugin"
+msgstr "Activer le plugin"
+
+#: inc/class.dcScript.php:46
+#: index.php:75
+msgid "Header code"
+msgstr "Code du header"
+
+#: inc/class.dcScript.php:47
+#: index.php:90
+msgid "Footer code"
+msgstr "Code du footer"
+
+#: inc/class.dcScript.php:67
+msgid "Invalid plugin directory"
+msgstr "repertoire de plugin incorrect"
+
+#: inc/class.dcScript.php:99
+msgid "%s require Dotclear version %s or more."
+msgstr "%s necessite Dotclear version %s ou plus"
+
+#: inc/class.dcScript.php:109
+msgid "[Plugin %s] Unknown error in installation."
+msgstr "Erreur inconnue lors de l'installation de %s"
+
+#: inc/class.dcScript.php:162
+msgid "icon plugin"
+msgstr "Icone"
+
+#: inc/class.dcScript.php:163
+msgid "Settings"
+msgstr "Paramètres"
+
+#: inc/class.dcScript.php:166
+msgid "Author(s)"
+msgstr "Auteur(s)"
+
+#: index.php:24
+#: index.php:31
+msgid "Code successfully updated."
+msgstr "Mise à jour du code avec succès"
+
+#: index.php:36
+msgid "Unable to save the code"
+msgstr "Impossible de sauver le code"
+
+#: index.php:50
+msgid "Unable to save the file"
+msgstr "Impossible de sauver le fichier"
+
+#: index.php:75
+#: index.php:90
+msgid "Enabled"
+msgstr "Activé"
+
+#: index.php:75
+#: index.php:90
+msgid "Disabled"
+msgstr "Désactivé"
+
+#: index.php:81
+#: index.php:96
+msgid "Save the configuration"
+msgstr "Sauver la configuration"
+
+#: index.php:82
+#: index.php:97
+msgid "Undo changes"
+msgstr "Annuler les changements"
+
