@@ -10,6 +10,7 @@ L'editeur de code utilise la coloration syntaxique de [CodeMirror](http://codemi
 
 ## Utilisation ##
 Le plugin met a disposition 2 editeurs de code HTML:
+
 * Un editeur pour inserer du code dans le header (balise `<head>`)
 * Un editeur pour inserer du code dans le footer de la page
 
