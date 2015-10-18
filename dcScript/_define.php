@@ -11,7 +11,7 @@ $this->registerModule(
 	/* Name */			'dcScript',
 	/* Description*/	'Add script for DC 2.7+',
 	/* Author */		'Gvx',
-	/* Version */		'2.0.0-r0034',
+	/* Version */		'2.0.0-r0035',
 	array(
 		'permissions' 			=>	'admin',
 		'type'					=>	'plugin',
