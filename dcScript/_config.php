@@ -34,7 +34,7 @@ echo
 		<p>
 			'.form::checkbox('enabled','1',$core->dcScript->settings('enabled')).
 			'<label class="classic" for="enabled">
-				'.sprintf(__('Enable %s on this blog'), html::escapeHTML(__($core->plugins->moduleInfo($core->dcScript->plugin_id, 'name')))).
+				'.sprintf(__('Enable %s on this blog'), html::escapeHTML(__($core->dcScript->info('name')))).
 			'</label>
 		</p>
 		<p class="form-note">'.__('Enable the plugin on this blog.').'</p>
