@@ -7,4 +7,4 @@
  * -- END LICENSE BLOCK -----------------------------------------------------*/
 if (!defined('DC_CONTEXT_ADMIN')) { return; }
 
-return $core->dcScript->install('2.7');
+return $core->dcScript->install('2.8');

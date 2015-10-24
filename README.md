@@ -6,7 +6,7 @@ Ce plugin pour [Dotclear](http://fr.dotclear.org/) permet d'inserer du code HTML
 L'editeur de code utilise la coloration syntaxique de [CodeMirror](http://codemirror.net/)
 
 ## Pré-requis ##
-* Dotclear 2.7 ou plus
+* Dotclear 2.8 ou plus
 
 ## Utilisation ##
 Le plugin met a disposition 2 editeurs de code HTML:

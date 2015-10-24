@@ -8,7 +8,7 @@
 if (!defined('DC_RC_PATH')) { return; }
 
 __('dcScript');						// plugin name
-__('Add script for DC 2.7+');		// description plugin
+__('Add script for DC 2.8+');		// description plugin
 
 class dcScript {
 
@@ -27,7 +27,7 @@ class dcScript {
 	}
 	
 	/*---------------------------------------------------------------------------
-	 * Helper for dotclear version 2.7 and more
+	 * Helper for dotclear version 2.8 and more
 	 * Version : 0.20.2
 	 * Copyright © 2008-2015 Gvx
 	 * Licensed under the GPL version 2.0 license.

@@ -9,9 +9,9 @@ if (!defined('DC_RC_PATH')) { return; }
 
 $this->registerModule(
 	/* Name */			'dcScript',
-	/* Description*/	'Add script for DC 2.7+',
+	/* Description*/	'Add script for DC 2.8+',
 	/* Author */		'Gvx',
-	/* Version */		'2.0.0-r0047',
+	/* Version */		'2.0.0-r0048',
 	array(
 		'permissions' 			=>	'admin',
 		'type'					=>	'plugin',
