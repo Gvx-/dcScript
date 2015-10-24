@@ -28,7 +28,7 @@ class dcScript {
 	
 	/*---------------------------------------------------------------------------
 	 * Helper for dotclear version 2.7 and more
-	 * Version : 0.19.2
+	 * Version : 0.20.0
 	 * Copyright © 2008-2015 Gvx
 	 * Licensed under the GPL version 2.0 license.
 	 * (http://www.gnu.org/licenses/old-licenses/gpl-2.0.html)
@@ -199,6 +199,16 @@ class dcScript {
 		} else {
 			$core->auth->user_prefs->{$this->plugin_id}->put($key,$value, null, null, true, $global);
 		}
+	}
+	
+	public function jsLoad($src) {
+		global $core;
+		return dcPage::jsLoad(dcPage::getPF($this->plugin_id.$src), $core->plugins->moduleInfo($this->plugin_id, 'version'));
+	}
+	
+	public function cssLoad($src, $media='screen') {
+		global $core;
+		return dcPage::cssLoad(dcPage::getPF($this->plugin_id.$src), $media, $core->plugins->moduleInfo($this->plugin_id, 'version'));
 	}
 	
 }

@@ -56,11 +56,11 @@ try {
 		<?php
 			echo '<title>'.html::escapeHTML($core->plugins->moduleInfo($p_id, 'name')).'</title>';
 			// Begin CodeMirror
-			echo dcPage::cssLoad(dcPage::getPF($p_id.'/codemirror/codemirror-custom.css'));
-			echo dcPage::jsLoad(dcPage::getPF($p_id.'/codemirror/codemirror-compressed.js'));
-			echo dcPage::jsLoad(dcPage::getPF($p_id.'/inc/admin.js'));
+			echo $core->dcScript->cssLoad('/codemirror/codemirror-custom.css');
+			echo $core->dcScript->jsLoad('/codemirror/codemirror-compressed.js');
+			echo $core->dcScript->jsLoad('/inc/admin.js');
 			// End CodeMirror
-			echo dcPage::cssLoad(dcPage::getPF($p_id.'/inc/style.css'));
+			echo $core->dcScript->cssLoad('/inc/style.css');
 			echo dcPage::jsConfirmClose('dcScript-form-tab-1','dcScript-form-tab-2');
 			echo dcPage::jsPageTabs(isset($_REQUEST['tab']) ? $_REQUEST['tab'] : 'tab-1');
 		?>
