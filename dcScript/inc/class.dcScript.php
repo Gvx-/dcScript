@@ -25,15 +25,15 @@ class dcScript {
 			echo "<!-- dcScript begin -->\n".$html."\n<!-- dcScript end -->";
 		}
 	}
-	
+
 	/*---------------------------------------------------------------------------
 	 * Helper for dotclear version 2.8 and more
-	 * Version : 0.20.2
+	 * Version : 0.20.4
 	 * Copyright © 2008-2015 Gvx
 	 * Licensed under the GPL version 2.0 license.
 	 * (http://www.gnu.org/licenses/old-licenses/gpl-2.0.html)
 	 *-------------------------------------------------------------------------*/
-	 
+
 	/* --== SPECIFIQUE FUNCTIONS ==-- */
 
 	protected function setDefaultSettings() {
@@ -80,7 +80,7 @@ class dcScript {
 		if(!is_file($options['root'].'/_define.php')) { throw new DomainException(__('Invalid plugin directory')); }
 		$this->plugin_id = basename($options['root']);
 		$this->admin_url = 'admin.plugin.'.$this->plugin_id;
-		
+
 		# default options
 		if(!is_array($options)) { $options = array(); }
 		$options['icons'] = array_merge(
@@ -131,8 +131,8 @@ class dcScript {
 		return false;
 	}
 
-	public function adminMenu($menu='Plugins') {
-		if(!defined('DC_CONTEXT_ADMIN')) { return; }
+	public function adminMenu($menu='Plugins', $check=true) {
+		if(!defined('DC_CONTEXT_ADMIN') or !$check) { return; }
 		global $_menu;
 		$_menu[$menu]->addItem(
 			html::escapeHTML(__($this->core->plugins->moduleInfo($this->plugin_id,'name'))),		// Item menu
@@ -167,10 +167,9 @@ class dcScript {
 		if(!defined('DC_CONTEXT_ADMIN')) { return; }
 		$support = $this->core->plugins->moduleInfo($this->plugin_id, 'support');
 		$details = $this->core->plugins->moduleInfo($this->plugin_id, 'details');
-		$config = is_file(path::real($this->core->plugins->moduleInfo($this->plugin_id, 'root').'/_config.php')) ? $this->core->adminurl->get('admin.plugins', array('module' => $this->plugin_id,'conf' => 1, 'redir' => $this->core->adminurl->get($this->admin_url))) : null;
 		return '<p class="right">
 					<img style="vertical-align: middle;" src="'.dcPage::getPF($this->plugin_id.$this->options['icons']['small']).'" alt="'.__('icon plugin').'"/>&nbsp;&nbsp;'.
-					($config ? '<a href="'.$config.'">'.__('Settings').'</a>&nbsp;-&nbsp;' : '').
+					$this->configLink(__('Settings'), $this->admin_url).
 					html::escapeHTML($this->core->plugins->moduleInfo($this->plugin_id, 'name')).'&nbsp;'.
 					__('Version').'&nbsp;:&nbsp;'.html::escapeHTML($this->core->plugins->moduleInfo($this->plugin_id, 'version')).'&nbsp;-&nbsp;'.
 					__('Author(s)').'&nbsp;:&nbsp;'.html::escapeHTML($this->core->plugins->moduleInfo($this->plugin_id, 'author')).
@@ -195,7 +194,7 @@ class dcScript {
 			$this->core->auth->user_prefs->{$this->plugin_id}->put($key,$value, null, null, true, $global);
 		}
 	}
-	
+
 	public function info($item=null) {
 		if(empty($item) || $item == 'id') {
 			return $this->plugin_id;
@@ -205,13 +204,32 @@ class dcScript {
 			return $this->core->plugins->moduleInfo($this->plugin_id, $item);
 		}
 	}
-	
+
 	public function jsLoad($src) {
+		if(!defined('DC_CONTEXT_ADMIN')) { return; }
 		return dcPage::jsLoad(dcPage::getPF($this->plugin_id.'/'.ltrim($src, '/')), $this->core->plugins->moduleInfo($this->plugin_id, 'version'));
 	}
-	
+
 	public function cssLoad($src, $media='screen') {
+		if(!defined('DC_CONTEXT_ADMIN')) { return; }
 		return dcPage::cssLoad(dcPage::getPF($this->plugin_id.'/'.ltrim($src, '/')), $media, $this->core->plugins->moduleInfo($this->plugin_id, 'version'));
 	}
-	
+
+	public function checkConfig() {
+		if(defined('DC_CONTEXT_ADMIN') && is_file(path::real($this->core->plugins->moduleInfo($this->plugin_id, 'root').'/_config.php'))) {
+			return $this->core->auth->isSuperAdmin() || $this->core->dcScript->settings('enabled');
+		} else {
+			return true;
+		}
+	}
+
+	public function configLink($label, $redir=null) {
+		if(defined('DC_CONTEXT_ADMIN') && $this->core->auth->isSuperAdmin() && is_file(path::real($this->core->plugins->moduleInfo($this->plugin_id, 'root').'/_config.php'))) {
+			if(empty($redir)) { $redir = $this->admin_url; }
+			$href = $this->core->adminurl->get('admin.plugins', array('module' => $this->plugin_id,'conf' => 1, 'redir' => $this->core->adminurl->get($redir)));
+			return '<a href="'.$href.'">'.$label.'</a>&nbsp;-&nbsp;';
+		}
+		return '';
+	}
+
 }

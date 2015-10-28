@@ -9,8 +9,15 @@ if (!defined('DC_CONTEXT_ADMIN')) { return; }
 
 dcPage::check('admin');
 
-if(!$core->dcScript->settings('enabled') && is_file(path::real($core->plugins->moduleInfo($core->dcScript->info('id'), 'root').'/_config.php'))) {
-	$core->adminurl->redirect('admin.plugins', array('module' => $core->dcScript->info('id'),'conf' => 1, 'redir' => $core->adminurl->get($core->dcScript->info('adminUrl'))));
+if(!$core->dcScript->settings('enabled') && is_file(path::real($core->dcScript->info('root').'/_config.php'))) {
+	if($core->dcScript->checkConfig()) {
+		$core->adminurl->redirect('admin.plugins', array(
+			'module' => $core->dcScript->info('id'),'conf' => 1, 'redir' => $core->adminurl->get($core->dcScript->info('adminUrl'))
+		));
+	} else {
+		dcPage::addNotice('message', sprintf(__('%s plugin is not configured.'), $core->dcScript->info('name')));
+		$core->adminurl->redirect('admin.home');
+	}
 }
 
 try {
@@ -51,7 +58,7 @@ try {
 <html>
 	<head>
 		<?php
-			echo '<title>'.html::escapeHTML($core->plugins->moduleInfo($core->dcScript->info('id'), 'name')).'</title>';
+			echo '<title>'.html::escapeHTML($core->dcScript->info('name')).'</title>';
 			// Begin CodeMirror
 			echo $core->dcScript->cssLoad('/codemirror/codemirror-custom.css');
 			echo $core->dcScript->jsLoad('/codemirror/codemirror-compressed.js');

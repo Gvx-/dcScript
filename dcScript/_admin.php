@@ -11,4 +11,4 @@ if(!$core->auth->check('admin',$core->blog->id)) { return; }
 
 $core->addBehavior('adminDashboardFavorites', array($core->dcScript, 'adminDashboardFavs'));
 
-$core->dcScript->adminMenu('System');
+$core->dcScript->adminMenu('System', $core->dcScript->checkConfig());
