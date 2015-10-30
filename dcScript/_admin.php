@@ -9,6 +9,7 @@ if (!defined('DC_CONTEXT_ADMIN')) { return; }
 
 if(!$core->auth->check('admin',$core->blog->id)) { return; }
 
-$core->addBehavior('adminDashboardFavorites', array($core->dcScript, 'adminDashboardFavs'));
-
-$core->dcScript->adminMenu('System', $core->dcScript->checkConfig());
+if($core->dcScript->checkConfig()) {
+	$core->addBehavior('adminDashboardFavorites', array($core->dcScript, 'adminDashboardFavs'));
+	$core->dcScript->adminMenu('System');
+}

@@ -28,7 +28,7 @@ class dcScript {
 
 	/*---------------------------------------------------------------------------
 	 * Helper for dotclear version 2.8 and more
-	 * Version : 0.20.4
+	 * Version : 0.20.5
 	 * Copyright © 2008-2015 Gvx
 	 * Licensed under the GPL version 2.0 license.
 	 * (http://www.gnu.org/licenses/old-licenses/gpl-2.0.html)
@@ -131,19 +131,21 @@ class dcScript {
 		return false;
 	}
 
-	public function adminMenu($menu='Plugins', $check=true) {
-		if(!defined('DC_CONTEXT_ADMIN') or !$check) { return; }
+	public function adminMenu($menu='Plugins') {
+		if(!defined('DC_CONTEXT_ADMIN')) { return; }
 		global $_menu;
-		$_menu[$menu]->addItem(
-			html::escapeHTML(__($this->core->plugins->moduleInfo($this->plugin_id,'name'))),		// Item menu
-			$this->core->adminurl->get($this->admin_url),											// Page admin url
-			dcPage::getPF($this->plugin_id.$this->options['icons']['small']),						// Icon menu
-			preg_match(																																		// Pattern url
-				'/'.$this->core->adminurl->get($this->admin_url).'(&.*)?$/',
-				$_SERVER['REQUEST_URI']
-			),
-			$this->core->auth->check($this->options['perm'], $this->core->blog->id)					// Permissions minimum
-		);
+		if(array_key_exists($menu, $_menu)) {
+			$_menu[$menu]->addItem(
+				html::escapeHTML(__($this->core->plugins->moduleInfo($this->plugin_id,'name'))),		// Item menu
+				$this->core->adminurl->get($this->admin_url),											// Page admin url
+				dcPage::getPF($this->plugin_id.$this->options['icons']['small']),						// Icon menu
+				preg_match(																																		// Pattern url
+					'/'.$this->core->adminurl->get($this->admin_url).'(&.*)?$/',
+					$_SERVER['REQUEST_URI']
+				),
+				$this->core->auth->check($this->options['perm'], $this->core->blog->id)					// Permissions minimum
+			);
+		}
 	}
 
 	public function adminDashboardFavs($core, $favs) {
@@ -206,30 +208,40 @@ class dcScript {
 	}
 
 	public function jsLoad($src) {
-		if(!defined('DC_CONTEXT_ADMIN')) { return; }
-		return dcPage::jsLoad(dcPage::getPF($this->plugin_id.'/'.ltrim($src, '/')), $this->core->plugins->moduleInfo($this->plugin_id, 'version'));
+		if(defined('DC_CONTEXT_ADMIN')) {
+			return dcPage::jsLoad(dcPage::getPF($this->plugin_id.'/'.ltrim($src, '/')), $this->core->plugins->moduleInfo($this->plugin_id, 'version'));
+		} else {
+			return '';		// delete to dc2.9
+			$core->blog->getQmarkURL().'pf='.$this->plugin_id;
+			return dcUtils::jsLoad($this->core->blog->getQmarkURL().'pf='.$this->plugin_id.'/'.ltrim($src, '/'), $this->core->plugins->moduleInfo($this->plugin_id, 'version'));
+		}
 	}
 
 	public function cssLoad($src, $media='screen') {
-		if(!defined('DC_CONTEXT_ADMIN')) { return; }
-		return dcPage::cssLoad(dcPage::getPF($this->plugin_id.'/'.ltrim($src, '/')), $media, $this->core->plugins->moduleInfo($this->plugin_id, 'version'));
+		if(defined('DC_CONTEXT_ADMIN')) {
+			return dcPage::cssLoad(dcPage::getPF($this->plugin_id.'/'.ltrim($src, '/')), $media, $this->core->plugins->moduleInfo($this->plugin_id, 'version'));
+		} else {
+			return '';		// delete to dc2.9
+			return dcUtils::cssLoad($this->core->blog->getQmarkURL().'pf='.$this->plugin_id.'/'.ltrim($src, '/'), $media, $this->core->plugins->moduleInfo($this->plugin_id, 'version'));
+		}
 	}
 
 	public function checkConfig() {
-		if(defined('DC_CONTEXT_ADMIN') && is_file(path::real($this->core->plugins->moduleInfo($this->plugin_id, 'root').'/_config.php'))) {
-			return $this->core->auth->isSuperAdmin() || $this->core->dcScript->settings('enabled');
+		if(!defined('DC_CONTEXT_ADMIN')) { return; }
+		if(is_file(path::real($this->core->plugins->moduleInfo($this->plugin_id, 'root').'/_config.php'))) {
+			return $this->core->auth->isSuperAdmin() || $this->settings('enabled');
 		} else {
 			return true;
 		}
 	}
 
 	public function configLink($label, $redir=null) {
-		if(defined('DC_CONTEXT_ADMIN') && $this->core->auth->isSuperAdmin() && is_file(path::real($this->core->plugins->moduleInfo($this->plugin_id, 'root').'/_config.php'))) {
-			if(empty($redir)) { $redir = $this->admin_url; }
-			$href = $this->core->adminurl->get('admin.plugins', array('module' => $this->plugin_id,'conf' => 1, 'redir' => $this->core->adminurl->get($redir)));
+		if(!defined('DC_CONTEXT_ADMIN')) { return; }
+		if($this->core->auth->isSuperAdmin() && is_file(path::real($this->core->plugins->moduleInfo($this->plugin_id, 'root').'/_config.php'))) {
+			$redir = $this->core->adminurl->get(empty($redir) ? $this->admin_url : $redir);
+			$href = $this->core->adminurl->get('admin.plugins', array('module' => $this->plugin_id,'conf' => 1, 'redir' => $redir));
 			return '<a href="'.$href.'">'.$label.'</a>&nbsp;-&nbsp;';
 		}
-		return '';
 	}
 
 }
