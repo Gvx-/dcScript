@@ -7,9 +7,13 @@
  * -- END LICENSE BLOCK -----------------------------------------------------*/
 if (!defined('DC_CONTEXT_ADMIN')) { return; }
 
-if(!$core->auth->check('admin',$core->blog->id)) { return; }
+# define new permissions
+$core->auth->setPermissionType('dcScript.edit',__('Edit public scripts'));
 
 if($core->dcScript->checkConfig()) {
 	$core->addBehavior('adminDashboardFavorites', array($core->dcScript, 'adminDashboardFavs'));
 	$core->dcScript->adminMenu('System');
 }
+
+if(!$core->auth->check('admin',$core->blog->id)) { return; }
+# admin only

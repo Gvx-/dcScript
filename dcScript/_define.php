@@ -11,9 +11,9 @@ $this->registerModule(
 	/* Name */			'dcScript',
 	/* Description*/	'Add script for DC 2.8+',
 	/* Author */		'Gvx',
-	/* Version */		'2.0.0-r0057',
+	/* Version */		'2.0.0-r0069',
 	array(
-		'permissions' 			=>	'admin',
+		'permissions' 			=>	'dcScript.edit',
 		'type'					=>	'plugin',
 		'Priority'				=>	1000,
 		'support'	/* url */	=>	'http://forum.dotclear.org/index.php',

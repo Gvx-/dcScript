@@ -11,24 +11,43 @@ __('dcScript');						// plugin name
 __('Add script for DC 2.8+');		// description plugin
 
 class dcScript {
+	
+	const __CRYPT__ = "__CRYPT__";		// tag crypt mode
 
 	public static function publicHeadContent($core, $_ctx) {
-		$html = base64_decode($core->dcScript->settings('header_code'));
+		$html = $this->decrypt($core->dcScript->settings('header_code'));
 		if($core->dcScript->settings('enabled') && $core->dcScript->settings('header_code_enabled') && !empty($html)) {
 			echo "<!-- dcScript begin -->\n".$html."\n<!-- dcScript end -->";
 		}
 	}
 
 	public static function publicFooterContent($core, $_ctx) {
-		$html = base64_decode($core->dcScript->settings('footer_code'));
+		$html = $this->decrypt($core->dcScript->settings('footer_code'));
 		if($core->dcScript->settings('enabled') && $core->dcScript->settings('footer_code_enabled') && !empty($html)) {
 			echo "<!-- dcScript begin -->\n".$html."\n<!-- dcScript end -->";
 		}
 	}
-
+	
+	public function encrypt($str, $key=DC_MASTER_KEY) {
+		$key = pack('H*', hash('sha256', $key.self::__CRYPT__));
+		$iv = mcrypt_create_iv(mcrypt_get_iv_size(MCRYPT_RIJNDAEL_256, MCRYPT_MODE_ECB), MCRYPT_RAND);
+		return self::__CRYPT__.trim(base64_encode(mcrypt_encrypt(MCRYPT_RIJNDAEL_256, $key, $str, MCRYPT_MODE_ECB, $iv)));
+	}
+ 
+	public function decrypt($str, $key=DC_MASTER_KEY) {
+		if(strpos($str, self::__CRYPT__) === 0) {
+			$str = substr($str, strlen(self::__CRYPT__));		// delete tag __CRYPT__
+			$key = pack('H*', hash('sha256', $key.self::__CRYPT__));
+			$iv = mcrypt_create_iv(mcrypt_get_iv_size(MCRYPT_RIJNDAEL_256, MCRYPT_MODE_ECB), MCRYPT_RAND);
+			return trim(mcrypt_decrypt(MCRYPT_RIJNDAEL_256, $key, base64_decode($str), MCRYPT_MODE_ECB, $iv));
+		} else {
+			return base64_decode($str);
+		}
+	}
+	
 	/*---------------------------------------------------------------------------
 	 * Helper for dotclear version 2.8 and more
-	 * Version : 0.20.5
+	 * Version : 0.20.8
 	 * Copyright © 2008-2015 Gvx
 	 * Licensed under the GPL version 2.0 license.
 	 * (http://www.gnu.org/licenses/old-licenses/gpl-2.0.html)
@@ -39,15 +58,15 @@ class dcScript {
 	protected function setDefaultSettings() {
 		# config plugin (TODO: specific settings)
 		$this->core->blog->settings->addNamespace($this->plugin_id);
-		$this->core->blog->settings->{$this->plugin_id}->put('enabled',false,'boolean',__('Enable plugin'),false,true);
-		$this->core->blog->settings->{$this->plugin_id}->put('header_code_enabled',false,'boolean',__('Enable header code'),false,true);
-		$this->core->blog->settings->{$this->plugin_id}->put('footer_code_enabled',false,'boolean',__('Enable footer code'),false,true);
-		$this->core->blog->settings->{$this->plugin_id}->put('header_code',base64_encode(''),'string',__('Header code'),false,true);
-		$this->core->blog->settings->{$this->plugin_id}->put('footer_code',base64_encode(''),'string',__('Footer code'),false,true);
-		$this->core->blog->settings->{$this->plugin_id}->put('backup_ext','.html.txt','string',__('Extension Backup Files'),false,true);
+		$this->core->blog->settings->{$this->plugin_id}->put('enabled', false, 'boolean', __('Enable plugin'), false, true);
+		$this->core->blog->settings->{$this->plugin_id}->put('header_code_enabled', false, 'boolean', __('Enable header code'), false, true);
+		$this->core->blog->settings->{$this->plugin_id}->put('footer_code_enabled', false, 'boolean', __('Enable footer code'), false, true);
+		$this->core->blog->settings->{$this->plugin_id}->put('header_code', $this->encrypt(''), 'string', __('Header code'), false, true);
+		$this->core->blog->settings->{$this->plugin_id}->put('footer_code', $this->encrypt(''), 'string', __('Footer code'), false, true);
+		$this->core->blog->settings->{$this->plugin_id}->put('backup_ext', '.html.txt', 'string', __('Extension Backup Files'), false, true);
 		# user config plugin (TODO: specific settings)
 		//$this->core->auth->user_prefs->addWorkSpace($this->plugin_id);
-		//$this->core->auth->user_prefs->$this->plugin_id->put('enabled',false,'boolean',__('Enable plugin'),false,true);
+		//$this->core->auth->user_prefs->$this->plugin_id->put('enabled', false, 'boolean', __('Enable plugin'), false, true);
 	}
 
 	/* --== STANDARD FUNCTIONS ==-- */
@@ -116,13 +135,14 @@ class dcScript {
 			$old_version = $this->core->getVersion($this->plugin_id);
 			if (version_compare($old_version, $new_version, '>=')) { return; }
 
+			# default settings
+			if(is_callable(array($this, 'setDefaultSettings'))) { $this->setDefaultSettings(); }
+
 			# --BEHAVIOR-- pluginInstallActions
-			if($this->core->callBehavior('pluginInstallActions', $this->plugin_id) === false) {
+			if($this->core->callBehavior('pluginInstallActions', $this->plugin_id, $old_version) === false) {
 				throw new Exception(sprintf(__('[Plugin %s] Unknown error in installation.'), $this->core->plugins->moduleInfo($this->plugin_id, 'name')));
 			}
 
-			# default settings
-			if(is_callable(array($this, 'setDefaultSettings'))) { $this->setDefaultSettings(); }
 			$this->core->setVersion($this->plugin_id, $new_version);
 			return true;
 		} catch (Exception $e) {
@@ -145,6 +165,8 @@ class dcScript {
 				),
 				$this->core->auth->check($this->options['perm'], $this->core->blog->id)					// Permissions minimum
 			);
+		} else {
+			throw new ErrorException(sprinf(__('%s menu not present.'), $menu), 0, E_USER_NOTICE, __FILE__, __LINE__);
 		}
 	}
 
@@ -201,28 +223,39 @@ class dcScript {
 		if(empty($item) || $item == 'id') {
 			return $this->plugin_id;
 		} elseif($item == 'adminUrl') {
-			return $this->admin_url;
+			return (defined('DC_CONTEXT_ADMIN') ? $this->admin_url : null);
 		} else {
 			return $this->core->plugins->moduleInfo($this->plugin_id, $item);
 		}
 	}
 
 	public function jsLoad($src) {
+		$file = $this->plugin_id.'/'.ltrim($src, '/');
+		$version = $this->core->plugins->moduleInfo($this->plugin_id, 'version');
 		if(defined('DC_CONTEXT_ADMIN')) {
-			return dcPage::jsLoad(dcPage::getPF($this->plugin_id.'/'.ltrim($src, '/')), $this->core->plugins->moduleInfo($this->plugin_id, 'version'));
+			return dcPage::jsLoad(dcPage::getPF($file), $version);
 		} else {
-			return '';		// delete to dc2.9
-			$core->blog->getQmarkURL().'pf='.$this->plugin_id;
-			return dcUtils::jsLoad($this->core->blog->getQmarkURL().'pf='.$this->plugin_id.'/'.ltrim($src, '/'), $this->core->plugins->moduleInfo($this->plugin_id, 'version'));
+			if(version_compare(DC_VERSION, '2.9', '<')) {
+				$file = html::escapeHTML($file).(strpos($file,'?') === false ? '?' : '&amp;').'v='.$version;
+				return '<script type="text/javascript" src="'.$this->core->blog->getQmarkURL().'pf='.$file.'"></script>'."\n";
+			} else {
+				return dcUtils::jsLoad($this->core->blog->getPF($file), $version);
+			}
 		}
 	}
 
 	public function cssLoad($src, $media='screen') {
+		$file = $this->plugin_id.'/'.ltrim($src, '/');
+		$version = $this->core->plugins->moduleInfo($this->plugin_id, 'version');
 		if(defined('DC_CONTEXT_ADMIN')) {
-			return dcPage::cssLoad(dcPage::getPF($this->plugin_id.'/'.ltrim($src, '/')), $media, $this->core->plugins->moduleInfo($this->plugin_id, 'version'));
+			return dcPage::cssLoad(dcPage::getPF($file), $media, $version);
 		} else {
-			return '';		// delete to dc2.9
-			return dcUtils::cssLoad($this->core->blog->getQmarkURL().'pf='.$this->plugin_id.'/'.ltrim($src, '/'), $media, $this->core->plugins->moduleInfo($this->plugin_id, 'version'));
+			if(version_compare(DC_VERSION, '2.9', '<')) {
+				$file = html::escapeHTML($file).(strpos($file,'?') === false ? '?' : '&amp;').'v='.$version;
+				return '<link rel="stylesheet" href="'.$this->core->blog->getQmarkURL().'pf='.$file.'" type="text/css" media="'.$media.'" />'."\n";
+			} else {
+				return dcUtils::cssLoad($this->core->blog->getPF($file), $media, $version);
+			}
 		}
 	}
 
