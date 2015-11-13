@@ -1,20 +1,20 @@
 # Language: Français
-# Module: dcScript - 2.0.0-r0058
-# Date: 2015-11-01 09:15:05
+# Module: dcScript - 2.0.0-r0086
+# Date: 2015-11-13 08:24:50
 # Translated with translater 2013.05.11
 
 msgid ""
 msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
-"Project-Id-Version: dcScript 2.0.0-r0058\n"
+"Project-Id-Version: dcScript 2.0.0-r0086\n"
 "POT-Creation-Date: \n"
-"PO-Revision-Date: 2015-11-01T09:15:05+00:00\n"
+"PO-Revision-Date: 2015-11-13T08:24:50+00:00\n"
 "Last-Translator: Gilles Grandveaux\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: _admin.php:10
+#: _admin.php:11
 msgid "Edit public scripts"
 msgstr "Editer les scripts public"
 
@@ -39,7 +39,7 @@ msgid "Active codes"
 msgstr "Codes actifs"
 
 #: _config.php:49
-#: inc/class.dcScript.php:43
+#: inc/class.dcScript.php:55
 msgid "Enable header code"
 msgstr "Activer le code du header"
 
@@ -48,7 +48,7 @@ msgid "Enable public header code."
 msgstr "Activer le code du header public"
 
 #: _config.php:56
-#: inc/class.dcScript.php:44
+#: inc/class.dcScript.php:56
 msgid "Enable footer code"
 msgstr "Activer le code du footer"
 
@@ -57,13 +57,17 @@ msgid "Enable public footer code."
 msgstr "Activer le code du footer public"
 
 #: _config.php:66
-#: inc/class.dcScript.php:47
+#: inc/class.dcScript.php:59
 msgid "Extension Backup Files"
 msgstr "Extension des fichiers de sauvegarde"
 
 #: _config.php:69
 msgid "Default extension backup files."
 msgstr "Extension par defaut des fichiers de sauvegarde"
+
+#: _prepend.php:14
+msgid "%1$s require PHP version %2$s. (your PHP version is %3$s)"
+msgstr "%1$s necessite PHP version %2$s (votre version est %3$s)"
 
 #: inc/class.dcScript.php:10
 msgid "dcScript"
@@ -73,46 +77,50 @@ msgstr "dcScript"
 msgid "Add script for DC 2.8+"
 msgstr "Ajouter des script a doctlear v2.8+"
 
-#: inc/class.dcScript.php:42
-#: inc/class.dcScript.php:50
+#: inc/class.dcScript.php:54
+#: inc/class.dcScript.php:62
 msgid "Enable plugin"
 msgstr "Activer le plugin"
 
-#: inc/class.dcScript.php:45
-#: index.php:79
+#: inc/class.dcScript.php:57
+#: index.php:81
 msgid "Header code"
 msgstr "Code du header"
 
-#: inc/class.dcScript.php:46
-#: index.php:94
+#: inc/class.dcScript.php:58
+#: index.php:96
 msgid "Footer code"
 msgstr "Code du footer"
 
-#: inc/class.dcScript.php:65
+#: inc/class.dcScript.php:79
 msgid "Conflict: dcCore or other plugin, and %s plugin."
 msgstr "Conflit entre dcCore ou un autre plugin et %s"
 
-#: inc/class.dcScript.php:80
+#: inc/class.dcScript.php:100
 msgid "Invalid plugin directory"
 msgstr "repertoire de plugin incorrect"
 
-#: inc/class.dcScript.php:111
+#: inc/class.dcScript.php:130
 msgid "%s require Dotclear version %s or more."
 msgstr "%s necessite Dotclear version %s ou plus"
 
-#: inc/class.dcScript.php:121
+#: inc/class.dcScript.php:143
 msgid "[Plugin %s] Unknown error in installation."
 msgstr "Erreur inconnue lors de l'installation de %s"
 
-#: inc/class.dcScript.php:175
+#: inc/class.dcScript.php:169
+msgid "%s menu not present."
+msgstr "le menu %s est absent"
+
+#: inc/class.dcScript.php:195
 msgid "icon plugin"
 msgstr "Icone"
 
-#: inc/class.dcScript.php:176
+#: inc/class.dcScript.php:196
 msgid "Settings"
 msgstr "Paramètres"
 
-#: inc/class.dcScript.php:179
+#: inc/class.dcScript.php:199
 msgid "Author(s)"
 msgstr "Auteur(s)"
 
@@ -120,36 +128,36 @@ msgstr "Auteur(s)"
 msgid "%s plugin is not configured."
 msgstr "Le plugin %s n'est pas configuré"
 
-#: index.php:28
-#: index.php:35
+#: index.php:29
+#: index.php:37
 msgid "Code successfully updated."
 msgstr "Mise à jour du code avec succès"
 
-#: index.php:40
+#: index.php:42
 msgid "Unable to save the code"
 msgstr "Impossible de sauver le code"
 
-#: index.php:54
+#: index.php:56
 msgid "Unable to save the file"
 msgstr "Impossible de sauver le fichier"
 
-#: index.php:79
-#: index.php:94
+#: index.php:81
+#: index.php:96
 msgid "Enabled"
 msgstr "Activé"
 
-#: index.php:79
-#: index.php:94
+#: index.php:81
+#: index.php:96
 msgid "Disabled"
 msgstr "Désactivé"
 
-#: index.php:85
-#: index.php:100
+#: index.php:87
+#: index.php:102
 msgid "Save the configuration"
 msgstr "Sauver la configuration"
 
-#: index.php:86
-#: index.php:101
+#: index.php:88
+#: index.php:103
 msgid "Undo changes"
 msgstr "Annuler les changements"
 

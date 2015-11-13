@@ -5,49 +5,42 @@
  * Licensed under the GPL version 2.0 license.
  * (http://www.gnu.org/licenses/old-licenses/gpl-2.0.html)
  * -- END LICENSE BLOCK -----------------------------------------------------*/
-if (!defined('DC_RC_PATH')) { return; }
+if(!defined('DC_RC_PATH')) { return; }
 
 __('dcScript');						// plugin name
 __('Add script for DC 2.8+');		// description plugin
 
 class dcScript {
 	
-	const __CRYPT__ = "__CRYPT__";		// tag crypt mode
-
 	public static function publicHeadContent($core, $_ctx) {
-		$html = $this->decrypt($core->dcScript->settings('header_code'));
+		$html = $core->dcScript->decrypt($core->dcScript->settings('header_code'));
 		if($core->dcScript->settings('enabled') && $core->dcScript->settings('header_code_enabled') && !empty($html)) {
-			echo "<!-- dcScript begin -->\n".$html."\n<!-- dcScript end -->";
+			echo "<!-- dcScript header begin -->\n".$html."\n<!-- dcScript header end -->";
 		}
 	}
 
 	public static function publicFooterContent($core, $_ctx) {
-		$html = $this->decrypt($core->dcScript->settings('footer_code'));
+		$html = $core->dcScript->decrypt($core->dcScript->settings('footer_code'));
 		if($core->dcScript->settings('enabled') && $core->dcScript->settings('footer_code_enabled') && !empty($html)) {
-			echo "<!-- dcScript begin -->\n".$html."\n<!-- dcScript end -->";
+			echo "<!-- dcScript footer begin -->\n".$html."\n<!-- dcScript footer end -->";
 		}
 	}
 	
 	public function encrypt($str, $key=DC_MASTER_KEY) {
-		$key = pack('H*', hash('sha256', $key.self::__CRYPT__));
+		$key = pack('H*', hash('sha256', $key));
 		$iv = mcrypt_create_iv(mcrypt_get_iv_size(MCRYPT_RIJNDAEL_256, MCRYPT_MODE_ECB), MCRYPT_RAND);
-		return self::__CRYPT__.trim(base64_encode(mcrypt_encrypt(MCRYPT_RIJNDAEL_256, $key, $str, MCRYPT_MODE_ECB, $iv)));
+		return trim(base64_encode(mcrypt_encrypt(MCRYPT_RIJNDAEL_256, $key, $str, MCRYPT_MODE_ECB, $iv)));
 	}
  
 	public function decrypt($str, $key=DC_MASTER_KEY) {
-		if(strpos($str, self::__CRYPT__) === 0) {
-			$str = substr($str, strlen(self::__CRYPT__));		// delete tag __CRYPT__
-			$key = pack('H*', hash('sha256', $key.self::__CRYPT__));
-			$iv = mcrypt_create_iv(mcrypt_get_iv_size(MCRYPT_RIJNDAEL_256, MCRYPT_MODE_ECB), MCRYPT_RAND);
-			return trim(mcrypt_decrypt(MCRYPT_RIJNDAEL_256, $key, base64_decode($str), MCRYPT_MODE_ECB, $iv));
-		} else {
-			return base64_decode($str);
-		}
+		$key = pack('H*', hash('sha256', $key));
+		$iv = mcrypt_create_iv(mcrypt_get_iv_size(MCRYPT_RIJNDAEL_256, MCRYPT_MODE_ECB), MCRYPT_RAND);
+		return trim(mcrypt_decrypt(MCRYPT_RIJNDAEL_256, $key, base64_decode($str), MCRYPT_MODE_ECB, $iv));
 	}
 	
 	/*---------------------------------------------------------------------------
 	 * Helper for dotclear version 2.8 and more
-	 * Version : 0.20.8
+	 * Version : 0.20.10
 	 * Copyright © 2008-2015 Gvx
 	 * Licensed under the GPL version 2.0 license.
 	 * (http://www.gnu.org/licenses/old-licenses/gpl-2.0.html)
@@ -75,8 +68,10 @@ class dcScript {
 	protected $admin_url;				// admin url plugin
 	protected $options = array();		// options plugin
 
-	public static function init($options=array(), $instanceName=__CLASS__) {
+	public static function init($options=array()) {
 		global $core;
+		$instanceName = __CLASS__;
+		//$instanceName = get_called_class();		// for the future (abstract class)
 		try {
 			if(!isset($core->{$instanceName})) {
 				$core->{$instanceName} = new self($options);
@@ -87,17 +82,22 @@ class dcScript {
 			$core->error->add($e->getMessage());
 		}
 	}
-
+	
 	public function __construct($options=array()) {
 		global $core;
 		$this->core = &$core;
 		# check plugin_id and admin url
-		if(!array_key_exists('root', $options) || !is_file($options['root'].'/_define.php')) {
-			$options['root'] = dirname(__FILE__);
-			if(!is_file($options['root'].'/_define.php')) { $options['root'] = dirname($options['root']); }
+		$plugin = realpath(dirname(__FILE__));
+		foreach(array_map('realpath', array_reverse(explode(PATH_SEPARATOR, DC_PLUGINS_ROOT))) as $path) {
+			if(strpos($plugin, $path) === 0) {
+				$id = explode(DIRECTORY_SEPARATOR, trim(str_replace($path, '', $plugin), DIRECTORY_SEPARATOR));
+				if(is_file($path.DIRECTORY_SEPARATOR.$id[0].DIRECTORY_SEPARATOR.'_define.php')) {
+					$this->plugin_id = $id[0];
+					break;
+				}
+			}
 		}
-		if(!is_file($options['root'].'/_define.php')) { throw new DomainException(__('Invalid plugin directory')); }
-		$this->plugin_id = basename($options['root']);
+		if(empty($this->plugin_id)) { throw new DomainException(__('Invalid plugin directory')); }
 		$this->admin_url = 'admin.plugin.'.$this->plugin_id;
 
 		# default options

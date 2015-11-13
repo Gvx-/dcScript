@@ -5,13 +5,13 @@
  * Licensed under the GPL version 2.0 license.
  * (http://www.gnu.org/licenses/old-licenses/gpl-2.0.html)
  * -- END LICENSE BLOCK -----------------------------------------------------*/
-if (!defined('DC_RC_PATH')) { return; }
+if(!defined('DC_RC_PATH')) { return; }
 
 $this->registerModule(
 	/* Name */			'dcScript',
 	/* Description*/	'Add script for DC 2.8+',
 	/* Author */		'Gvx',
-	/* Version */		'2.0.0-r0069',
+	/* Version */		'2.0.0-r0086',
 	array(
 		'permissions' 			=>	'dcScript.edit',
 		'type'					=>	'plugin',
