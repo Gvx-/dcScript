@@ -7,7 +7,7 @@
  * -- END LICENSE BLOCK -----------------------------------------------------*/
 if(!defined('DC_CONTEXT_ADMIN')) { return; }
 
-dcPage::check('admin');
+dcPage::check('dcScript.edit');
 
 if(!$core->dcScript->settings('enabled') && is_file(path::real($core->dcScript->info('root').'/_config.php'))) {
 	if($core->dcScript->checkConfig()) {
@@ -48,9 +48,9 @@ try {
 		$filename = '"'.trim($core->blog->name).'_'.date('Y-m-d').'_'.$_GET['download'].'.'.trim($core->dcScript->settings('backup_ext'),'.').'"';
 		header('Content-Disposition: attachment;filename='.$filename);
 		header('Content-Type: text/plain; charset=UTF-8');
-		echo base64_decode($core->dcScript->settings($_GET['download'].'_code'));
+		echo $core->dcScript->decrypt($core->dcScript->settings($_GET['download'].'_code'));
 		exit;
-	}		
+	}
 } catch(exception $e) {
 		//$core->error->add($e->getMessage());
 		$core->error->add(__('Unable to save the file'));
@@ -109,7 +109,7 @@ try {
 			// Footer plugin
 			echo $core->dcScript->adminFooterInfo();
 			// helpBlock
-			dcPage::helpBlock('dcScript-edit'); 
+			dcPage::helpBlock('dcScript-edit');
 		?>
 	</body>
 </html>

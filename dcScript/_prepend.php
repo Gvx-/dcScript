@@ -8,26 +8,26 @@
 if(!defined('DC_RC_PATH')) { return; }					# public & admin
 
 # check PHP version
-if(version_compare(PHP_VERSION, '5.2', '<')) {
-	$_id = basename(dirname(__FILE__));
+$_id = basename(dirname(__FILE__));
+$_version = $core->plugins->moduleInfo($_id, '_php_min_version');
+if(empty($_version)) { $_version = '5.2'; }
+if(version_compare(PHP_VERSION, $_version, '<')) {
 	if(defined('DC_CONTEXT_ADMIN')) {
-		dcPage::addErrorNotice(sprintf(__('%1$s require PHP version %2$s. (your PHP version is %3$s)'), $_id, '5.2', PHP_VERSION));
+		dcPage::addErrorNotice(sprintf(__('%1$s require PHP version %2$s. (your PHP version is %3$s)'), $_id, $_version, PHP_VERSION));
 	}
 	$core->plugins->deactivateModule($_id);
-	unset($_id);
+	unset($_id, $_version);
 	return;
 }
+unset($_id, $_version);
 
 # chargement des class du plugin
+$__autoload['dcPluginHelper022'] = dirname(__FILE__).'/inc/class.dcPluginHelper.php';
 $__autoload['dcScript'] = dirname(__FILE__).'/inc/class.dcScript.php';
 
 # initialisation
-dcScript::init(array(
-	'perm'		=> 'admin',								# permissions acces page administration
-	'icons'		=> array(								# icones pour menu & tableau de bord
-		'small' => '/inc/icon-small.png',
-		'large' => '/inc/icon-large.png'
-	)
-));
+//dcScript::init();
+dcScript::init();
 
-if (!defined('DC_CONTEXT_ADMIN')) { return false; }		# admin only
+if (!defined('DC_CONTEXT_ADMIN')) { return false; }
+# admin only

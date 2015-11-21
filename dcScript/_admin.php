@@ -10,10 +10,12 @@ if(!defined('DC_CONTEXT_ADMIN')) { return; }
 # define new permissions
 $core->auth->setPermissionType('dcScript.edit',__('Edit public scripts'));
 
-if($core->dcScript->checkConfig()) {
-	$core->addBehavior('adminDashboardFavorites', array($core->dcScript, 'adminDashboardFavs'));
-	$core->dcScript->adminMenu('System');
-}
+# menu & dashboard
+$core->addBehavior('adminDashboardFavorites', array($core->dcScript, 'adminDashboardFavs'));
+$core->dcScript->adminMenu('System');
 
 if(!$core->auth->check('admin',$core->blog->id)) { return; }
 # admin only
+
+if(!$core->auth->isSuperAdmin()) { return; }
+# super admin only

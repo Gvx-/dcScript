@@ -6,8 +6,7 @@
  * (http://www.gnu.org/licenses/old-licenses/gpl-2.0.html)
  * -- END LICENSE BLOCK -----------------------------------------------------*/
 if(!defined('DC_CONTEXT_ADMIN')) { return; }
-
-dcPage::check('admin');
+if(!$core->auth->isSuperAdmin()) { return; }
 
 if (isset($_POST['save'])) {
 	try {
@@ -28,7 +27,7 @@ if (isset($_POST['save'])) {
 	http::redirect($_REQUEST['redir']);
 }
 
-echo 
+echo
 	'<div class="fieldset">
 		<h3>'.__('Activation').'</h3>
 		<p>
@@ -69,5 +68,5 @@ echo
 			<p class="form-note">'.__('Default extension backup files.').'</p>
 		</div>
 	</div>
-';			
+';
 dcPage::helpBlock('dcScript-config');
