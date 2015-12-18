@@ -14,7 +14,7 @@ $core->auth->setPermissionType('dcScript.edit',__('Edit public scripts'));
 $core->addBehavior('adminDashboardFavorites', array($core->dcScript, 'adminDashboardFavs'));
 $core->dcScript->adminMenu('System');
 
-if(!$core->auth->check('admin',$core->blog->id)) { return; }
+if(!$core->auth->check('admin', $core->blog->id)) { return; }
 # admin only
 
 if(!$core->auth->isSuperAdmin()) { return; }

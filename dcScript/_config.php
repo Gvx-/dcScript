@@ -6,7 +6,8 @@
  * (http://www.gnu.org/licenses/old-licenses/gpl-2.0.html)
  * -- END LICENSE BLOCK -----------------------------------------------------*/
 if(!defined('DC_CONTEXT_ADMIN')) { return; }
-if(!$core->auth->isSuperAdmin()) { return; }
+
+dcPage::checkSuper();
 
 if (isset($_POST['save'])) {
 	try {
@@ -20,7 +21,7 @@ if (isset($_POST['save'])) {
 		//$core->error->add($e->getMessage());
 		$core->error->add(__('Unable to save the configuration'));
 	}
-	if(empty($_REQUEST['redir'])) {
+	if(!empty($_GET['redir']) && strpos($_GET['redir'], 'p='.$core->dcScript->info('id')) === false) {
 		$core->error->add(__('Redirection not found'));
 		$core->adminurl->redirect('admin.home');
 	}

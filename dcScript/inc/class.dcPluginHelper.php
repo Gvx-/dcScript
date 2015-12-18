@@ -1,33 +1,42 @@
 <?php
 /* -- BEGIN LICENSE BLOCK -----------------------------------------------------
  * Plugin helper for dotclear version 2.8 and more
- * Version : 0.22.0
+ * Version : 0.23.0
  * Copyright © 2008-2015 Gvx
  * Licensed under the GPL version 2.0 license.
  * (http://www.gnu.org/licenses/old-licenses/gpl-2.0.html)
  * -- END LICENSE BLOCK -----------------------------------------------------*/
 if(!defined('DC_RC_PATH')) { return; }
 
+if (!defined('NL')) { define('NL',"\n"); }    // New Line
 
-abstract class dcPluginHelper022 {
+abstract class dcPluginHelper023 {
 
 	### Specific functions to overload ###
 
 	protected function setDefaultSettings() {
-		# config plugin (TODO: specific settings)
+		# create config plugin (TODO: specific settings)
 		//$this->core->blog->settings->addNamespace($this->plugin_id);
 		//$this->core->blog->settings->{$this->plugin_id}->put('enabled', false, 'boolean', __('Enable plugin'), false, true);
-		# user config plugin (TODO: specific settings)
+		# create user config plugin (TODO: specific settings)
 		//$this->core->auth->user_prefs->addWorkSpace($this->plugin_id);
 		//$this->core->auth->user_prefs->$this->plugin_id->put('enabled', false, 'boolean', __('Enable plugin'), false, true);
 	}
 
 	protected function installActions($old_version) {
-
+		# upgrade previous versions
+		if(!empty($old_version)) {
+			
+		}
 	}
 
 	protected function uninstallActions() {
-
+		# erase config plugin (TODO: specific settings)
+		//$this->core->blog->settings->addNamespace($this->plugin_id);
+		//$this->core->blog->settings->{$this->plugin_id}->drop('enabled');
+		# erase user config plugin (TODO: specific settings)
+		//$this->core->auth->user_prefs->addWorkSpace($this->plugin_id);
+		//$this->core->auth->user_prefs->$this->plugin_id->drop('enabled');
 	}
 
 	### Standard functions ###
@@ -37,35 +46,11 @@ abstract class dcPluginHelper022 {
 	protected $icon_small;				// small icon file
 	protected $icon_large;				// large icon file
 
-	public static function init() {
-		global $core;
-		$instanceName = get_called_class();
-		try {
-			if(!isset($core->{$instanceName})) {
-				$core->{$instanceName} = new $instanceName();
-			} else {
-				throw new LogicException(sprintf(__('Conflict: dcCore or other plugin, and %s plugin.'), $instanceName));
-			}
-		} catch(Exception $e) {
-			$core->error->add($e->getMessage());
-		}
-	}
-
-	public function __construct() {
+	public function __construct($id) {
 		global $core;
 		$this->core = &$core;
-		# check plugin_id and admin url
-		$plugin = realpath(dirname(__FILE__));
-		foreach(array_map('realpath', array_reverse(explode(PATH_SEPARATOR, DC_PLUGINS_ROOT))) as $path) {
-			if(strpos($plugin, $path) === 0) {
-				$id = explode(DIRECTORY_SEPARATOR, trim(str_replace($path, '', $plugin), DIRECTORY_SEPARATOR));
-				if(is_file($path.DIRECTORY_SEPARATOR.$id[0].DIRECTORY_SEPARATOR.'_define.php')) {
-					$this->plugin_id = $id[0];
-					break;
-				}
-			}
-		}
-		if(empty($this->plugin_id)) { throw new DomainException(__('Invalid plugin directory')); }
+		# set plugin id and admin url
+		$this->plugin_id = $id;
 		$this->admin_url = 'admin.plugin.'.$this->plugin_id;
 
 		# set icons
@@ -90,6 +75,14 @@ abstract class dcPluginHelper022 {
 				if (version_compare(DC_VERSION, $dcMinVer, '<')) {
 					$this->core->plugins->deactivateModule($this->plugin_id);
 					throw new Exception(sprintf(__('%s require Dotclear version %s or more.'), $this->core->plugins->moduleInfo($this->plugin_id, 'name'), $dcMinVer));
+				}
+			}
+			# check PHP version
+			$phpMinVer = $this->core->plugins->moduleInfo($this->plugin_id, '_php_min_version');
+			if(!empty($phpMinVer)) {
+				if(version_compare(PHP_VERSION, $phpMinVer, '<')) {
+					$this->core->plugins->deactivateModule($this->plugin_id);
+					throw new Exception(sprintf(__('%1$s require PHP version %2$s. (your PHP version is %3$s)'), $this->core->plugins->moduleInfo($this->plugin_id, 'name'), $phpMinVer, PHP_VERSION));
 				}
 			}
 			# check plugin versions
@@ -134,7 +127,7 @@ abstract class dcPluginHelper022 {
 			$_menu[$menu]->addItem(
 				html::escapeHTML(__($this->core->plugins->moduleInfo($this->plugin_id,'name'))),		// Item menu
 				$this->core->adminurl->get($this->admin_url),											// Page admin url
-				dcPage::getPF($this->icon_small),										// Icon menu
+				dcPage::getPF($this->icon_small),														// Icon menu
 				preg_match(																																		// Pattern url
 					'/'.$this->core->adminurl->get($this->admin_url).'(&.*)?$/',
 					$_SERVER['REQUEST_URI']
@@ -179,9 +172,37 @@ abstract class dcPluginHelper022 {
 		';
 	}
 
+	### Widget functions ###
+
+	protected static function widgetHeader(&$w, $title) {
+		$w->setting('title', __('Title (optional)').' :', $title);
+	}
+
+	protected static function widgetFooter(&$w, $context=true, $class='') {
+		if($context) { $w->setting('homeonly', __('Display on:'), 0, 'combo', array(__('All pages') => 0, __('Home page only') => 1, __('Except on home page') => 2)); }
+		$w->setting('content_only', __('Content only'), 0, 'check');
+		$w->setting('class', __('CSS class:'), $class);
+		$w->setting('offline', __('To put off line'), false, 'check');
+	}
+
+	protected static function widgetAddBasic(&$w, $id, $name, $callback, $help, $title) {
+		$w->create($id, $name, $callback, null, $help);
+		self::widgetHeader($w->{$id}, $title);
+		self::widgetFooter($w->{$id});
+	}
+
+	protected static function widgetRender($w, $content) {
+		global $core;
+		if (($w->homeonly == 1 && $core->url->type != 'default') || ($w->homeonly == 2 && $core->url->type == 'default') || $w->offline || empty($content)) {
+			return;
+		}
+		$content = ($w->title ? $w->renderTitle(html::escapeHTML($w->title)) : '').$content;
+		return $w->renderDiv($w->content_only, $w->class,'',$content);
+	}
+	
 	### Common functions ###
 
-	public function settings($key, $value=null, $global=false) {
+	public final function settings($key, $value=null, $global=false) {
 		if(is_null($value)) {
 			return $this->core->blog->settings->{$this->plugin_id}->$key;
 		} else {
@@ -189,7 +210,7 @@ abstract class dcPluginHelper022 {
 		}
 	}
 
-	public function userSettings($key, $value=null, $global=false) {
+	public final function userSettings($key, $value=null, $global=false) {
 		if(is_null($value)) {
 			return $this->core->auth->user_prefs->{$this->plugin_id}->$key;
 		} else {
@@ -197,7 +218,7 @@ abstract class dcPluginHelper022 {
 		}
 	}
 
-	public function info($item=null) {
+	public final function info($item=null) {
 		if(empty($item) || $item == 'id') {
 			return $this->plugin_id;
 		} elseif($item == 'adminUrl') {
@@ -207,30 +228,30 @@ abstract class dcPluginHelper022 {
 		}
 	}
 
-	public function jsLoad($src) {
+	public final function jsLoad($src) {
 		$file = $this->plugin_id.'/'.ltrim($src, '/');
 		$version = $this->core->plugins->moduleInfo($this->plugin_id, 'version');
 		if(defined('DC_CONTEXT_ADMIN')) {
 			return dcPage::jsLoad(dcPage::getPF($file), $version);
 		} else {
 			if(version_compare(DC_VERSION, '2.9', '<')) {
-				$file = html::escapeHTML($file).(strpos($file,'?') === false ? '?' : '&amp;').'v='.$version;
-				return '<script type="text/javascript" src="'.$this->core->blog->getQmarkURL().'pf='.$file.'"></script>'."\n";
+				$href = $this->core->blog->getQmarkURL().'pf='.html::escapeHTML($file).(strpos($file, '?') === false ? '?' : '&amp;').'v='.$version;
+				return '<script type="text/javascript" src="'.$href.'"></script>'."\n";
 			} else {
 				return dcUtils::jsLoad($this->core->blog->getPF($file), $version);
 			}
 		}
 	}
 
-	public function cssLoad($src, $media='screen') {
+	public final function cssLoad($src, $media='screen') {
 		$file = $this->plugin_id.'/'.ltrim($src, '/');
 		$version = $this->core->plugins->moduleInfo($this->plugin_id, 'version');
 		if(defined('DC_CONTEXT_ADMIN')) {
 			return dcPage::cssLoad(dcPage::getPF($file), $media, $version);
 		} else {
 			if(version_compare(DC_VERSION, '2.9', '<')) {
-				$file = html::escapeHTML($file).(strpos($file,'?') === false ? '?' : '&amp;').'v='.$version;
-				return '<link rel="stylesheet" href="'.$this->core->blog->getQmarkURL().'pf='.$file.'" type="text/css" media="'.$media.'" />'."\n";
+				$href = $this->core->blog->getQmarkURL().'pf='.html::escapeHTML($file).(strpos($file, '?') === false ? '?' : '&amp;').'v='.$version;
+				return '<link rel="stylesheet" href="'.$href.'" type="text/css" media="'.$media.'" />'."\n";
 			} else {
 				return dcUtils::cssLoad($this->core->blog->getPF($file), $media, $version);
 			}

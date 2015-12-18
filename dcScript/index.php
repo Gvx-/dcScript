@@ -24,7 +24,7 @@ try {
 	# submit tab 1
 	if (isset($_POST['update_header'])) {
 		//$core->dcScript->settings('header_code', base64_encode(trim($_POST['header_code'])));
-		$core->dcScript->settings('header_code', $core->dcScript->encrypt(trim($_POST['header_code'])));
+		$core->dcScript->settings('header_code', dcScript::encrypt(trim($_POST['header_code'])));
 		$core->blog->triggerBlog();
 		dcPage::addSuccessNotice(__('Code successfully updated.'));
 		$core->adminurl->redirect($core->dcScript->info('adminUrl'), array(), '#tab-1');
@@ -32,7 +32,7 @@ try {
 	# submit tab 2
 	if (isset($_POST['update_footer'])) {
 		//$core->dcScript->settings('footer_code', base64_encode(trim($_POST['footer_code'])));
-		$core->dcScript->settings('footer_code', $core->dcScript->encrypt(trim($_POST['footer_code'])));
+		$core->dcScript->settings('footer_code', dcScript::encrypt(trim($_POST['footer_code'])));
 		$core->blog->triggerBlog();
 		dcPage::addSuccessNotice(__('Code successfully updated.'));
 		$core->adminurl->redirect($core->dcScript->info('adminUrl'), array(), '#tab-2');
@@ -48,7 +48,7 @@ try {
 		$filename = '"'.trim($core->blog->name).'_'.date('Y-m-d').'_'.$_GET['download'].'.'.trim($core->dcScript->settings('backup_ext'),'.').'"';
 		header('Content-Disposition: attachment;filename='.$filename);
 		header('Content-Type: text/plain; charset=UTF-8');
-		echo $core->dcScript->decrypt($core->dcScript->settings($_GET['download'].'_code'));
+		echo dcScript::decrypt($core->dcScript->settings($_GET['download'].'_code'));
 		exit;
 	}
 } catch(exception $e) {
@@ -82,7 +82,7 @@ try {
 					<form action="'.html::escapeHTML($core->adminurl->get($core->dcScript->info('adminUrl'))).'" method="post" id="'.html::escapeHTML($core->dcScript->info('id')).'-form-tab-1">
 						<p>'.$core->formNonce().'</p>
 						<p>'.form::hidden('change_header','')/*for check change in CodeMirror => jsConfirmClose()*/.'</p>
-						<p>'.form::textArea('header_code',120,25,html::escapeHTML($core->dcScript->decrypt($core->dcScript->settings('header_code'))),'maximal',0).'</p>
+						<p>'.form::textArea('header_code',120,25,html::escapeHTML(dcScript::decrypt($core->dcScript->settings('header_code'))),'maximal',0).'</p>
 						<p class="button-bar clear">
 							<input type="submit" id="update_header" name="update_header" title="'.__('Save the configuration').'" value="'.__('Save').'" />
 							<input type="reset" title="'.__('Undo changes').'" value="'.__('Cancel').'" />
@@ -97,7 +97,7 @@ try {
 					<form action="'.html::escapeHTML($core->adminurl->get($core->dcScript->info('adminUrl'))).'" method="post" id="'.html::escapeHTML($core->dcScript->info('id')).'-form-tab-2">
 						<p>'.$core->formNonce().'</p>
 						<p>'.form::hidden('change_footer','')/*for check change in CodeMirror => jsConfirmClose()*/.'</p>
-						<p>'.form::textArea('footer_code',120,25,html::escapeHTML($core->dcScript->decrypt($core->dcScript->settings('footer_code'))),'maximal',0).'</p>
+						<p>'.form::textArea('footer_code',120,25,html::escapeHTML(dcScript::decrypt($core->dcScript->settings('footer_code'))),'maximal',0).'</p>
 						<p class="button-bar clear">
 							<input type="submit" id="update_footer" name="update_footer" title="'.__('Save the configuration').'" value="'.__('Save').'" />
 							<input type="reset" title="'.__('Undo changes').'" value="'.__('Cancel').'" />
