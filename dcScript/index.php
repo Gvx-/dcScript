@@ -1,7 +1,7 @@
 <?php
 /* -- BEGIN LICENSE BLOCK -----------------------------------------------------
  * This file is part of plugin dcScript for Dotclear 2.
- * Copyright © 2014-2015 Gvx
+ * Copyright © 2014-2016 Gvx
  * Licensed under the GPL version 2.0 license.
  * (http://www.gnu.org/licenses/old-licenses/gpl-2.0.html)
  * -- END LICENSE BLOCK -----------------------------------------------------*/
@@ -10,7 +10,7 @@ if(!defined('DC_CONTEXT_ADMIN')) { return; }
 dcPage::check('dcScript.edit');
 
 if(!$core->dcScript->settings('enabled') && is_file(path::real($core->dcScript->info('root').'/_config.php'))) {
-	if($core->dcScript->checkConfig()) {
+	if($core->auth->isSuperAdmin()) {
 		$core->adminurl->redirect('admin.plugins', array(
 			'module' => $core->dcScript->info('id'),'conf' => 1, 'redir' => $core->adminurl->get($core->dcScript->info('adminUrl'))
 		));

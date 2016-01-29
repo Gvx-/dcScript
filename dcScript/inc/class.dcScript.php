@@ -1,7 +1,7 @@
 <?php
 /* -- BEGIN LICENSE BLOCK -----------------------------------------------------
  * This file is part of plugin dcScript for Dotclear 2.
- * Copyright © 2014-2015 Gvx
+ * Copyright © 2014-2016 Gvx
  * Licensed under the GPL version 2.0 license.
  * (http://www.gnu.org/licenses/old-licenses/gpl-2.0.html)
  * -- END LICENSE BLOCK -----------------------------------------------------*/
@@ -10,7 +10,7 @@ if(!defined('DC_RC_PATH')) { return; }
 __('dcScript');						// plugin name
 __('Add script for DC 2.8+');		// description plugin
 
-class dcScript extends dcPluginHelper023 {
+class dcScript extends dcPluginHelper024 {
 
 	public static function publicHeadContent($core, $_ctx) {
 		$html = self::decrypt($core->dcScript->settings('header_code'));
@@ -52,23 +52,25 @@ class dcScript extends dcPluginHelper023 {
 	protected function installActions($old_version) {
 		# upgrade previous versions
 		if(!empty($old_version)) {
-			if (version_compare($old_version, '2', '<')) {
-				$this->settings('header_code', self::encrypt(base64_decode($this->settings('header_code'))));
-				$this->settings('footer_code', self::encrypt(base64_decode($this->settings('footer_code'))));
+			if(version_compare($old_version, '2', '<')) {		// /!\ timeout possible for a lot blogs
+				# upgrade global settings
+				$this->core->blog->settings->{$this->plugin_id}->dropAll(true);
+				$this->setDefaultSettings();
+				# upgrade all blogs settings
+				$rs = $this->core->getBlogs();
+				while ($rs->fetch()) {
+					$settings = new dcSettings($this->core, $rs->blog_id);
+					$settings->addNamespace($this->plugin_id);
+					$settings->{$this->plugin_id}->put('enabled', $settings->{$this->plugin_id}->get('enabled'));
+					$settings->{$this->plugin_id}->put('header_code_enabled', $settings->{$this->plugin_id}->get('header_code_enabled'));
+					$settings->{$this->plugin_id}->put('footer_code_enabled', $settings->{$this->plugin_id}->get('footer_code_enabled'));
+					$settings->{$this->plugin_id}->put('header_code', self::encrypt(base64_decode($settings->{$this->plugin_id}->get('header_code'))));
+					$settings->{$this->plugin_id}->put('footer_code', self::encrypt(base64_decode($settings->{$this->plugin_id}->get('footer_code'))));
+					$settings->{$this->plugin_id}->put('backup_ext', $settings->{$this->plugin_id}->get('backup_ext'));
+				}
+				dcPage::addWarningNotice(__('Default settings update.'));
 			}
-
 		}
-	}
-
-	protected function uninstallActions() {
-		# erase config plugin
-		$this->core->blog->settings->addNamespace($this->plugin_id);
-		$this->core->blog->settings->{$this->plugin_id}->drop('enabled');
-		$this->core->blog->settings->{$this->plugin_id}->drop('header_code_enabled');
-		$this->core->blog->settings->{$this->plugin_id}->drop('footer_code_enabled');
-		$this->core->blog->settings->{$this->plugin_id}->drop('header_code');
-		$this->core->blog->settings->{$this->plugin_id}->drop('footer_code');
-		$this->core->blog->settings->{$this->plugin_id}->drop('backup_ext');
 	}
 
 }

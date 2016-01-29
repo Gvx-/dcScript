@@ -1,6 +1,6 @@
 /* -- BEGIN LICENSE BLOCK -----------------------------------------------------
  * This file is part of dcScript for Dotclear 2.
- * Copyright © 2014-2015 Gvx
+ * Copyright © 2014-2016 Gvx
  * Licensed under the GPL version 2.0 license.
  * (http://www.gnu.org/licenses/old-licenses/gpl-2.0.html)
  * -- END LICENSE BLOCK -----------------------------------------------------*/
@@ -14,7 +14,7 @@
 		description:	'dcScript for dotclear version 2.7+',
 		version:		'0.24.0',
 		author:			'Gvx',
-		copyright:		'© 2014-2015 Gvx',
+		copyright:		'© 2014-2016 Gvx',
 		support:		'',
 		license:		'http://www.gnu.org/licenses/old-licenses/gpl-2.0.html'
 	};
