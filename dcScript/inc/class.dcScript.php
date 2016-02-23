@@ -37,6 +37,11 @@ class dcScript extends dcPluginHelper024 {
 		$iv = mcrypt_create_iv(mcrypt_get_iv_size(MCRYPT_RIJNDAEL_256, MCRYPT_MODE_ECB), MCRYPT_RAND);
 		return trim(mcrypt_decrypt(MCRYPT_RIJNDAEL_256, $key, base64_decode($str), MCRYPT_MODE_ECB, $iv));
 	}
+	
+	public function transCrypt($old_key, $new_key) {
+		$this->core->blog->settings->{$this->plugin_id}->put('header_code', self::encrypt(self::decrypt($core->dcScript->settings('header_code'), $old_key), $new_key));
+		$this->core->blog->settings->{$this->plugin_id}->put('footer_code', self::encrypt(self::decrypt($core->dcScript->settings('footer_code'), $old_key), $new_key));
+	}
 
 	protected function setDefaultSettings() {
 		# create config plugin
