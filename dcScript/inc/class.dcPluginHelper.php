@@ -1,14 +1,14 @@
 <?php
 /* -- BEGIN LICENSE BLOCK -----------------------------------------------------
  * Plugin helper for dotclear version 2.8 and more
- * Version : 0.24.0
+ * Version : 0.24.1
  * Copyright © 2008-2016 Gvx
  * Licensed under the GPL version 2.0 license.
  * (http://www.gnu.org/licenses/old-licenses/gpl-2.0.html)
  * -- END LICENSE BLOCK -----------------------------------------------------*/
 if(!defined('DC_RC_PATH')) { return; }
 
-if (!defined('NL')) { define('NL',"\n"); }    // New Line
+if (!defined('NL')) { define('NL', "\n"); }    // New Line
 
 abstract class dcPluginHelper024 {
 	
@@ -87,22 +87,6 @@ abstract class dcPluginHelper024 {
 	public final function install() {
 		if(!defined('DC_CONTEXT_ADMIN')) { return; }
 		try {
-			# check DC version
-			$dcMinVer = $this->info('_dc_min_version');
-			if(!empty($dcMinVer)) {
-				if (version_compare(DC_VERSION, $dcMinVer, '<')) {
-					$this->core->plugins->deactivateModule($this->plugin_id);
-					throw new Exception(sprintf(__('%s require Dotclear version %s or more.'), $this->info('name'), $dcMinVer));
-				}
-			}
-			# check PHP version
-			$phpMinVer = $this->info('_php_min_version');
-			if(!empty($phpMinVer)) {
-				if(version_compare(PHP_VERSION, $phpMinVer, '<')) {
-					$this->core->plugins->deactivateModule($this->plugin_id);
-					throw new Exception(sprintf(__('%1$s require PHP version %2$s. (your PHP version is %3$s)'), $this->info('name'), $phpMinVer, PHP_VERSION));
-				}
-			}
 			# check plugin versions
 			$new_version = $this->info('version');
 			$old_version = $this->core->getVersion($this->plugin_id);
