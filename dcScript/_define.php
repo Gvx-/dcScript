@@ -11,13 +11,13 @@ $this->registerModule(
 	/* Name */			'dcScript',
 	/* Description*/	'Add script for DC 2.8+',
 	/* Author */		'Gvx',
-	/* Version */		'2.0.0-r0142',
+	/* Version */		'2.0.0',
 	array(
 		/* standard plugin options dotclear */
 		'permissions' 				=>	'dcScript.edit'
 		, 'type'					=>	'plugin'
 		, 'Priority'				=>	1000
-		, 'support'		/* url */	=>	'http://forum.dotclear.org/index.php'
+		, 'support'		/* url */	=>	'http://forum.dotclear.org/viewtopic.php?pid=335785#p335785'
 		, 'details' 	/* url */	=>	'https://bitbucket.org/Gvx_/dcscript'
 		, 'requires'	/* id(s) */	=>	array(
 			array('core', '2.8')
@@ -25,10 +25,6 @@ $this->registerModule(
 		/* specific plugin options */
 		, '_icon_small'				=>	'/inc/icon-small.png'
 		, '_icon_large'				=>	'/inc/icon-large.png'
-		/*	debug options */
-		//, '_debug_mode'			=>	true
-		//, '_debug_log'			=>	true
-		//, '_debug_log_reset'		=>	true
 	)
 );
 

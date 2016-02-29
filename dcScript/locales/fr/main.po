@@ -1,14 +1,14 @@
 # Language: Français
-# Module: dcScript - 2.0.0-r0136
-# Date: 2016-01-26 22:09:57
+# Module: dcScript - 2.0.0-r0142
+# Date: 2016-02-27 11:16:12
 # Translated with translater 2013.05.11
 
 msgid ""
 msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
-"Project-Id-Version: dcScript 2.0.0-r0136\n"
+"Project-Id-Version: dcScript 2.0.0-r0142\n"
 "POT-Creation-Date: \n"
-"PO-Revision-Date: 2016-01-26T22:09:57+00:00\n"
+"PO-Revision-Date: 2016-02-27T11:16:12+00:00\n"
 "Last-Translator: Gvx\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -39,7 +39,7 @@ msgid "Active codes"
 msgstr "Codes actifs"
 
 #: _config.php:49
-#: inc/class.dcScript.php:45
+#: inc/class.dcScript.php:50
 msgid "Enable header code"
 msgstr "Activer le code du header"
 
@@ -48,7 +48,7 @@ msgid "Enable public header code."
 msgstr "Activer le code du header public"
 
 #: _config.php:56
-#: inc/class.dcScript.php:46
+#: inc/class.dcScript.php:51
 msgid "Enable footer code"
 msgstr "Activer le code du footer"
 
@@ -57,7 +57,7 @@ msgid "Enable public footer code."
 msgstr "Activer le code du footer public"
 
 #: _config.php:66
-#: inc/class.dcScript.php:49
+#: inc/class.dcScript.php:54
 msgid "Extension Backup Files"
 msgstr "Extension des fichiers de sauvegarde"
 
@@ -67,39 +67,31 @@ msgstr "Extension par defaut des fichiers de sauvegarde"
 
 #: inc/class.dcPluginHelper.php:23
 #: inc/class.dcPluginHelper.php:26
-#: inc/class.dcScript.php:44
+#: inc/class.dcScript.php:49
 msgid "Enable plugin"
 msgstr "Activer le plugin"
 
-#: inc/class.dcPluginHelper.php:95
-msgid "%s require Dotclear version %s or more."
-msgstr "%s necessite Dotclear version %s ou plus"
-
-#: inc/class.dcPluginHelper.php:103
-msgid "%1$s require PHP version %2$s. (your PHP version is %3$s)"
-msgstr "%1$s necessite PHP version %2$s (votre version est %3$s)"
-
-#: inc/class.dcPluginHelper.php:161
+#: inc/class.dcPluginHelper.php:145
 msgid "%s menu not present."
 msgstr "le menu %s est absent"
 
-#: inc/class.dcPluginHelper.php:187
+#: inc/class.dcPluginHelper.php:171
 msgid "icon plugin"
 msgstr "Icone"
 
-#: inc/class.dcPluginHelper.php:188
+#: inc/class.dcPluginHelper.php:172
 msgid "Settings"
 msgstr "Paramètres"
 
-#: inc/class.dcPluginHelper.php:191
+#: inc/class.dcPluginHelper.php:175
 msgid "Author(s)"
 msgstr "Auteur(s)"
 
-#: inc/class.dcPluginHelper.php:232
+#: inc/class.dcPluginHelper.php:216
 msgid "The folder is not in the shared directory"
 msgstr "Le dossier ne se trouve pas dans le répertoire partagé"
 
-#: inc/class.dcPluginHelper.php:234
+#: inc/class.dcPluginHelper.php:218
 msgid "Creating a shared directory failed"
 msgstr "La création d'un répertoire partagé a échoué"
 
@@ -111,17 +103,17 @@ msgstr "dcScript"
 msgid "Add script for DC 2.8+"
 msgstr "Ajouter des scripts a doctlear v2.8+"
 
-#: inc/class.dcScript.php:47
+#: inc/class.dcScript.php:52
 #: index.php:81
 msgid "Header code"
 msgstr "Code du header"
 
-#: inc/class.dcScript.php:48
+#: inc/class.dcScript.php:53
 #: index.php:96
 msgid "Footer code"
 msgstr "Code du footer"
 
-#: inc/class.dcScript.php:71
+#: inc/class.dcScript.php:76
 msgid "Default settings update."
 msgstr "les paramètres par défaut ont été mis a jour"
 
