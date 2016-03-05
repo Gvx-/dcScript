@@ -1,7 +1,7 @@
 <?php
 /* -- BEGIN LICENSE BLOCK -----------------------------------------------------
  * Plugin helper for dotclear version 2.8 and more
- * Version : 0.24.1
+ * Version : 0.25.0
  * Copyright © 2008-2016 Gvx
  * Licensed under the GPL version 2.0 license.
  * (http://www.gnu.org/licenses/old-licenses/gpl-2.0.html)
@@ -10,8 +10,8 @@ if(!defined('DC_RC_PATH')) { return; }
 
 if (!defined('NL')) { define('NL', "\n"); }    // New Line
 
-abstract class dcPluginHelper024 {
-	
+abstract class dcPluginHelper025 {
+
 	### Constants ###
 	const DC_SHARED_DIR = '_shared';
 
@@ -31,7 +31,7 @@ abstract class dcPluginHelper024 {
 	protected function installActions($old_version) {
 		# upgrade previous versions
 		if(!empty($old_version)) {
-			
+
 		}
 		$this->debugDisplay('Not install actions for this plugin.');
 	}
@@ -47,26 +47,28 @@ abstract class dcPluginHelper024 {
 	protected $admin_url;				// admin url plugin
 	protected $icon_small;				// small icon file
 	protected $icon_large;				// large icon file
-	private $debug_mode;				// debug mode for plugin
-	private $debug_log;					// debug Log for plugin
+
+	private $debug_mode = false;		// debug mode for plugin
+	private $debug_log = false;			// debug Log for plugin
+	private $debug_log_reset = false;	// debug logfile reset for plugin
 	private $debug_logfile;				// debug logfilename for plugin
-	private $debug_log_reset;			// debug logfile reset for plugin
 
 	public function __construct($id) {
 		global $core;
 		$this->core = &$core;
-		
-		# Check/set shared directory
-		//self::getSharedDir();
-		
+
 		# set plugin id and admin url
 		$this->plugin_id = $id;
 		$this->admin_url = 'admin.plugin.'.$this->plugin_id;
 
 		# set debug mode
-		$this->debug_mode = $this->info('_debug_mode', $_SERVER['HTTP_HOST'] === 'localhost');
-		$this->debug_log = $this->info('_debug_log', $_SERVER['HTTP_HOST'] === 'localhost');
-		$this->debug_log_reset = $this->info('_debug_log_reset', false);
+		$debug_options = dirname(__FILE__).'/../.debug.php';
+		if(is_file($debug_options)) { require_once($debug_options); }
+
+		# start logfile
+		$this->debugLog('*****************************************************');
+		$this->debugLog('Start log - Version: '.$this->core->getVersion($this->plugin_id));
+		$this->debugLog('Page: '.$_SERVER['PHP_SELF'].'?'.$_SERVER['QUERY_STRING']);
 
 		# set icons
 		$this->icon_small = $this->plugin_id.$this->info('_icon_small');
@@ -77,9 +79,9 @@ abstract class dcPluginHelper024 {
 
 		# uninstall plugin procedure
 		if($this->core->auth->isSuperAdmin()) { $this->core->addBehavior('pluginBeforeDelete', array($this, 'uninstall')); }
-		
+
 		# debug
-		//$this->debugDisplay('Debug mode actived for this plugin');
+		$this->debugDisplay('Debug mode actived for this plugin');
 	}
 
 	### Admin functions ###
@@ -97,6 +99,7 @@ abstract class dcPluginHelper024 {
 			$this->installActions($old_version);
 			# valid install
 			$this->core->setVersion($this->plugin_id, $new_version);
+			$this->debugLog('Update version '.$new_version);
 			return true;
 		} catch (Exception $e) {
 			$this->debugDisplay('[Install] : '.$e->getMessage());
@@ -107,6 +110,7 @@ abstract class dcPluginHelper024 {
 
 	public final function uninstall() {
 		if(!defined('DC_CONTEXT_ADMIN')) { return; }
+		$this->debugLog('uninstall version '.$this->core->getVersion($this->plugin_id));
 		# specifics uninstall actions
 		$this->uninstallActions();
 		# delete all users prefs
@@ -206,9 +210,9 @@ abstract class dcPluginHelper024 {
 		$content = ($w->title ? $w->renderTitle(html::escapeHTML($w->title)) : '').$content;
 		return $w->renderDiv($w->content_only, $w->class,'',$content);
 	}
-	
+
 	### Common functions ###
-	
+
 	public static function getSharedDir($dir='') {
 		$dir = trim($dir, '\\/');
 		$dc_shared = DC_TPL_CACHE.'/'.self::DC_SHARED_DIR;
@@ -219,7 +223,7 @@ abstract class dcPluginHelper024 {
 		}
 		return $shared;
 	}
-	
+
 	public final function settings($key, $value=null, $global=false) {
 		if(is_null($value)) {
 			try {
@@ -300,10 +304,10 @@ abstract class dcPluginHelper024 {
 	}
 
 	### debug functions ###
-	
+
 	protected final function debugDisplay($msg) {
 		if($this->debug_mode && !empty($msg)) {
-			if(!defined('DC_CONTEXT_ADMIN')) { dcPage::addWarningNotice(':: [DEBUG] :: ['.$this->plugin_id.']<br />'.$msg); }
+			if(defined('DC_CONTEXT_ADMIN')) { dcPage::addWarningNotice(':: [DEBUG] :: ['.$this->plugin_id.']<br />'.$msg); }
 			$this->debugLog('[Debug display]: '.$msg);
 		}
 	}
@@ -315,7 +319,7 @@ abstract class dcPluginHelper024 {
 				if($this->debug_log_reset && is_file($this->debug_logfile)) { @unlink($this->debug_logfile); }
 			}
 			if(!empty($value)) { $text .= ':'.NL.print_r($value, true).NL.str_pad('', 60, '*'); }
-			file_put_contents ($this->debug_logfile, '['.date('Y-m-d-H-i-s').'] : ['.$this->plugin_id.'] : ['.$this->core->blog->id.'] :'.$text.NL, FILE_APPEND);
+			file_put_contents ($this->debug_logfile, NL.'['.date('Y-m-d-H-i-s').'] : ['.$this->plugin_id.'] : ['.$this->core->blog->id.'] : '.$text, FILE_APPEND);
 		}
 	}
 

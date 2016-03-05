@@ -10,17 +10,17 @@ if(!defined('DC_RC_PATH')) { return; }
 __('dcScript');						// plugin name
 __('Add script for DC 2.8+');		// description plugin
 
-class dcScript extends dcPluginHelper024 {
+class dcScript extends dcPluginHelper025 {
 	
 	public static function publicHeadContent($core, $_ctx) {
-		$html = self::decrypt($core->dcScript->settings('header_code'), $this->getCryptKey());
+		$html = self::decrypt($core->dcScript->settings('header_code'), $core->dcScript->getCryptKey());
 		if($core->dcScript->settings('enabled') && $core->dcScript->settings('header_code_enabled') && !empty($html)) {
 			echo "<!-- dcScript header begin -->\n".$html."\n<!-- dcScript header end -->";
 		}
 	}
 
 	public static function publicFooterContent($core, $_ctx) {
-		$html = self::decrypt($core->dcScript->settings('footer_code'), $this->getCryptKey());
+		$html = self::decrypt($core->dcScript->settings('footer_code'), $core->dcScript->getCryptKey());
 		if($core->dcScript->settings('enabled') && $core->dcScript->settings('footer_code_enabled') && !empty($html)) {
 			echo "<!-- dcScript footer begin -->\n".$html."\n<!-- dcScript footer end -->";
 		}

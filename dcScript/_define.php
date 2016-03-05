@@ -11,7 +11,7 @@ $this->registerModule(
 	/* Name */			'dcScript',
 	/* Description*/	'Add script for DC 2.8+',
 	/* Author */		'Gvx',
-	/* Version */		'3.0.0-r0001',
+	/* Version */		'3.0.0-r0010',
 	array(
 		/* standard plugin options dotclear */
 		'permissions' 				=>	'dcScript.edit'
@@ -25,10 +25,6 @@ $this->registerModule(
 		/* specific plugin options */
 		, '_icon_small'				=>	'/inc/icon-small.png'
 		, '_icon_large'				=>	'/inc/icon-large.png'
-		/*	debug options */
-		//, '_debug_mode'			=>	true
-		//, '_debug_log'			=>	true
-		//, '_debug_log_reset'		=>	true
 	)
 );
 
