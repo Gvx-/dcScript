@@ -13,7 +13,8 @@ if (!defined('NL')) { define('NL', "\n"); }    // New Line
 abstract class dcPluginHelper025 {
 
 	### Constants ###
-	const DC_SHARED_DIR = '_shared';
+	const VERSION = '0.25.2';				// class version
+	const DC_SHARED_DIR = '_shared';		// shared directory name 
 
 	### Specific functions to overload ###
 
@@ -39,6 +40,93 @@ abstract class dcPluginHelper025 {
 	protected function uninstallActions() {
 		# specific actions for uninstall
 		$this->debugDisplay('Not uninstall actions for this plugin.');
+	}
+	
+	public function configPage() {
+		global $core;
+		if(!defined('DC_CONTEXT_ADMIN')) { return; }
+		dcPage::checkSuper();
+		if (isset($_POST['save'])) {
+			try {
+				$global = ($_POST['global_settings'] == 'global_settings' ? 'global' :'local');
+				$this->settings('enabled', !empty($_POST['enabled']), $global);
+				$core->blog->triggerBlog();
+				dcPage::addSuccessNotice(__('Configuration successfully updated.'));
+			} catch(exception $e) {
+				//$core->error->add($e->getMessage());
+				$core->error->add(__('Unable to save the configuration'));
+			}
+			if(!empty($_GET['redir']) && strpos($_GET['redir'], 'p='.$this->info('id')) === false) {
+				$core->error->add(__('Redirection not found'));
+				$core->adminurl->redirect('admin.home');
+			}
+			http::redirect($_REQUEST['redir']);
+		}
+
+		echo
+			'<div class="fieldset">
+				<h3>'.__('Activation').'</h3>
+				<p>
+					'.form::checkbox('enabled','1',$this->settings('enabled', null, 'global')).
+					'<label class="classic" for="enabled">
+						'.sprintf(__('Enable %s on this blog'), html::escapeHTML(__($this->info('name')))).
+					'</label>
+				</p>
+				<p class="form-note">'.__('Enable the plugin on this blog.').'</p>
+				<p class="info">'
+					.sprintf(__('Settings for %s'),html::escapeHTML($core->blog->name)).' : <strong>'
+					.($this->settings('enabled') ? __('Enabled') : __('Disabled')).'</strong>
+				</p>
+			</div>
+			<!-- HTML CODE HERE -->
+			<div class="fieldset clear">
+				<h3>'.__('Scope').'</h3>
+				<div class="two-cols clear">
+					<div class="col">
+						<p>'.form::radio(array('global_settings'), html::escapeHTML('global_settings'), true).'
+						<label class="classic" for="global_settings">'.__('Global settings').'</label></p>
+					</div>
+					<div class="col">
+						<p>'.form::radio(array('global_settings', 'local_settings'), html::escapeHTML('local_settings'), false).'
+						<label class="classic" for="local_settings">'.sprintf(__('Settings for %s'),html::escapeHTML($core->blog->name)).'</label></p>
+					</div>
+				</div>
+				<div class="clear"></div>
+			</div>
+		';
+		dcPage::helpBlock(/*'dcScript-config'*/);
+		
+	}
+	
+	public function indexPage() {
+		global $core;
+		if(!defined('DC_CONTEXT_ADMIN')) { return; }
+		//dcPage::check('dcScript.edit');
+		if(!$this->settings('enabled') && is_file(path::real($this->info('root').'/_config.php'))) {
+			if($core->auth->isSuperAdmin()) {
+				$core->adminurl->redirect('admin.plugins', array(
+					'module' => $this->info('id'),'conf' => 1, 'redir' => $core->adminurl->get($this->info('adminUrl'))
+				));
+			} else {
+				dcPage::addNotice('message', sprintf(__('%s plugin is not configured.'), $this->info('name')));
+				$core->adminurl->redirect('admin.home');
+			}
+		}
+		echo
+			'<html>
+				<head>
+					<title>'.html::escapeHTML($this->info('name')).'</title>'.
+					$this->jsLoad('/inc/admin.js').NL.
+					$this->cssLoad('/inc/style.css').NL.'
+				</head>
+				<body class="no-js">
+					'.$this->adminBaseline().NL.'
+					<!-- HTML CODE HERE -->
+					'.$this->adminFooterInfo();
+					dcPage::helpBlock(/*'dcScript-edit'*/);
+		echo
+			'	</body>
+			</html>';
 	}
 
 	### Standard functions ###
@@ -78,10 +166,10 @@ abstract class dcPluginHelper025 {
 		$this->setDefaultSettings();
 
 		# uninstall plugin procedure
-		if($this->core->auth->isSuperAdmin()) { $this->core->addBehavior('pluginBeforeDelete', array($this, 'uninstall')); }
+		if(defined('DC_CONTEXT_ADMIN') && $this->core->auth->isSuperAdmin()) { $this->core->addBehavior('pluginBeforeDelete', array($this, 'uninstall')); }
 
 		# debug
-		$this->debugDisplay('Debug mode actived for this plugin');
+		//$this->debugDisplay('Debug mode actived for this plugin');
 	}
 
 	### Admin functions ###
@@ -93,8 +181,6 @@ abstract class dcPluginHelper025 {
 			$new_version = $this->info('version');
 			$old_version = $this->core->getVersion($this->plugin_id);
 			if (version_compare($old_version, $new_version, '>=')) { return; }
-			# default settings
-			$this->setDefaultSettings();
 			# specifics install actions
 			$this->installActions($old_version);
 			# valid install
@@ -108,8 +194,7 @@ abstract class dcPluginHelper025 {
 		return false;
 	}
 
-	public final function uninstall() {
-		if(!defined('DC_CONTEXT_ADMIN')) { return; }
+	protected final function uninstall() {
 		$this->debugLog('uninstall version '.$this->core->getVersion($this->plugin_id));
 		# specifics uninstall actions
 		$this->uninstallActions();
@@ -121,8 +206,7 @@ abstract class dcPluginHelper025 {
 		$this->core->delVersion($this->plugin_id);
 	}
 
-	public final function configLink($label, $redir=null, $prefix='', $suffix='') {
-		if(!defined('DC_CONTEXT_ADMIN')) { return; }
+	protected final function configLink($label, $redir=null, $prefix='', $suffix='') {
 		if($this->core->auth->isSuperAdmin() && is_file(path::real($this->info('root').'/_config.php'))) {
 			$redir = $this->core->adminurl->get(empty($redir) ? $this->admin_url : $redir);
 			$href = $this->core->adminurl->get('admin.plugins', array('module' => $this->plugin_id,'conf' => 1, 'redir' => $redir));
@@ -161,14 +245,12 @@ abstract class dcPluginHelper025 {
 		));
 	}
 
-	public function adminBaseline($items=array()) {
-		if(!defined('DC_CONTEXT_ADMIN')) { return; }
+	protected function adminBaseline($items=array()) {
 		if(empty($items)) { $items = array( $this->info('name') => ''); }
 		return dcPage::breadcrumb(array_merge(array(html::escapeHTML($this->core->blog->name) => ''),$items)).dcPage::notices()."\n";
 	}
 
-	public function adminFooterInfo() {
-		if(!defined('DC_CONTEXT_ADMIN')) { return; }
+	protected function adminFooterInfo() {
 		$support = $this->info('support');
 		$details = $this->info('details');
 		return '<p class="right">
@@ -213,7 +295,7 @@ abstract class dcPluginHelper025 {
 
 	### Common functions ###
 
-	public static function getSharedDir($dir='') {
+	protected static function getSharedDir($dir='') {
 		$dir = trim($dir, '\\/');
 		$dc_shared = DC_TPL_CACHE.'/'.self::DC_SHARED_DIR;
 		$shared = path::real($dc_shared.(empty($dir) ? '' : '/'.$dir), false);
@@ -224,9 +306,14 @@ abstract class dcPluginHelper025 {
 		return $shared;
 	}
 
-	public final function settings($key, $value=null, $global=false) {
+	protected final function settings($key, $value=null, $scope='default') {
 		if(is_null($value)) {
 			try {
+				if($scope == 'global' || $scope === true) {
+					return $this->core->blog->settings->{$this->plugin_id}->getGlobal($key);
+				} elseif($scope == 'local') {
+					return $this->core->blog->settings->{$this->plugin_id}->getlocal($key);
+				}
 				return $this->core->blog->settings->{$this->plugin_id}->$key;
 			} catch(Exception $e) {
 				$this->debugDisplay('Blog settings read error.('.$key.')');
@@ -234,6 +321,7 @@ abstract class dcPluginHelper025 {
 			}
 		} else {
 			try {
+				$global = ($scope == 'global' || $scope === true);
 				$this->core->blog->settings->{$this->plugin_id}->put($key, $value, null, null, true, $global);
 			} catch(Exception $e) {
 				$this->debugDisplay('Blog settings write error (namespace not exist).('.$key.')');
@@ -243,7 +331,7 @@ abstract class dcPluginHelper025 {
 		}
 	}
 
-	public final function userSettings($key, $value=null, $global=false) {
+	protected final function userSettings($key, $value=null, $scope='default') {
 		if(is_null($value)) {
 			try {
 				return $this->core->auth->user_prefs->{$this->plugin_id}->$key;
@@ -253,6 +341,7 @@ abstract class dcPluginHelper025 {
 			}
 		} else {
 			try {
+				$global = ($scope == 'global' || $scope === true);
 				$this->core->auth->user_prefs->{$this->plugin_id}->put($key,$value, null, null, true, $global);
 			} catch(Exception $e) {
 				$this->debugDisplay('User settings write error (namespace not exist).('.$key.')');
@@ -262,18 +351,20 @@ abstract class dcPluginHelper025 {
 		}
 	}
 
-	public final function info($item=null, $default=null) {
+	protected final function info($item=null, $default=null) {
 		if(empty($item) || $item == 'id') {
 			return $this->plugin_id;
 		} elseif($item == 'adminUrl') {
 			return (defined('DC_CONTEXT_ADMIN') ? $this->admin_url : null);
+		} elseif($item == 'helperVersion') {
+			return self::VERSION;
 		} else {
 			$res = $this->core->plugins->moduleInfo($this->plugin_id, $item);
 			return $res === null ? $default : $res;
 		}
 	}
 
-	public final function jsLoad($src) {
+	protected final function jsLoad($src) {
 		$file = $this->plugin_id.'/'.ltrim($src, '/');
 		$version = $this->info('version');
 		if(defined('DC_CONTEXT_ADMIN')) {
@@ -288,7 +379,7 @@ abstract class dcPluginHelper025 {
 		}
 	}
 
-	public final function cssLoad($src, $media='screen') {
+	protected final function cssLoad($src, $media='screen') {
 		$file = $this->plugin_id.'/'.ltrim($src, '/');
 		$version = $this->info('version');
 		if(defined('DC_CONTEXT_ADMIN')) {

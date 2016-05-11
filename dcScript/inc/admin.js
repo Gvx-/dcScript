@@ -8,21 +8,9 @@
 /*global jQuery,CodeMirror */
 (function ($, window, document, undefined) {
 	'use strict';
-	// -- INFORMATIONS BLOCK BEGIN ----------------------------------------------------
-	var informations = {
-		name:			'dcScriptAdmin',
-		description:	'dcScript for dotclear version 2.7+',
-		version:		'0.24.0',
-		author:			'Gvx',
-		copyright:		'© 2014-2016 Gvx',
-		support:		'',
-		license:		'http://www.gnu.org/licenses/old-licenses/gpl-2.0.html'
-	};
-	// -- INFORMATIONS BLOCK END ------------------------------------------------------
-
 	$(document).ready(function () {
 		var
-			cm_options = {
+			cm_options = {																	// codemirror options
 				mode: 'text/html',
 				//theme: 'eclipse',
 				//indentWithTabs: true,
@@ -44,44 +32,56 @@
 				gutters: ['CodeMirror-linenumbers', 'CodeMirror-foldgutter'],
 				styleActiveLine: true
 			},
-			actionTabCm = function (id, tab) {															// Actions tabs codemirror
+			actions = function () {															// Actions codemirror
 				var
 					cm,
-					tabSelector = '#tab-' + tab,
-					el = document.getElementById(id + '_code'),
-					$actionButtons = $('#update_' + id + ', ' + tabSelector + ' input[type="reset"]'),
-					$exportButton = $('#export_' + id),
-					$checkChange = $('#change_' + id),
-					urlExport = $exportButton.attr('href');
+					el = document.getElementById('code'),
+					$actionButtons = $('#update, #reset'),
+					$exportButton = $('#export'),
+					$checkChange = $('#change'),
+					$behaviors = $('#behaviors'),
+					$behaviorsGo = $('#behaviors_go'),
+					changes = function () {
+						$actionButtons.removeAttr('disabled');
+						$exportButton.addClass('disabled');
+						$checkChange.val('true');
+						$behaviors.val($('#behavior_edit').val()).attr('disabled', 'disabled');
+						//$behaviorsGo.attr('disabled', 'disabled');
+					};
 				if (el) {
 					cm = CodeMirror.fromTextArea(el, cm_options);
 					cm.focus();
-					if (!cm.doc.getValue()) {																													// Code empty
-						$exportButton.attr('href', tabSelector).addClass('disabled');
+					if (!cm.doc.getValue()) {												// Code empty
+						$exportButton.addClass('disabled');
 					}
-					cm.on('change', function (e) {
-						$actionButtons.removeAttr('disabled');
-						$exportButton.attr('href', tabSelector).addClass('disabled');
-						$checkChange.val('true');
+					//$behaviorsGo.attr('disabled', 'disabled');
+					cm.on('change', function (e) {											// edit change
+						changes();
 					});
-					$(tabSelector).on('reset', function (e) {											// Action reset tabs
-						cm.doc.setValue(el.value);
+					$('#active').on('change', function (e) {								// active change
+						changes();
+					});
+					$behaviors.on('change', function (e) {									// select behaviors change
+						$behaviorsGo./*removeAttr('disabled').*/trigger('click');
+					});
+					$('form').on('reset', function (e) {									// Action reset
+						cm.doc.setValue(el.defaultValue);
+						cm.clearHistory();
 						cm.focus();
 						$actionButtons.attr('disabled', 'disabled');
-						if (cm.doc.getValue()) {
-							$exportButton.attr('href', urlExport).removeClass('disabled');
-						}
+						if (cm.doc.getValue()) { $exportButton.removeClass('disabled'); }
+						$behaviors.removeAttr('disabled');
 						$checkChange.val('');
 					});
-					$(window).on('hashchange', function (e) {											// set focus
+					$(window).on('hashchange', function (e) {								// set focus
 						setTimeout(function () { cm.focus(); }, 0);
 					});
 				}
 				$actionButtons.attr('disabled', 'disabled');
 			};
+			
 		// processing
-		actionTabCm('header', 1);
-		actionTabCm('footer', 2);
-		window.scrollTo(0, 0);																																	// Go to top
+		actions();
+		window.scrollTo(0, 0);																// Go to top
 	});
 }(jQuery, window, document));

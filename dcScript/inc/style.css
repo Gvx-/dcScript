@@ -28,12 +28,18 @@ input[type="reset"][disabled="disabled"],
 a.button.disabled {
 	opacity: 0.5; cursor: default;
 }
-input[type="submit"], a.button {
+.button-bar input[type="submit"],
+.button-bar input[type="reset"],
+.button-bar a.button {
 	margin: 1em;
 }
 
 /* --== no javascript ==-- */
-body.no-js #tab-2,
-body.no-js #tab-3 {
+/*
+body.no-js # {
+	display: none;
+}
+*/
+body.with-js #behaviors_go {
 	display: none;
 }

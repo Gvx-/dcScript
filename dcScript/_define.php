@@ -9,9 +9,9 @@ if(!defined('DC_RC_PATH')) { return; }
 
 $this->registerModule(
 	/* Name */			'dcScript',
-	/* Description*/	'Add script for DC 2.8+',
+	/* Description*/	'Add script for DC 2.9+',
 	/* Author */		'Gvx',
-	/* Version */		'3.0.0-r0010',
+	/* Version */		'3.0.0-r0031',
 	array(
 		/* standard plugin options dotclear */
 		'permissions' 				=>	'dcScript.edit'
@@ -20,7 +20,7 @@ $this->registerModule(
 		, 'support'		/* url */	=>	'http://forum.dotclear.org/viewtopic.php?pid=335785#p335785'
 		, 'details' 	/* url */	=>	'https://bitbucket.org/Gvx_/dcscript'
 		, 'requires'	/* id(s) */	=>	array(
-			array('core', '2.8')
+			array('core', '2.9')
 		)
 		/* specific plugin options */
 		, '_icon_small'				=>	'/inc/icon-small.png'
@@ -29,6 +29,6 @@ $this->registerModule(
 );
 
 # ---------------------------------------------------------
-# use codemirror version 5.12
+# use codemirror version 5.14.2
 # see: http://codemirror.net/
 # ---------------------------------------------------------
