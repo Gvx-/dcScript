@@ -10,7 +10,7 @@ if(!defined('DC_RC_PATH')) { return; }
 __('dcScript');						// plugin name
 __('Add script for DC 2.9+');		// description plugin
 
-class dcScript extends dcPluginHelper025 {
+class dcScript extends dcPluginHelper029 {
 	
 	# behaviors functions
 	public function publicHeadContent($core, $_ctx) {$this->codeInsert('publicHeadContent');}
@@ -29,18 +29,18 @@ class dcScript extends dcPluginHelper025 {
 	# admin configuration page
 	public function configPage() {
 		if(!defined('DC_CONTEXT_ADMIN')) { return; }
-		dcPage::checkSuper();
+		if(!$this->core->auth->check($this->info('permissions'), $this->core->blog->id)) { return; }
+		$scope = $this->configScope();
 		if (isset($_POST['save'])) {
 			try {
-				$global = ($_POST['global_settings'] == 'global_settings' ? 'global' : 'local');
-				$behaviors = ($global == 'global' ? $this->settings('behaviors', null, $global) : $this->settings('behaviors'));
+				$behaviors = ($scope == 'global' ? $this->settings('behaviors', null, $scope) : $this->settings('behaviors'));
 				foreach($behaviors as $k => &$v) {
-					$v['enabled'] = empty($_POST['enabled_'.$k]) ? false : true;
-					$v['active'] = empty($_POST['active_'.$k]) ? false : true;
+					$v['enabled'] = !empty($_POST['enabled_'.$k]);
+					$v['active'] = !empty($_POST['active_'.$k]);
 				}
-				$this->settings('enabled', !empty($_POST['enabled']), $global);
-				$this->settings('backup_ext', html::escapeHTML($_POST['backup']), $global);
-				$this->settings('behaviors', $behaviors, $global);
+				$this->settings('enabled', !empty($_POST['enabled']), $scope);
+				$this->settings('backup_ext', html::escapeHTML($_POST['backup']), $scope);
+				$this->settings('behaviors', $behaviors, $scope);
 				$this->core->blog->triggerBlog();
 				dcPage::addSuccessNotice(__('Configuration successfully updated.'));
 			} catch(exception $e) {
@@ -52,9 +52,10 @@ class dcScript extends dcPluginHelper025 {
 				$this->core->adminurl->redirect('admin.home');
 			}
 			http::redirect($_REQUEST['redir']);
+		} elseif($scope == 'global') {
+			dcPage::addWarningNotice(__('Globals options'));
 		}
-		$behaviors_global = $this->settings('behaviors', null, 'global');
-		$behaviors_local = $this->settings('behaviors');
+		$behaviors = $this->settings('behaviors', null, $scope);
 		$behaviors_table = '
 			<div class="table-outer">
 				<table>
@@ -62,22 +63,24 @@ class dcScript extends dcPluginHelper025 {
 					<tbody>
 						<tr>
 							<th scope="col">'.__('Name').'</th>
-							<th class="first">'.__('Allowed').'</th>
-							<th class="nowrap" scope="col">'.sprintf(__('Allowed for %s'),html::escapeHTML($this->core->blog->name)).'</th>
+							'.($this->core->auth->isSuperAdmin() ? '<th scope="col">'.__('Allowed').'</th>' : '').'
 							<th scope="col">'.__('Enabled').'</th>
-							<th class="nowrap" scope="col">'.sprintf(__('Enabled for %s'),html::escapeHTML($this->core->blog->name)).'</th>
+							<th scope="col">'.__('content').'</th>
+							<th scope="col">'.''.'</th>
 						</tr>
 		';
-		foreach($behaviors_global as $k => $v) {
-			$behaviors_table .= '
-				<tr class="line">
-					<td class="maximal" scope="row">'.$k.'</td>
-					<td class="nowrap">'.form::checkbox('enabled_'.$k, html::escapeHTML($k), $v['enabled']).'</td>
-					<td class="nowrap info"><strong>'.($behaviors_local[$k]['enabled'] ? __('Enabled') : __('Disabled')).'</strong></td>
-					<td class="nowrap">'.form::checkbox('active_'.$k, html::escapeHTML($k), $v['active']).'</td>
-					<td class="nowrap info"><strong>'.($behaviors_local[$k]['active'] ? __('Enabled') : __('Disabled')).'</strong></td>
-				</tr>
-			';
+		foreach($behaviors as $k => $v) {
+			if($this->core->auth->isSuperAdmin() || $v['enabled']) {
+				$behaviors_table .= '
+					<tr class="line">
+						<td scope="row" class="nowrap">'.html::escapeHTML($k).'</td>
+						'.($this->core->auth->isSuperAdmin() ? '<td scope="row" class="nowrap">'.form::checkbox('enabled_'.$k, html::escapeHTML($k), $v['enabled']).'</td>' : '').'
+						<td scope="row" class="nowrap">'.form::checkbox('active_'.$k, html::escapeHTML($k), $v['active']).'</td>
+						<td scope="row" class="nowrap">'.(empty(html::escapeHTML($v['content'])) ? __('Empty') : __('Filled')).'</td>
+						<td scope="row" class="maximal nowrap">'.''.'</td>
+					</tr>
+				';
+			}
 		}
 		$behaviors_table .= '
 					</tbody>
@@ -85,55 +88,36 @@ class dcScript extends dcPluginHelper025 {
 			</div>
 		';
 		echo
+			$this->configBaseline($scope).
 			'<div id="options">
-				<div class="fieldset">
-					<h3>'.__('Scope').'</h3>
-					<div class="two-cols clear">
-						<div class="col">
-							<p>'.form::radio(array('global_settings'), html::escapeHTML('global_settings'), true).'
-							<label class="classic" for="global_settings">'.__('Global settings').'</label></p>
-						</div>
-						<div class="col">
-							<p>'.form::radio(array('global_settings', 'local_settings'), html::escapeHTML('local_settings'), false).'
-							<label class="classic" for="local_settings">'.sprintf(__('Settings for %s'),html::escapeHTML($this->core->blog->name)).'</label></p>
-						</div>
-					</div>
-					<div class="fieldset clear">
-						<h3>'.__('Activation').'</h3>
-						<p>
-							'.form::checkbox('enabled','1',$this->settings('enabled', null, 'global')).
-							'<label class="classic" for="enabled">
-								'.sprintf(__('Enable %s on this blog'), html::escapeHTML(__($this->info('name')))).'&nbsp;&nbsp;&nbsp;
-							</label>
-							<span class="info">'
-								.sprintf(__('Settings for %s'),html::escapeHTML($this->core->blog->name)).' : <strong>'
-								.($this->settings('enabled') ? __('Enabled') : __('Disabled')).'</strong>
-							</span>
-						</p>
-						<p class="form-note">'.__('Enable the plugin on this blog.').'</p>
-					</div>
-					<div class="fieldset clear">
-						<h3>'.__('Active codes').'</h3>
-						'.$behaviors_table.'
-						<div class="clear"></div>
-					</div>
-					<div class="fieldset clear">
-						<h3>'.__('Options').'</h3>
-						<p>
-							<label class="classic" for="backup">'.__('Extension Backup Files').' : </label>
-							'.form::field('backup',25,255,$this->settings('backup_ext', null, 'global'),'classic').'&nbsp;&nbsp;&nbsp;
-							<span class="info">'
-								.sprintf(__('Settings for %s'),html::escapeHTML($this->core->blog->name)).' : <strong>'
-								.$this->settings('backup_ext').'</strong>
-							</span>
-						</p>
-						<p class="form-note">'.__('Default extension backup files.').'</p>
-					</div>
+				<div class="fieldset clear">
+					<h3>'.__('Activation').'</h3>
+					<p>
+						'.form::checkbox('enabled','1',$this->settings('enabled', null, 'global')).
+						'<label class="classic" for="enabled">
+							'.sprintf(__('Enable %s on this blog'), html::escapeHTML(__($this->info('name')))).'&nbsp;&nbsp;&nbsp;
+						</label>
+						<span class="form-note">'.__('Enable the plugin on this blog.').'</span>
+					</p>
 				</div>
-			</div>';
+				<div class="fieldset clear">
+					<h3>'.__('Active codes').'</h3>
+					'.$behaviors_table.'
+					<div class="clear"></div>
+				</div>
+				<div class="fieldset clear">
+					<h3>'.__('Options').'</h3>
+					<p>
+						<label class="classic" for="backup">'.__('Extension Backup Files').' : </label>
+						'.form::field('backup', 25, 255, $this->settings('backup_ext', null, 'global'),'classic').'&nbsp;&nbsp;&nbsp;
+						<span class="form-note">'.__('Default extension backup files.').'</span>
+					</p>
+				</div>
+			</div>
+		';
 		dcPage::helpBlock('dcScript-config');
 	}
-	
+
 	# admin index page
 	public function indexPage() {
 		if(!defined('DC_CONTEXT_ADMIN')) { return; }
@@ -151,7 +135,9 @@ class dcScript extends dcPluginHelper025 {
 		$behaviors_list = $this->settings('behaviors');		
 		$behaviors = array();
 		foreach($behaviors_list as $k => &$v) {
-			if($v['enabled']) { $behaviors[$k] = $k; }
+			if($v['enabled']) {
+				$behaviors[(empty($v['content']) ? '&#9647;' : '&#9646;').'&nbsp;'.($v['active'] ? '&#10004;' : '&#10008;').'&nbsp;-&nbsp;'.$k] = $k;
+			}
 		}
 		//$this->debugLog('POST', $_POST);
 		try {
@@ -197,7 +183,7 @@ class dcScript extends dcPluginHelper025 {
 					//$this->jsLoad('/codemirror/codemirror-custom.js').NL.
 					$this->jsLoad('/codemirror/codemirror-compressed.js').NL.
 					$this->jsLoad('/inc/admin.js').NL.
-					$this->cssLoad('/inc/style.css').NL.
+					$this->cssLoad('/inc/admin.css').NL.
 					dcPage::jsConfirmClose('dcScript-form').NL.'
 				</head>
 				<body class="dcscript no-js">

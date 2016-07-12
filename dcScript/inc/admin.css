@@ -40,6 +40,6 @@ body.no-js # {
 	display: none;
 }
 */
-body.with-js #behaviors_go {
+body.with-js #behaviors_go, body.with-js #scope_go {
 	display: none;
 }

@@ -1,20 +1,19 @@
 <?php
 /* -- BEGIN LICENSE BLOCK -----------------------------------------------------
- * Plugin helper for dotclear version 2.8 and more
- * Version : 0.25.0
+ * Plugin helper for dotclear version 2.9 or hegher
  * Copyright © 2008-2016 Gvx
  * Licensed under the GPL version 2.0 license.
  * (http://www.gnu.org/licenses/old-licenses/gpl-2.0.html)
  * -- END LICENSE BLOCK -----------------------------------------------------*/
 if(!defined('DC_RC_PATH')) { return; }
 
-if (!defined('NL')) { define('NL', "\n"); }    // New Line
+if (!defined('NL')) { define('NL', "\n"); }		// New Line
+if (!defined('DC_VAR')) { define('DC_VAR', DC_ROOT.'/var'); }		// emulation DC_VAR for dc < 2.10
 
-abstract class dcPluginHelper025 {
+abstract class dcPluginHelper029 {
 
 	### Constants ###
-	const VERSION = '0.25.2';				// class version
-	const DC_SHARED_DIR = '_shared';		// shared directory name 
+	const VERSION = '0.29.1';					// class version
 
 	### Specific functions to overload ###
 
@@ -45,11 +44,11 @@ abstract class dcPluginHelper025 {
 	public function configPage() {
 		global $core;
 		if(!defined('DC_CONTEXT_ADMIN')) { return; }
-		dcPage::checkSuper();
+		if(!$this->core->auth->check($this->info('permissions'), $this->core->blog->id)) { return; }
+		$scope = $this->configScope();
 		if (isset($_POST['save'])) {
 			try {
-				$global = ($_POST['global_settings'] == 'global_settings' ? 'global' :'local');
-				$this->settings('enabled', !empty($_POST['enabled']), $global);
+				$this->settings('enabled', !empty($_POST['enabled']), $scope);
 				$core->blog->triggerBlog();
 				dcPage::addSuccessNotice(__('Configuration successfully updated.'));
 			} catch(exception $e) {
@@ -61,9 +60,12 @@ abstract class dcPluginHelper025 {
 				$core->adminurl->redirect('admin.home');
 			}
 			http::redirect($_REQUEST['redir']);
+		} elseif($scope == 'global') {
+			dcPage::addWarningNotice(__('Globals options'));
 		}
 
 		echo
+			$this->configBaseline($scope).
 			'<div class="fieldset">
 				<h3>'.__('Activation').'</h3>
 				<p>
@@ -73,28 +75,10 @@ abstract class dcPluginHelper025 {
 					'</label>
 				</p>
 				<p class="form-note">'.__('Enable the plugin on this blog.').'</p>
-				<p class="info">'
-					.sprintf(__('Settings for %s'),html::escapeHTML($core->blog->name)).' : <strong>'
-					.($this->settings('enabled') ? __('Enabled') : __('Disabled')).'</strong>
-				</p>
 			</div>
 			<!-- HTML CODE HERE -->
-			<div class="fieldset clear">
-				<h3>'.__('Scope').'</h3>
-				<div class="two-cols clear">
-					<div class="col">
-						<p>'.form::radio(array('global_settings'), html::escapeHTML('global_settings'), true).'
-						<label class="classic" for="global_settings">'.__('Global settings').'</label></p>
-					</div>
-					<div class="col">
-						<p>'.form::radio(array('global_settings', 'local_settings'), html::escapeHTML('local_settings'), false).'
-						<label class="classic" for="local_settings">'.sprintf(__('Settings for %s'),html::escapeHTML($core->blog->name)).'</label></p>
-					</div>
-				</div>
-				<div class="clear"></div>
-			</div>
-		';
-		dcPage::helpBlock(/*'dcScript-config'*/);
+			';
+			dcPage::helpBlock(/*'dcScript-config'*/);
 		
 	}
 	
@@ -117,7 +101,7 @@ abstract class dcPluginHelper025 {
 				<head>
 					<title>'.html::escapeHTML($this->info('name')).'</title>'.
 					$this->jsLoad('/inc/admin.js').NL.
-					$this->cssLoad('/inc/style.css').NL.'
+					$this->cssLoad('/inc/admin.css').NL.'
 				</head>
 				<body class="no-js">
 					'.$this->adminBaseline().NL.'
@@ -207,11 +191,30 @@ abstract class dcPluginHelper025 {
 	}
 
 	protected final function configLink($label, $redir=null, $prefix='', $suffix='') {
-		if($this->core->auth->isSuperAdmin() && is_file(path::real($this->info('root').'/_config.php'))) {
+		if($this->core->auth->check($this->info('permissions'), $this->core->blog->id) && is_file(path::real($this->info('root').'/_config.php'))) {
 			$redir = $this->core->adminurl->get(empty($redir) ? $this->admin_url : $redir);
 			$href = $this->core->adminurl->get('admin.plugins', array('module' => $this->plugin_id,'conf' => 1, 'redir' => $redir));
 			return $prefix.'<a href="'.$href.'">'.$label.'</a>'.$suffix;
 		}
+	}
+	
+	protected final function configScope() {
+		return (isset($_POST['scope']) ? $_POST['scope'] : ($this->core->auth->isSuperAdmin() ? 'global' : 'local'));
+	}
+
+	protected function configBaseline($scope=null) {
+		if($this->core->auth->isSuperAdmin()) {
+			if(empty($scope)) { $scope = $this->configScope(); }
+			$html =	'<p class="anchor-nav">
+						<label class="classic">'.__('Scope').'&nbsp;:&nbsp;
+							'.form::combo('scope', array(__('Global settings') => 'global', sprintf(__('Settings for %s'), html::escapeHTML($this->core->blog->name)) => 'local'), $scope).'
+							<input id="scope_go" name="scope_go" type="submit" value="'.__('Go').'" />
+						</label>
+					</p>'.NL;
+		} else {
+			$html = '';
+		}
+		return NL.$this->jsLoad('/inc/config.js').$this->cssLoad('/inc/config.css', 'screen', true).dcPage::jsConfirmClose('module_config').$html;
 	}
 
 	public function adminMenu($menu='Plugins') {
@@ -222,7 +225,7 @@ abstract class dcPluginHelper025 {
 				html::escapeHTML(__($this->info('name'))),									// Item menu
 				$this->core->adminurl->get($this->admin_url),								// Page admin url
 				dcPage::getPF($this->icon_small),											// Icon menu
-				preg_match(																																		// Pattern url
+				preg_match(																	// Pattern url
 					'/'.$this->core->adminurl->get($this->admin_url).'(&.*)?$/',
 					$_SERVER['REQUEST_URI']
 				),
@@ -295,15 +298,16 @@ abstract class dcPluginHelper025 {
 
 	### Common functions ###
 
-	protected static function getSharedDir($dir='') {
+	protected static function getVarDir($dir='') {
 		$dir = trim($dir, '\\/');
-		$dc_shared = DC_TPL_CACHE.'/'.self::DC_SHARED_DIR;
-		$shared = path::real($dc_shared.(empty($dir) ? '' : '/'.$dir), false);
-		if(strpos($shared, $dc_shared) === false) { throw new Exception(__('The folder is not in the shared directory')); }
-		if(!is_dir($shared)) {
-			if(!mkdir($shared, 0700, true)) { throw new Exception(__('Creating a shared directory failed')); }
+		$var_dir = path::real(DC_VAR.(empty($dir) ? '' : '/'.$dir), false);
+		if(strpos($var_dir, DC_VAR) === false) { throw new Exception(__('The folder is not in the var directory')); }
+		if(!is_dir($var_dir)) {
+			if(!mkdir($var_dir, 0700, true)) { throw new Exception(__('Creating a var directory failed')); }
+			$f = DC_VAR.'/.htaccess'; 
+			if (!file_exists($f)) { @file_put_contents($f,'Require all denied'.NL.'Deny from all'.NL); } 			
 		}
-		return $shared;
+		return $var_dir;
 	}
 
 	protected final function settings($key, $value=null, $scope='default') {
@@ -364,36 +368,45 @@ abstract class dcPluginHelper025 {
 		}
 	}
 
+	# for dc 2.9 or hegher
 	protected final function jsLoad($src) {
 		$file = $this->plugin_id.'/'.ltrim($src, '/');
 		$version = $this->info('version');
 		if(defined('DC_CONTEXT_ADMIN')) {
 			return dcPage::jsLoad(dcPage::getPF($file), $version);
 		} else {
-			if(version_compare(DC_VERSION, '2.9', '<')) {
-				$href = $this->core->blog->getQmarkURL().'pf='.html::escapeHTML($file).(strpos($file, '?') === false ? '?' : '&amp;').'v='.$version;
-				return '<script type="text/javascript" src="'.$href.'"></script>'."\n";
-			} else {
-				return dcUtils::jsLoad($this->core->blog->getPF($file), $version);
-			}
+			return dcUtils::jsLoad($this->core->blog->getPF($file), $version);
 		}
 	}
 
-	protected final function cssLoad($src, $media='screen') {
+	# for dc 2.9 or hegher
+	protected final function cssLoad($src, $media='screen', $import=false) {
 		$file = $this->plugin_id.'/'.ltrim($src, '/');
 		$version = $this->info('version');
 		if(defined('DC_CONTEXT_ADMIN')) {
-			return dcPage::cssLoad(dcPage::getPF($file), $media, $version);
+			if($import) {
+				return	'<style type="text/css">@import url('.dcPage::getPF($file).');</style>'.NL;
+			} else {
+				return dcPage::cssLoad(dcPage::getPF($file), $media, $version);
+			}
 		} else {
-			if(version_compare(DC_VERSION, '2.9', '<')) {
-				$href = $this->core->blog->getQmarkURL().'pf='.html::escapeHTML($file).(strpos($file, '?') === false ? '?' : '&amp;').'v='.$version;
-				return '<link rel="stylesheet" href="'.$href.'" type="text/css" media="'.$media.'" />'."\n";
+			if($import) {
+				return	'<style type="text/css">@import url('.$this->core->blog->getPF($file).');</style>'.NL;
 			} else {
 				return dcUtils::cssLoad($this->core->blog->getPF($file), $media, $version);
 			}
 		}
 	}
-
+	
+	# for dc 2.10 or hegher
+	protected final function getVF($file) {
+		if(defined('DC_CONTEXT_ADMIN')) {
+			return dcPage::getVF($file);
+		} else {
+			return $this->core->blog->getVF($file);
+		}
+	}
+	
 	### debug functions ###
 
 	protected final function debugDisplay($msg) {
@@ -406,7 +419,7 @@ abstract class dcPluginHelper025 {
 	protected final function debugLog($text, $value=null) {
 		if($this->debug_log && !empty($text)) {
 			if(empty($this->debug_logfile)) {				# initialization
-				$this->debug_logfile = self::getSharedDir('logs').'/log_'.$this->plugin_id.'.txt';
+				$this->debug_logfile = self::getVarDir('logs').'/log_'.$this->plugin_id.'.txt';
 				if($this->debug_log_reset && is_file($this->debug_logfile)) { @unlink($this->debug_logfile); }
 			}
 			if(!empty($value)) { $text .= ':'.NL.print_r($value, true).NL.str_pad('', 60, '*'); }

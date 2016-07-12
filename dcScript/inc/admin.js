@@ -46,7 +46,6 @@
 						$exportButton.addClass('disabled');
 						$checkChange.val('true');
 						$behaviors.val($('#behavior_edit').val()).attr('disabled', 'disabled');
-						//$behaviorsGo.attr('disabled', 'disabled');
 					};
 				if (el) {
 					cm = CodeMirror.fromTextArea(el, cm_options);
@@ -54,7 +53,6 @@
 					if (!cm.doc.getValue()) {												// Code empty
 						$exportButton.addClass('disabled');
 					}
-					//$behaviorsGo.attr('disabled', 'disabled');
 					cm.on('change', function (e) {											// edit change
 						changes();
 					});
@@ -62,7 +60,8 @@
 						changes();
 					});
 					$behaviors.on('change', function (e) {									// select behaviors change
-						$behaviorsGo./*removeAttr('disabled').*/trigger('click');
+						document.body.style.cursor = 'wait';
+						$behaviorsGo.trigger('click');
 					});
 					$('form').on('reset', function (e) {									// Action reset
 						cm.doc.setValue(el.defaultValue);
@@ -72,9 +71,6 @@
 						if (cm.doc.getValue()) { $exportButton.removeClass('disabled'); }
 						$behaviors.removeAttr('disabled');
 						$checkChange.val('');
-					});
-					$(window).on('hashchange', function (e) {								// set focus
-						setTimeout(function () { cm.focus(); }, 0);
 					});
 				}
 				$actionButtons.attr('disabled', 'disabled');
