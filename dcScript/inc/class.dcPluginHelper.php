@@ -31,7 +31,11 @@ abstract class dcPluginHelper029 {
 	protected function installActions($old_version) {
 		# upgrade previous versions
 		if(!empty($old_version)) {
-
+			try {
+				# TODO HERE Specifics upgrades
+			} catch(Exception $e) {
+				$core->error->add(__('Something went wrong with auto upgrade:').' '.$e->getMessage());
+			}
 		}
 		$this->debugDisplay('Not install actions for this plugin.');
 	}
@@ -40,30 +44,25 @@ abstract class dcPluginHelper029 {
 		# specific actions for uninstall
 		$this->debugDisplay('Not uninstall actions for this plugin.');
 	}
-	
+
 	public function configPage() {
-		global $core;
-		if(!defined('DC_CONTEXT_ADMIN')) { return; }
-		if(!$this->core->auth->check($this->info('permissions'), $this->core->blog->id)) { return; }
+		if(!defined('DC_CONTEXT_ADMIN') || !$this->core->auth->check('admin', $this->core->blog->id)) { return; }
 		$scope = $this->configScope();
 		if (isset($_POST['save'])) {
 			try {
 				$this->settings('enabled', !empty($_POST['enabled']), $scope);
-				$core->blog->triggerBlog();
+				$this->core->blog->triggerBlog();
 				dcPage::addSuccessNotice(__('Configuration successfully updated.'));
 			} catch(exception $e) {
-				//$core->error->add($e->getMessage());
-				$core->error->add(__('Unable to save the configuration'));
+				//$this->core->error->add($e->getMessage());
+				$this->core->error->add(__('Unable to save the configuration'));
 			}
 			if(!empty($_GET['redir']) && strpos($_GET['redir'], 'p='.$this->info('id')) === false) {
-				$core->error->add(__('Redirection not found'));
-				$core->adminurl->redirect('admin.home');
+				$this->core->error->add(__('Redirection not found'));
+				$this->core->adminurl->redirect('admin.home');
 			}
 			http::redirect($_REQUEST['redir']);
-		} elseif($scope == 'global') {
-			dcPage::addWarningNotice(__('Globals options'));
 		}
-
 		echo
 			$this->configBaseline($scope).
 			'<div class="fieldset">
@@ -79,29 +78,35 @@ abstract class dcPluginHelper029 {
 			<!-- HTML CODE HERE -->
 			';
 			dcPage::helpBlock(/*'dcScript-config'*/);
-		
 	}
-	
+
 	public function indexPage() {
-		global $core;
 		if(!defined('DC_CONTEXT_ADMIN')) { return; }
 		//dcPage::check('dcScript.edit');
 		if(!$this->settings('enabled') && is_file(path::real($this->info('root').'/_config.php'))) {
-			if($core->auth->isSuperAdmin()) {
-				$core->adminurl->redirect('admin.plugins', array(
-					'module' => $this->info('id'),'conf' => 1, 'redir' => $core->adminurl->get($this->info('adminUrl'))
+			if($this->core->auth->check('admin', $this->core->blog->id)) {
+				$this->core->adminurl->redirect('admin.plugins', array(
+					'module' => $this->info('id'),'conf' => 1, 'redir' => $this->core->adminurl->get($this->info('adminUrl'))
 				));
 			} else {
 				dcPage::addNotice('message', sprintf(__('%s plugin is not configured.'), $this->info('name')));
-				$core->adminurl->redirect('admin.home');
+				$this->core->adminurl->redirect('admin.home');
 			}
+		}
+		try {
+			if (isset($_POST['save'])) {
+				// TODO HERE inputs check
+			}
+		} catch(exception $e) {
+			//$this->core->error->add($e->getMessage());
+			$this->core->error->add(__('Unable to save the code'));
 		}
 		echo
 			'<html>
 				<head>
 					<title>'.html::escapeHTML($this->info('name')).'</title>'.
-					$this->jsLoad('/inc/admin.js').NL.
-					$this->cssLoad('/inc/admin.css').NL.'
+					$this->jsLoad('/inc/index.js').NL.
+					$this->cssLoad('/inc/index.css').NL.'
 				</head>
 				<body class="no-js">
 					'.$this->adminBaseline().NL.'
@@ -191,30 +196,42 @@ abstract class dcPluginHelper029 {
 	}
 
 	protected final function configLink($label, $redir=null, $prefix='', $suffix='') {
-		if($this->core->auth->check($this->info('permissions'), $this->core->blog->id) && is_file(path::real($this->info('root').'/_config.php'))) {
+		if($this->core->auth->check('admin', $this->core->blog->id) && is_file(path::real($this->info('root').'/_config.php'))) {
 			$redir = $this->core->adminurl->get(empty($redir) ? $this->admin_url : $redir);
 			$href = $this->core->adminurl->get('admin.plugins', array('module' => $this->plugin_id,'conf' => 1, 'redir' => $redir));
 			return $prefix.'<a href="'.$href.'">'.$label.'</a>'.$suffix;
 		}
 	}
-	
+
 	protected final function configScope() {
-		return (isset($_POST['scope']) ? $_POST['scope'] : ($this->core->auth->isSuperAdmin() ? 'global' : 'local'));
+		return (isset($_POST['scope']) ? $_POST['scope'] : ($this->core->auth->isSuperAdmin() ? 'global' : 'default'));
 	}
 
 	protected function configBaseline($scope=null) {
 		if($this->core->auth->isSuperAdmin()) {
 			if(empty($scope)) { $scope = $this->configScope(); }
+			if($scope == 'global') { dcPage::addWarningNotice(__('Update global options')); }
 			$html =	'<p class="anchor-nav">
 						<label class="classic">'.__('Scope').'&nbsp;:&nbsp;
-							'.form::combo('scope', array(__('Global settings') => 'global', sprintf(__('Settings for %s'), html::escapeHTML($this->core->blog->name)) => 'local'), $scope).'
+							'.form::combo('scope', array(__('Global settings') => 'global', sprintf(__('Settings for %s'), html::escapeHTML($this->core->blog->name)) => 'default'), $scope).'
 							<input id="scope_go" name="scope_go" type="submit" value="'.__('Go').'" />
 						</label>
-					</p>'.NL;
+					</p>';
 		} else {
 			$html = '';
 		}
-		return NL.$this->jsLoad('/inc/config.js').$this->cssLoad('/inc/config.css', 'screen', true).dcPage::jsConfirmClose('module_config').$html;
+		$html .= '
+			<div class="fieldset clear">
+				<h3>'.__('Activation').'</h3>
+				<p>
+					'.form::checkbox('enabled','1',$this->settings('enabled', null, $scope)).
+					'<label class="classic" for="enabled">
+						'.sprintf(__('Enable %s on this blog'), html::escapeHTML(__($this->info('name')))).'&nbsp;&nbsp;&nbsp;
+					</label>
+					<span class="form-note">'.__('Enable the plugin on this blog.').'</span>
+				</p>
+			</div>'.NL;
+		return NL.$this->jsLoad('/inc/config.js').$this->cssLoad('/inc/config.css', 'all', true).dcPage::jsConfirmClose('module_config').$html;
 	}
 
 	public function adminMenu($menu='Plugins') {
@@ -304,8 +321,8 @@ abstract class dcPluginHelper029 {
 		if(strpos($var_dir, DC_VAR) === false) { throw new Exception(__('The folder is not in the var directory')); }
 		if(!is_dir($var_dir)) {
 			if(!mkdir($var_dir, 0700, true)) { throw new Exception(__('Creating a var directory failed')); }
-			$f = DC_VAR.'/.htaccess'; 
-			if (!file_exists($f)) { @file_put_contents($f,'Require all denied'.NL.'Deny from all'.NL); } 			
+			$f = DC_VAR.'/.htaccess';
+			if (!file_exists($f)) { @file_put_contents($f,'Require all denied'.NL.'Deny from all'.NL); }
 		}
 		return $var_dir;
 	}
@@ -380,24 +397,24 @@ abstract class dcPluginHelper029 {
 	}
 
 	# for dc 2.9 or hegher
-	protected final function cssLoad($src, $media='screen', $import=false) {
+	protected final function cssLoad($src, $media='all', $import=false) {
 		$file = $this->plugin_id.'/'.ltrim($src, '/');
 		$version = $this->info('version');
 		if(defined('DC_CONTEXT_ADMIN')) {
 			if($import) {
-				return	'<style type="text/css">@import url('.dcPage::getPF($file).');</style>'.NL;
+				return	'<style type="text/css">@import url('.dcPage::getPF($file).') '.$media.';</style>'.NL;
 			} else {
 				return dcPage::cssLoad(dcPage::getPF($file), $media, $version);
 			}
 		} else {
 			if($import) {
-				return	'<style type="text/css">@import url('.$this->core->blog->getPF($file).');</style>'.NL;
+				return	'<style type="text/css">@import url('.$this->core->blog->getPF($file).') '.$media.';</style>'.NL;
 			} else {
 				return dcUtils::cssLoad($this->core->blog->getPF($file), $media, $version);
 			}
 		}
 	}
-	
+
 	# for dc 2.10 or hegher
 	protected final function getVF($file) {
 		if(defined('DC_CONTEXT_ADMIN')) {
@@ -406,7 +423,7 @@ abstract class dcPluginHelper029 {
 			return $this->core->blog->getVF($file);
 		}
 	}
-	
+
 	### debug functions ###
 
 	protected final function debugDisplay($msg) {
@@ -423,7 +440,7 @@ abstract class dcPluginHelper029 {
 				if($this->debug_log_reset && is_file($this->debug_logfile)) { @unlink($this->debug_logfile); }
 			}
 			if(!empty($value)) { $text .= ':'.NL.print_r($value, true).NL.str_pad('', 60, '*'); }
-			file_put_contents ($this->debug_logfile, NL.'['.date('Y-m-d-H-i-s').'] : ['.$this->plugin_id.'] : ['.$this->core->blog->id.'] : '.$text, FILE_APPEND);
+			@file_put_contents ($this->debug_logfile, NL.'['.date('Y-m-d-H-i-s').'] : ['.$this->plugin_id.'] : ['.$this->core->blog->id.'] : '.$text, FILE_APPEND);
 		}
 	}
 

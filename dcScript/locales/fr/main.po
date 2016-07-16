@@ -1,14 +1,14 @@
 # Language: Français
-# Module: dcScript - 3.0.0-r0036
-# Date: 2016-07-12 05:58:49
+# Module: dcScript - 3.0.0-r0043
+# Date: 2016-07-16 09:36:55
 # Translated with translater 2013.05.11
 
 msgid ""
 msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
-"Project-Id-Version: dcScript 3.0.0-r0036\n"
+"Project-Id-Version: dcScript 3.0.0-r0043\n"
 "POT-Creation-Date: \n"
-"PO-Revision-Date: 2016-07-12T05:58:49+00:00\n"
+"PO-Revision-Date: 2016-07-16T09:36:55+00:00\n"
 "Last-Translator: Gvx\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -20,78 +20,74 @@ msgstr "Editer les scripts public"
 
 #: inc/class.dcPluginHelper.php:23
 #: inc/class.dcPluginHelper.php:26
-#: inc/class.dcScript.php:378
+#: inc/class.dcScript.php:243
 msgid "Enable plugin"
 msgstr "Activer le plugin"
 
-#: inc/class.dcPluginHelper.php:56
-#: inc/class.dcScript.php:48
-#: inc/class.dcScript.php:150
+#: inc/class.dcPluginHelper.php:58
+#: inc/class.dcScript.php:47
 msgid "Unable to save the configuration"
 msgstr "Impossible de sauver la configuration"
 
-#: inc/class.dcPluginHelper.php:59
-#: inc/class.dcScript.php:51
-#: inc/class.dcScript.php:153
+#: inc/class.dcPluginHelper.php:61
+#: inc/class.dcScript.php:50
 msgid "Redirection not found"
 msgstr "Redirection introuvable"
 
-#: inc/class.dcPluginHelper.php:71
-#: inc/class.dcScript.php:106
-#: inc/class.dcScript.php:208
+#: inc/class.dcPluginHelper.php:73
+#: inc/class.dcPluginHelper.php:229
 msgid "Enable %s on this blog"
 msgstr "Activer %s pour ce blog"
 
-#: inc/class.dcPluginHelper.php:74
-#: inc/class.dcScript.php:108
-#: inc/class.dcScript.php:215
+#: inc/class.dcPluginHelper.php:76
+#: inc/class.dcPluginHelper.php:231
 msgid "Enable the plugin on this blog."
 msgstr "Activer le plugin pour ce blog"
 
-#: inc/class.dcPluginHelper.php:77
-#: inc/class.dcScript.php:67
-#: inc/class.dcScript.php:169
-#: inc/class.dcScript.php:212
-msgid "Enabled"
-msgstr "Activé"
-
-#: inc/class.dcPluginHelper.php:77
-#: inc/class.dcScript.php:212
-msgid "Disabled"
-msgstr "Désactivé"
-
-#: inc/class.dcPluginHelper.php:82
-#: inc/class.dcScript.php:93
-#: inc/class.dcScript.php:192
-msgid "Scope"
-msgstr "Domaine d'application"
-
-#: inc/class.dcPluginHelper.php:110
-#: inc/class.dcScript.php:251
+#: inc/class.dcPluginHelper.php:92
+#: inc/class.dcScript.php:116
 msgid "%s plugin is not configured."
 msgstr "Le plugin %s n'est pas configuré"
 
-#: inc/class.dcPluginHelper.php:234
+#: inc/class.dcPluginHelper.php:102
+#: inc/class.dcScript.php:140
+msgid "Unable to save the code"
+msgstr "Impossible de sauver le code"
+
+#: inc/class.dcPluginHelper.php:213
+msgid "Update global options"
+msgstr "Mise à jour des options globales"
+
+#: inc/class.dcPluginHelper.php:215
+msgid "Scope"
+msgstr "Domaine d'application"
+
+#: inc/class.dcPluginHelper.php:217
+#: inc/class.dcScript.php:183
+msgid "Go"
+msgstr "Aller"
+
+#: inc/class.dcPluginHelper.php:253
 msgid "%s menu not present."
 msgstr "le menu %s est absent"
 
-#: inc/class.dcPluginHelper.php:258
+#: inc/class.dcPluginHelper.php:277
 msgid "icon plugin"
 msgstr "Icone"
 
-#: inc/class.dcPluginHelper.php:259
+#: inc/class.dcPluginHelper.php:278
 msgid "Settings"
 msgstr "Paramètres"
 
-#: inc/class.dcPluginHelper.php:262
+#: inc/class.dcPluginHelper.php:281
 msgid "Author(s)"
 msgstr "Auteur(s)"
 
-#: inc/class.dcPluginHelper.php:302
+#: inc/class.dcPluginHelper.php:321
 msgid "The folder is not in the var directory"
 msgstr "Le dossier ne se trouve pas dans le répertoire VAR"
 
-#: inc/class.dcPluginHelper.php:304
+#: inc/class.dcPluginHelper.php:323
 msgid "Creating a var directory failed"
 msgstr "La creation du répertoire VAR a échoué"
 
@@ -103,95 +99,77 @@ msgstr "dcScript"
 msgid "Add script for DC 2.9+"
 msgstr "Ajouter des scripts a doctlear v2.9+"
 
-#: inc/class.dcScript.php:56
-msgid "Globals options"
-msgstr "Options globales"
-
-#: inc/class.dcScript.php:62
-#: inc/class.dcScript.php:163
+#: inc/class.dcScript.php:59
 msgid "Behaviors list"
 msgstr "Liste des behaviors (comportements)"
 
-#: inc/class.dcScript.php:66
-#: inc/class.dcScript.php:167
+#: inc/class.dcScript.php:63
 msgid "Allowed"
 msgstr "Autorisé"
 
-#: inc/class.dcScript.php:68
+#: inc/class.dcScript.php:64
+msgid "Enabled"
+msgstr "Activé"
+
+#: inc/class.dcScript.php:65
 msgid "content"
 msgstr "Contenu"
 
-#: inc/class.dcScript.php:79
+#: inc/class.dcScript.php:76
 msgid "Empty"
 msgstr "Vide"
 
-#: inc/class.dcScript.php:79
+#: inc/class.dcScript.php:76
 msgid "Filled"
 msgstr "Rempli"
 
-#: inc/class.dcScript.php:95
-#: inc/class.dcScript.php:318
-msgid "Go"
-msgstr "Aller"
-
-#: inc/class.dcScript.php:112
-#: inc/class.dcScript.php:218
+#: inc/class.dcScript.php:90
 msgid "Active codes"
 msgstr "Codes actifs"
 
-#: inc/class.dcScript.php:119
-#: inc/class.dcScript.php:225
-#: inc/class.dcScript.php:379
+#: inc/class.dcScript.php:92
+msgid "Allowed: Available for editing"
+msgstr "Autorisé: Disponible pour l'édition"
+
+#: inc/class.dcScript.php:92
+msgid "Enabled: Enable insertion in the public pages"
+msgstr "Activé: Active l'insetion dans les pages publiques"
+
+#: inc/class.dcScript.php:97
+#: inc/class.dcScript.php:244
 msgid "Extension Backup Files"
 msgstr "Extension des fichiers de sauvegarde"
 
-#: inc/class.dcScript.php:121
-#: inc/class.dcScript.php:232
+#: inc/class.dcScript.php:99
 msgid "Default extension backup files."
 msgstr "Extension par defaut des fichiers de sauvegarde"
 
-#: inc/class.dcScript.php:168
-msgid "Allowed for %s"
-msgstr "Autorisé pour %s"
-
-#: inc/class.dcScript.php:170
-msgid "Enabled for %s"
-msgstr "Activé pour %s"
-
-#: inc/class.dcScript.php:270
+#: inc/class.dcScript.php:135
 msgid "Code successfully updated."
 msgstr "Mise à jour du code avec succès"
 
-#: inc/class.dcScript.php:275
-msgid "Unable to save the code"
-msgstr "Impossible de sauver le code"
-
-#: inc/class.dcScript.php:282
+#: inc/class.dcScript.php:147
 msgid "Unable to select the code"
 msgstr "Impossible de choisir un code"
 
-#: inc/class.dcScript.php:296
+#: inc/class.dcScript.php:161
 msgid "Unable to save the file"
 msgstr "Impossible de sauver le fichier"
 
-#: inc/class.dcScript.php:316
+#: inc/class.dcScript.php:181
 msgid "Behavior"
 msgstr "Behavior (comportement)"
 
-#: inc/class.dcScript.php:324
+#: inc/class.dcScript.php:189
 msgid "Save the configuration"
 msgstr "Sauver la configuration"
 
-#: inc/class.dcScript.php:325
+#: inc/class.dcScript.php:190
 msgid "Undo changes"
 msgstr "Annuler les changements"
 
-#: inc/class.dcScript.php:380
-#: inc/class.dcScript.php:381
+#: inc/class.dcScript.php:245
+#: inc/class.dcScript.php:246
 msgid "behaviors array"
 msgstr "Table des comportements (behaviors)"
-
-#: inc/class.dcScript.php:405
-msgid "Default settings update."
-msgstr "les paramètres par défaut ont été mis a jour"
 

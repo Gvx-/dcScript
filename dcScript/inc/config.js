@@ -14,7 +14,8 @@
 			document.body.style.cursor = 'wait';
 			$('#scope_go').trigger('click');
 		});
-		$('form').on('change', function (e) {
+		$('form input:not(#scope)').on('change', function (e) {
+			$('#scope').attr('disabled', 'disabled');
 			$('input[name="save"]').removeAttr('disabled');
 		});
 	});

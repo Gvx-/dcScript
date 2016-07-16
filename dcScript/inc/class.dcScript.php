@@ -11,7 +11,7 @@ __('dcScript');						// plugin name
 __('Add script for DC 2.9+');		// description plugin
 
 class dcScript extends dcPluginHelper029 {
-	
+
 	# behaviors functions
 	public function publicHeadContent($core, $_ctx) {$this->codeInsert('publicHeadContent');}
 	public function publicFooterContent($core, $_ctx) { $this->codeInsert('publicFooterContent'); }
@@ -28,12 +28,11 @@ class dcScript extends dcPluginHelper029 {
 
 	# admin configuration page
 	public function configPage() {
-		if(!defined('DC_CONTEXT_ADMIN')) { return; }
-		if(!$this->core->auth->check($this->info('permissions'), $this->core->blog->id)) { return; }
+		if(!defined('DC_CONTEXT_ADMIN') || !$this->core->auth->check('admin', $this->core->blog->id)) { return; }
 		$scope = $this->configScope();
 		if (isset($_POST['save'])) {
 			try {
-				$behaviors = ($scope == 'global' ? $this->settings('behaviors', null, $scope) : $this->settings('behaviors'));
+				$behaviors = $this->settings('behaviors', null, $scope);
 				foreach($behaviors as $k => &$v) {
 					$v['enabled'] = !empty($_POST['enabled_'.$k]);
 					$v['active'] = !empty($_POST['active_'.$k]);
@@ -52,8 +51,6 @@ class dcScript extends dcPluginHelper029 {
 				$this->core->adminurl->redirect('admin.home');
 			}
 			http::redirect($_REQUEST['redir']);
-		} elseif($scope == 'global') {
-			dcPage::addWarningNotice(__('Globals options'));
 		}
 		$behaviors = $this->settings('behaviors', null, $scope);
 		$behaviors_table = '
@@ -73,11 +70,11 @@ class dcScript extends dcPluginHelper029 {
 			if($this->core->auth->isSuperAdmin() || $v['enabled']) {
 				$behaviors_table .= '
 					<tr class="line">
-						<td scope="row" class="nowrap">'.html::escapeHTML($k).'</td>
-						'.($this->core->auth->isSuperAdmin() ? '<td scope="row" class="nowrap">'.form::checkbox('enabled_'.$k, html::escapeHTML($k), $v['enabled']).'</td>' : '').'
-						<td scope="row" class="nowrap">'.form::checkbox('active_'.$k, html::escapeHTML($k), $v['active']).'</td>
-						<td scope="row" class="nowrap">'.(empty(html::escapeHTML($v['content'])) ? __('Empty') : __('Filled')).'</td>
-						<td scope="row" class="maximal nowrap">'.''.'</td>
+						<td class="nowrap">'.html::escapeHTML($k).'</td>
+						'.($this->core->auth->isSuperAdmin() ? '<td class="nowrap">'.form::checkbox('enabled_'.$k, html::escapeHTML($k), $v['enabled']).'</td>' : '').'
+						<td class="nowrap">'.form::checkbox('active_'.$k, html::escapeHTML($k), $v['active']).'</td>
+						<td class="nowrap">'.(empty(html::escapeHTML($v['content'])) ? __('Empty') : __('Filled')).'</td>
+						<td class="maximal nowrap">'.''.'</td>
 					</tr>
 				';
 			}
@@ -89,33 +86,21 @@ class dcScript extends dcPluginHelper029 {
 		';
 		echo
 			$this->configBaseline($scope).
-			'<div id="options">
-				<div class="fieldset clear">
-					<h3>'.__('Activation').'</h3>
-					<p>
-						'.form::checkbox('enabled','1',$this->settings('enabled', null, 'global')).
-						'<label class="classic" for="enabled">
-							'.sprintf(__('Enable %s on this blog'), html::escapeHTML(__($this->info('name')))).'&nbsp;&nbsp;&nbsp;
-						</label>
-						<span class="form-note">'.__('Enable the plugin on this blog.').'</span>
-					</p>
-				</div>
-				<div class="fieldset clear">
-					<h3>'.__('Active codes').'</h3>
-					'.$behaviors_table.'
-					<div class="clear"></div>
-				</div>
-				<div class="fieldset clear">
-					<h3>'.__('Options').'</h3>
-					<p>
-						<label class="classic" for="backup">'.__('Extension Backup Files').' : </label>
-						'.form::field('backup', 25, 255, $this->settings('backup_ext', null, 'global'),'classic').'&nbsp;&nbsp;&nbsp;
-						<span class="form-note">'.__('Default extension backup files.').'</span>
-					</p>
-				</div>
+			'<div class="fieldset clear">
+				<h3>'.__('Active codes').'</h3>
+				'.$behaviors_table.'
+				<p class="form-note">'.__('Allowed: Available for editing').'<br/>'.__('Enabled: Enable insertion in the public pages').'</p>
+			</div>
+			<div class="fieldset clear">
+				<h3>'.__('Options').'</h3>
+				<p>
+					<label class="classic" for="backup">'.__('Extension Backup Files').' : </label>
+					'.form::field('backup', 25, 255, $this->settings('backup_ext', null, $scope),'classic').'&nbsp;&nbsp;&nbsp;
+					<span class="form-note">'.__('Default extension backup files.').'</span>
+				</p>
 			</div>
 		';
-		dcPage::helpBlock('dcScript-config');
+		//dcPage::helpBlock('dcScript-config');
 	}
 
 	# admin index page
@@ -123,7 +108,7 @@ class dcScript extends dcPluginHelper029 {
 		if(!defined('DC_CONTEXT_ADMIN')) { return; }
 		dcPage::check('dcScript.edit');
 		if(!$this->settings('enabled') && is_file(path::real($this->info('root').'/_config.php'))) {
-			if($this->core->auth->isSuperAdmin()) {
+			if($$this->core->auth->check('admin', $this->core->blog->id)) {
 				$this->core->adminurl->redirect('admin.plugins', array(
 					'module' => $this->info('id'),'conf' => 1, 'redir' => $this->core->adminurl->get($this->info('adminUrl'))
 				));
@@ -132,7 +117,7 @@ class dcScript extends dcPluginHelper029 {
 				$this->core->adminurl->redirect('admin.home');
 			}
 		}
-		$behaviors_list = $this->settings('behaviors');		
+		$behaviors_list = $this->settings('behaviors');
 		$behaviors = array();
 		foreach($behaviors_list as $k => &$v) {
 			if($v['enabled']) {
@@ -182,8 +167,8 @@ class dcScript extends dcPluginHelper029 {
 					'.$this->cssLoad('/codemirror/codemirror-custom.css').NL.
 					//$this->jsLoad('/codemirror/codemirror-custom.js').NL.
 					$this->jsLoad('/codemirror/codemirror-compressed.js').NL.
-					$this->jsLoad('/inc/admin.js').NL.
-					$this->cssLoad('/inc/admin.css').NL.
+					$this->jsLoad('/inc/index.js').NL.
+					$this->cssLoad('/inc/index.css').NL.
 					dcPage::jsConfirmClose('dcScript-form').NL.'
 				</head>
 				<body class="dcscript no-js">
@@ -225,7 +210,7 @@ class dcScript extends dcPluginHelper029 {
 		$iv = mcrypt_create_iv(mcrypt_get_iv_size(MCRYPT_RIJNDAEL_256, MCRYPT_MODE_ECB), MCRYPT_RAND);
 		return trim(mcrypt_decrypt(MCRYPT_RIJNDAEL_256, $key, base64_decode($str), MCRYPT_MODE_ECB, $iv));
 	}
-	
+
 	protected function getCryptKey($salt=DC_MASTER_KEY) {
 		return sha1($_SERVER['HTTP_HOST'].$salt);
 	}
@@ -237,7 +222,7 @@ class dcScript extends dcPluginHelper029 {
 			echo "<!-- dcScript ".html::escapeHTML($behavior)." begin -->\n".$behaviors[$behavior]['content']."\n<!-- dcScript ".html::escapeHTML($behavior)." end -->";
 		}
 	}
-	
+
 	protected function setDefaultSettings() {
 		# create config plugin
 		$behaviors = array(
@@ -262,66 +247,74 @@ class dcScript extends dcPluginHelper029 {
 	}
 
 	protected function installActions($old_version) {
-		# upgrade previous versions
+		# upgrade previous versions - /!\ be exceeded timeout for a lot blogs
 		if(!empty($old_version)) {
-			# version < 2
-			if(version_compare($old_version, '2', '<')) {		// /!\ timeout possible for a lot blogs
-				# upgrade global settings
-				$this->core->blog->settings->{$this->plugin_id}->dropAll(true);
-				$this->setDefaultSettings();
-				# upgrade all blogs settings
-				$rs = $this->core->getBlogs();
-				while ($rs->fetch()) {
-					$settings = new dcSettings($this->core, $rs->blog_id);
-					$settings->addNamespace($rs->blog_id);
-					$settings->{$this->plugin_id}->put('enabled', $settings->{$this->plugin_id}->get('enabled'));
-					$settings->{$this->plugin_id}->put('header_code_enabled', $settings->{$this->plugin_id}->get('header_code_enabled'));
-					$settings->{$this->plugin_id}->put('footer_code_enabled', $settings->{$this->plugin_id}->get('footer_code_enabled'));
-					$settings->{$this->plugin_id}->put('header_code', self::encrypt(base64_decode($settings->{$this->plugin_id}->get('header_code')), DC_MASTER_KEY));
-					$settings->{$this->plugin_id}->put('footer_code', self::encrypt(base64_decode($settings->{$this->plugin_id}->get('footer_code')), DC_MASTER_KEY));
-					$settings->{$this->plugin_id}->put('backup_ext', $settings->{$this->plugin_id}->get('backup_ext'));
-					unset($settings);
-				}
-				dcPage::addWarningNotice(__('Default settings update.'));
-			}
-			# version < 2.0.0-r0143
-			if(version_compare($old_version, '2.0.0-r0143', '<')) {		// /!\ timeout possible for a lot blogs
-				# upgrade all blogs settings
-				$rs = $this->core->getBlogs();
-				while ($rs->fetch()) {
-					$settings = new dcSettings($this->core, $rs->blog_id);
-					$settings->addNamespace($this->plugin_id);
-					$settings->{$this->plugin_id}->put('header_code', self::encrypt(self::decrypt($settings->{$this->plugin_id}->get('header_code'), DC_MASTER_KEY), $this->getCryptKey()));
-					$settings->{$this->plugin_id}->put('footer_code', self::encrypt(self::decrypt($settings->{$this->plugin_id}->get('footer_code'), DC_MASTER_KEY), $this->getCryptKey()));
-					unset($settings);
-				}
-			
-			}
-			# version < 3
-			if(version_compare($old_version, '3', '<')) {		// /!\ timeout possible for a lot blogs
-				$rs = $this->core->getBlogs();
-				while ($rs->fetch()) {
-					$settings = new dcSettings($this->core, $rs->blog_id);
-					$settings->addNamespace($this->plugin_id);
-					$behaviors = $settings->{$this->plugin_id}->get('behaviors');
-					$html = self::decrypt($settings->{$this->plugin_id}->get('header_code'), $this->getCryptKey());
-					if(!empty($html)) {
-						$behaviors['publicHeadContent']['content'] = $html;
-						$behaviors['publicHeadContent']['active'] = $settings->{$this->plugin_id}->get('header_code_enabled');
+			try {
+				# version < 2
+				if(version_compare($old_version, '2', '<')) {
+					# upgrade global settings
+					$this->core->blog->settings->{$this->plugin_id}->dropAll(true);
+					$this->setDefaultSettings();
+					# upgrade all blogs settings
+					$rs = $this->core->getBlogs();
+					while ($rs->fetch()) {
+						$settings = new dcSettings($this->core, $rs->blog_id);
+						$settings->addNamespace($rs->blog_id);
+						$settings->{$this->plugin_id}->put('enabled', $settings->{$this->plugin_id}->get('enabled'));
+						$settings->{$this->plugin_id}->put('header_code_enabled', $settings->{$this->plugin_id}->get('header_code_enabled'));
+						$settings->{$this->plugin_id}->put('footer_code_enabled', $settings->{$this->plugin_id}->get('footer_code_enabled'));
+						$settings->{$this->plugin_id}->put('header_code', self::encrypt(base64_decode($settings->{$this->plugin_id}->get('header_code')), DC_MASTER_KEY));
+						$settings->{$this->plugin_id}->put('footer_code', self::encrypt(base64_decode($settings->{$this->plugin_id}->get('footer_code')), DC_MASTER_KEY));
+						$settings->{$this->plugin_id}->put('backup_ext', $settings->{$this->plugin_id}->get('backup_ext'));
+						unset($settings);
 					}
-					$html = self::decrypt($settings->{$this->plugin_id}->get('footer_code'), $this->getCryptKey());
-					if(!empty($html)) {
-						$behaviors['publicFooterContent']['content'] = $html;
-						$behaviors['publicFooterContent']['active'] = $settings->{$this->plugin_id}->get('footer_code_enabled');
-					}
-					$settings->{$this->plugin_id}->put('behaviors', $behaviors);
-					# erase old settings
-					$settings->{$this->plugin_id}->drop('header_code_enabled');
-					$settings->{$this->plugin_id}->drop('footer_code_enabled');
-					$settings->{$this->plugin_id}->drop('header_code');
-					$settings->{$this->plugin_id}->drop('footer_code');
-					unset($settings, $behaviors);
+					unset($rs);
 				}
+				# version < 2.0.0-r0143
+				if(version_compare($old_version, '2.0.0-r0143', '<')) {
+					# upgrade all blogs settings
+					$rs = $this->core->getBlogs();
+					while ($rs->fetch()) {
+						$settings = new dcSettings($this->core, $rs->blog_id);
+						$settings->addNamespace($this->plugin_id);
+						$settings->{$this->plugin_id}->put('header_code', self::encrypt(self::decrypt($settings->{$this->plugin_id}->get('header_code'), DC_MASTER_KEY), $this->getCryptKey()));
+						$settings->{$this->plugin_id}->put('footer_code', self::encrypt(self::decrypt($settings->{$this->plugin_id}->get('footer_code'), DC_MASTER_KEY), $this->getCryptKey()));
+						unset($settings);
+					}
+					unset($rs);
+				}
+				# version < 3
+				if(version_compare($old_version, '3', '<')) {
+					$dir_var = $this->getVarDir('/dcScript/backup');
+					$rs = $this->core->getBlogs();
+					while ($rs->fetch()) {
+						$settings = new dcSettings($this->core, $rs->blog_id);
+						$settings->addNamespace($this->plugin_id);
+						$behaviors = $settings->{$this->plugin_id}->get('behaviors');
+						$html = self::decrypt($settings->{$this->plugin_id}->get('header_code'), $this->getCryptKey());
+						if(!empty($html)) {
+							@file_put_contents($dir_var.'/'.$rs->blog_id.'-header_code.html.txt', $html);	// security backup
+							$behaviors['publicHeadContent']['content'] = $html;
+							$behaviors['publicHeadContent']['active'] = $settings->{$this->plugin_id}->get('header_code_enabled');
+						}
+						$html = self::decrypt($settings->{$this->plugin_id}->get('footer_code'), $this->getCryptKey());
+						if(!empty($html)) {
+							@file_put_contents($dir_var.'/'.$rs->blog_id.'-footer_code.html.txt', $html);	// security backup
+							$behaviors['publicFooterContent']['content'] = $html;
+							$behaviors['publicFooterContent']['active'] = $settings->{$this->plugin_id}->get('footer_code_enabled');
+						}
+						$settings->{$this->plugin_id}->put('behaviors', $behaviors);
+						# erase old settings
+						$settings->{$this->plugin_id}->drop('header_code_enabled');
+						$settings->{$this->plugin_id}->drop('footer_code_enabled');
+						$settings->{$this->plugin_id}->drop('header_code');
+						$settings->{$this->plugin_id}->drop('footer_code');
+						unset($settings, $behaviors);
+					}
+					unset($rs, $dir_var);
+				}
+			} catch(Exception $e) {
+				$core->error->add(__('Something went wrong with auto upgrade:').' '.$e->getMessage());
 			}
 		}
 	}
