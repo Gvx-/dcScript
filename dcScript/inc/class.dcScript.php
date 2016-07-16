@@ -87,7 +87,7 @@ class dcScript extends dcPluginHelper029 {
 		echo
 			$this->configBaseline($scope).
 			'<div class="fieldset clear">
-				<h3>'.__('Active codes').'</h3>
+				<h3>'.__('Selecting behaviors').'</h3>
 				'.$behaviors_table.'
 				<p class="form-note">'.__('Allowed: Available for editing').'<br/>'.__('Enabled: Enable insertion in the public pages').'</p>
 			</div>

@@ -6,13 +6,23 @@ Ce plugin pour [Dotclear](http://fr.dotclear.org/) permet d'inserer du code HTML
 L'editeur de code utilise la coloration syntaxique de [CodeMirror](http://codemirror.net/)
 
 ## Pré-requis ##
-* Dotclear 2.8 ou plus
+* Dotclear 2.9 ou plus
 
 ## Utilisation ##
-Le plugin met a disposition 2 editeurs de code HTML:
+Le plugin permet d'ajouter du code HTML dans les behaviors publics suivant:
 
-* Un editeur pour inserer du code dans le header (balise `<head>`)
-* Un editeur pour inserer du code dans le footer de la page
+* publicHeadContent
+* publicFooterContent
+* publicEntryBeforeContent
+* publicEntryAfterContent
+* publicCommentBeforeContent
+* publicCommentAfterContent
+* publicCommentFormBeforeContent
+* publicCommentFormAfterContent
+* publicPingBeforeContent
+* publicPingAfterContent
+* publicTopAfterContent
+* publicInsideFooter
 
 ## Téléchargements ##
 Vous pouvez télécharger les packages [ici](https://bitbucket.org/Gvx_/dcscript/downloads)

@@ -1,14 +1,14 @@
 # Language: Français
-# Module: dcScript - 3.0.0-r0043
-# Date: 2016-07-16 09:36:55
+# Module: dcScript - 3.0.0-r0044
+# Date: 2016-07-16 13:01:26
 # Translated with translater 2013.05.11
 
 msgid ""
 msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
-"Project-Id-Version: dcScript 3.0.0-r0043\n"
+"Project-Id-Version: dcScript 3.0.0-r0044\n"
 "POT-Creation-Date: \n"
-"PO-Revision-Date: 2016-07-16T09:36:55+00:00\n"
+"PO-Revision-Date: 2016-07-16T13:01:26+00:00\n"
 "Last-Translator: Gvx\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -35,12 +35,12 @@ msgid "Redirection not found"
 msgstr "Redirection introuvable"
 
 #: inc/class.dcPluginHelper.php:73
-#: inc/class.dcPluginHelper.php:229
+#: inc/class.dcPluginHelper.php:230
 msgid "Enable %s on this blog"
 msgstr "Activer %s pour ce blog"
 
 #: inc/class.dcPluginHelper.php:76
-#: inc/class.dcPluginHelper.php:231
+#: inc/class.dcPluginHelper.php:232
 msgid "Enable the plugin on this blog."
 msgstr "Activer le plugin pour ce blog"
 
@@ -54,40 +54,44 @@ msgstr "Le plugin %s n'est pas configuré"
 msgid "Unable to save the code"
 msgstr "Impossible de sauver le code"
 
-#: inc/class.dcPluginHelper.php:213
-msgid "Update global options"
-msgstr "Mise à jour des options globales"
-
-#: inc/class.dcPluginHelper.php:215
+#: inc/class.dcPluginHelper.php:214
 msgid "Scope"
 msgstr "Domaine d'application"
 
-#: inc/class.dcPluginHelper.php:217
+#: inc/class.dcPluginHelper.php:216
 #: inc/class.dcScript.php:183
 msgid "Go"
 msgstr "Aller"
 
-#: inc/class.dcPluginHelper.php:253
+#: inc/class.dcPluginHelper.php:218
+msgid "Select the blog in which parameters apply"
+msgstr "Sélectionnez le blog auquel s'applique les paramètres"
+
+#: inc/class.dcPluginHelper.php:219
+msgid "Update global options"
+msgstr "Mise à jour des options globales"
+
+#: inc/class.dcPluginHelper.php:254
 msgid "%s menu not present."
 msgstr "le menu %s est absent"
 
-#: inc/class.dcPluginHelper.php:277
+#: inc/class.dcPluginHelper.php:278
 msgid "icon plugin"
 msgstr "Icone"
 
-#: inc/class.dcPluginHelper.php:278
+#: inc/class.dcPluginHelper.php:279
 msgid "Settings"
 msgstr "Paramètres"
 
-#: inc/class.dcPluginHelper.php:281
+#: inc/class.dcPluginHelper.php:282
 msgid "Author(s)"
 msgstr "Auteur(s)"
 
-#: inc/class.dcPluginHelper.php:321
+#: inc/class.dcPluginHelper.php:322
 msgid "The folder is not in the var directory"
 msgstr "Le dossier ne se trouve pas dans le répertoire VAR"
 
-#: inc/class.dcPluginHelper.php:323
+#: inc/class.dcPluginHelper.php:324
 msgid "Creating a var directory failed"
 msgstr "La creation du répertoire VAR a échoué"
 
@@ -124,8 +128,8 @@ msgid "Filled"
 msgstr "Rempli"
 
 #: inc/class.dcScript.php:90
-msgid "Active codes"
-msgstr "Codes actifs"
+msgid "Selecting behaviors"
+msgstr "Sélection des comportements (behaviors)"
 
 #: inc/class.dcScript.php:92
 msgid "Allowed: Available for editing"

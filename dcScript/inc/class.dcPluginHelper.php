@@ -210,12 +210,13 @@ abstract class dcPluginHelper029 {
 	protected function configBaseline($scope=null) {
 		if($this->core->auth->isSuperAdmin()) {
 			if(empty($scope)) { $scope = $this->configScope(); }
-			if($scope == 'global') { dcPage::addWarningNotice(__('Update global options')); }
 			$html =	'<p class="anchor-nav">
 						<label class="classic">'.__('Scope').'&nbsp;:&nbsp;
 							'.form::combo('scope', array(__('Global settings') => 'global', sprintf(__('Settings for %s'), html::escapeHTML($this->core->blog->name)) => 'default'), $scope).'
 							<input id="scope_go" name="scope_go" type="submit" value="'.__('Go').'" />
 						</label>
+						&nbsp;&nbsp;<span class="form-note">'.__('Select the blog in which parameters apply').'</span>
+						'.($scope == 'global' ? '&nbsp;&nbsp;<span class="warning">'.__('Update global options').'</span': '').'
 					</p>';
 		} else {
 			$html = '';
