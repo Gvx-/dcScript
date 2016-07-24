@@ -9,7 +9,7 @@ L'editeur de code utilise la coloration syntaxique de [CodeMirror](http://codemi
 * Dotclear 2.9 ou plus
 
 ## Utilisation ##
-Le plugin permet d'ajouter du code HTML dans les behaviors publics suivant:
+Le plugin permet d'ajouter du code HTML dans les behaviors publics suivants:
 
 * publicHeadContent
 * publicFooterContent

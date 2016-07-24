@@ -10,10 +10,10 @@ if(!defined('DC_RC_PATH')) { return; }
 if (!defined('NL')) { define('NL', "\n"); }		// New Line
 if (!defined('DC_VAR')) { define('DC_VAR', DC_ROOT.'/var'); }		// emulation DC_VAR for dc < 2.10
 
-abstract class dcPluginHelper029 {
+abstract class dcPluginHelper29c {
 
 	### Constants ###
-	const VERSION = '0.29.1';					// class version
+	const VERSION = '2.9.c';					// class version
 
 	### Specific functions to overload ###
 
@@ -133,6 +133,9 @@ abstract class dcPluginHelper029 {
 	public function __construct($id) {
 		global $core;
 		$this->core = &$core;
+		
+		# check DC_VAR
+		self::getVarDir('', true);
 
 		# set plugin id and admin url
 		$this->plugin_id = $id;
@@ -147,18 +150,33 @@ abstract class dcPluginHelper029 {
 		$this->debugLog('Start log - Version: '.$this->core->getVersion($this->plugin_id));
 		$this->debugLog('Page: '.$_SERVER['PHP_SELF'].'?'.$_SERVER['QUERY_STRING']);
 
-		# set icons
-		$this->icon_small = $this->plugin_id.$this->info('_icon_small');
-		$this->icon_large = $this->plugin_id.$this->info('_icon_large');
+		# Set admin context
+		if(defined('DC_CONTEXT_ADMIN')) {
+			# register self url
+			$urls = $this->core->adminurl->dumpUrls();
+			if(!array_key_exists('admin.self', $urls)) {
+				$url = http::getSelfURI();
+				$url = str_replace('?'.parse_url($url, PHP_URL_QUERY), '', $url);		// delete query
+				$url = substr($url, 1 + strrpos($url, '/'));							// keep page name
+				$urls = array_column((array)$urls, 'url');
+				if(in_array($url, $urls)) {
+					$this->core->adminurl->register('admin.self', $url, (empty($_GET) ? array(): $_GET));
+				}
+			}
 
+			# set icons
+			$this->icon_small = $this->plugin_id.$this->info('_icon_small');
+			$this->icon_large = $this->plugin_id.$this->info('_icon_large');
+
+			# uninstall plugin procedure
+			if($this->core->auth->isSuperAdmin()) { $this->core->addBehavior('pluginBeforeDelete', array($this, 'uninstall')); }
+		}
+		
 		# set default settings if empty
 		$this->setDefaultSettings();
 
-		# uninstall plugin procedure
-		if(defined('DC_CONTEXT_ADMIN') && $this->core->auth->isSuperAdmin()) { $this->core->addBehavior('pluginBeforeDelete', array($this, 'uninstall')); }
-
 		# debug
-		//$this->debugDisplay('Debug mode actived for this plugin');
+		if($this->debug_mode) { $this->debugDisplay('Debug mode actived for this plugin'); }
 	}
 
 	### Admin functions ###
@@ -305,29 +323,33 @@ abstract class dcPluginHelper029 {
 		self::widgetFooter($w->{$id});
 	}
 
-	protected static function widgetRender($w, $content) {
+	protected static function widgetRender($w, $content, $class='', $attr='') {
 		global $core;
 		if (($w->homeonly == 1 && $core->url->type != 'default') || ($w->homeonly == 2 && $core->url->type == 'default') || $w->offline || empty($content)) {
 			return;
 		}
 		$content = ($w->title ? $w->renderTitle(html::escapeHTML($w->title)) : '').$content;
-		return $w->renderDiv($w->content_only, $w->class,'',$content);
+		return $w->renderDiv($w->content_only, trim(trim($class).' '.$w->class), trim($attr), $content);
 	}
 
 	### Common functions ###
 
-	protected static function getVarDir($dir='') {
+	protected static function getVarDir($dir='', $create=false) {
 		$dir = trim($dir, '\\/');
 		$var_dir = path::real(DC_VAR.(empty($dir) ? '' : '/'.$dir), false);
 		if(strpos($var_dir, DC_VAR) === false) { throw new Exception(__('The folder is not in the var directory')); }
 		if(!is_dir($var_dir)) {
-			if(!mkdir($var_dir, 0700, true)) { throw new Exception(__('Creating a var directory failed')); }
-			$f = DC_VAR.'/.htaccess';
-			if (!file_exists($f)) { @file_put_contents($f,'Require all denied'.NL.'Deny from all'.NL); }
+			if($create) {
+				if(!@mkdir($var_dir, 0700, true)) { throw new Exception(__('Creating a var directory failed')); }
+				$f = DC_VAR.'/.htaccess';
+				if (!file_exists($f)) { @file_put_contents($f,'Require all denied'.NL.'Deny from all'.NL); }
+			} else{
+				return false;
+			}
 		}
 		return $var_dir;
 	}
-
+	
 	protected final function settings($key, $value=null, $scope='default') {
 		if(is_null($value)) {
 			try {
@@ -386,7 +408,7 @@ abstract class dcPluginHelper029 {
 		}
 	}
 
-	# for dc 2.9 or hegher
+	# since dc 2.9
 	protected final function jsLoad($src) {
 		$file = $this->plugin_id.'/'.ltrim($src, '/');
 		$version = $this->info('version');
@@ -397,7 +419,7 @@ abstract class dcPluginHelper029 {
 		}
 	}
 
-	# for dc 2.9 or hegher
+	# since dc 2.9
 	protected final function cssLoad($src, $media='all', $import=false) {
 		$file = $this->plugin_id.'/'.ltrim($src, '/');
 		$version = $this->info('version');
@@ -416,7 +438,7 @@ abstract class dcPluginHelper029 {
 		}
 	}
 
-	# for dc 2.10 or hegher
+	# since dc 2.10
 	protected final function getVF($file) {
 		if(defined('DC_CONTEXT_ADMIN')) {
 			return dcPage::getVF($file);
@@ -437,7 +459,7 @@ abstract class dcPluginHelper029 {
 	protected final function debugLog($text, $value=null) {
 		if($this->debug_log && !empty($text)) {
 			if(empty($this->debug_logfile)) {				# initialization
-				$this->debug_logfile = self::getVarDir('logs').'/log_'.$this->plugin_id.'.txt';
+				$this->debug_logfile = self::getVarDir('logs', true).'/log_'.$this->plugin_id.'.txt';
 				if($this->debug_log_reset && is_file($this->debug_logfile)) { @unlink($this->debug_logfile); }
 			}
 			if(!empty($value)) { $text .= ':'.NL.print_r($value, true).NL.str_pad('', 60, '*'); }

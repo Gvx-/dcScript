@@ -10,7 +10,7 @@ if(!defined('DC_RC_PATH')) { return; }
 __('dcScript');						// plugin name
 __('Add script for DC 2.9+');		// description plugin
 
-class dcScript extends dcPluginHelper029 {
+class dcScript extends dcPluginHelper29c {
 
 	# behaviors functions
 	public function publicHeadContent($core, $_ctx) {$this->codeInsert('publicHeadContent');}
@@ -165,7 +165,6 @@ class dcScript extends dcPluginHelper029 {
 				<head>
 					<title>'.html::escapeHTML($this->info('name')).'</title>
 					'.$this->cssLoad('/codemirror/codemirror-custom.css').NL.
-					//$this->jsLoad('/codemirror/codemirror-custom.js').NL.
 					$this->jsLoad('/codemirror/codemirror-compressed.js').NL.
 					$this->jsLoad('/inc/index.js').NL.
 					$this->cssLoad('/inc/index.css').NL.
@@ -219,6 +218,7 @@ class dcScript extends dcPluginHelper029 {
 	protected function codeInsert($behavior) {
 		$behaviors = $this->settings('behaviors');
 		if($this->settings('enabled') && $behaviors[$behavior]['enabled'] && $behaviors[$behavior]['active'] && !empty($behaviors[$behavior]['content'])) {
+			$this->debugLog('insert code in "'.$behavior.'"');
 			echo "<!-- dcScript ".html::escapeHTML($behavior)." begin -->\n".$behaviors[$behavior]['content']."\n<!-- dcScript ".html::escapeHTML($behavior)." end -->";
 		}
 	}
@@ -243,16 +243,18 @@ class dcScript extends dcPluginHelper029 {
 		$this->core->blog->settings->{$this->plugin_id}->put('enabled', false, 'boolean', __('Enable plugin'), false, true);
 		$this->core->blog->settings->{$this->plugin_id}->put('backup_ext', '.html.txt', 'string', __('Extension Backup Files'), false, true);
 		$this->core->blog->settings->{$this->plugin_id}->put('behaviors', $behaviors, 'array', __('behaviors array'), false, true);
-		//$this->core->blog->settings->{$this->plugin_id}->put('behaviors', $behaviors, 'array', __('behaviors array'), true, true);		// debug
 	}
 
 	protected function installActions($old_version) {
 		# upgrade previous versions - /!\ be exceeded timeout for a lot blogs
+		$step = (isset($_GET['step_pu']) ? $_GET['step_pu'] : $old_version);
+		$this->debugLog('<'.__METHOD__.'>: old_version='.$old_version.' / step='.$step);
 		if(!empty($old_version)) {
 			try {
 				# version < 2
-				if(version_compare($old_version, '2', '<')) {
+				if(version_compare($old_version, '2', '<') && version_compare($step, '2', '<')) {
 					# upgrade global settings
+					$this->debugLog('Update to version 2');
 					$this->core->blog->settings->{$this->plugin_id}->dropAll(true);
 					$this->setDefaultSettings();
 					# upgrade all blogs settings
@@ -269,10 +271,12 @@ class dcScript extends dcPluginHelper029 {
 						unset($settings);
 					}
 					unset($rs);
+					$this->core->adminurl->redirect('admin.self', array('step_pu' => '2'));
 				}
 				# version < 2.0.0-r0143
-				if(version_compare($old_version, '2.0.0-r0143', '<')) {
+				if(version_compare($old_version, '2.0.0-r0143', '<') && version_compare($step, '2.0.0-r0143', '<')) {
 					# upgrade all blogs settings
+					$this->debugLog('Update to version 2.0.0-r0143');
 					$rs = $this->core->getBlogs();
 					while ($rs->fetch()) {
 						$settings = new dcSettings($this->core, $rs->blog_id);
@@ -282,10 +286,12 @@ class dcScript extends dcPluginHelper029 {
 						unset($settings);
 					}
 					unset($rs);
+					$this->core->adminurl->redirect('admin.self', array('step_pu' => '2.0.0-r0143'));
 				}
 				# version < 3
-				if(version_compare($old_version, '3', '<')) {
-					$dir_var = $this->getVarDir('/dcScript/backup');
+				if(version_compare($old_version, '3', '<') && version_compare($step, '3', '<')) {
+					$this->debugLog('Update to version 3');
+					$dir_var = self::getVarDir('/dcScript/backup', true);
 					$rs = $this->core->getBlogs();
 					while ($rs->fetch()) {
 						$settings = new dcSettings($this->core, $rs->blog_id);
@@ -312,11 +318,32 @@ class dcScript extends dcPluginHelper029 {
 						unset($settings, $behaviors);
 					}
 					unset($rs, $dir_var);
+					//$this->core->adminurl->redirect('admin.self', array('step_pu' => '3'));	# for the future
 				}
+				# version >= 3
+				if(version_compare($old_version, '3', '>=') && version_compare($step, '3', '>')) {
+					# erase old backups
+					$dir = self::getVarDir('/dcScript/backup');
+					$files = @scandir($dir);
+					if(is_array($files)) {
+						$this->debugLog('Erase backups version 3');
+						foreach($files as $f) {
+							if(strpos($f, '-header_code.html.txt') !== false || strpos($f, '-footer_code.html.txt') !== false) { @unlink($dir.'/'.$f); }
+						}
+					}
+					unset($dir, $files);
+				}
+				/*	# FOR TEST :: version < 100
+				if(version_compare($old_version, '100', '<') && version_compare($step, '100', '<')) {
+					$this->debugLog('Update to version 100 for test');
+					$this->core->adminurl->redirect('admin.self', array('step_pu' => '100'));	# for the future
+				}
+				/* 	# FOR TEST */
+				$this->debugLog('End of update');
 			} catch(Exception $e) {
-				$core->error->add(__('Something went wrong with auto upgrade:').' '.$e->getMessage());
+				$this->core->error->add(__('Something went wrong with auto upgrade:').' '.$e->getMessage());
 			}
 		}
 	}
-
+	
 }

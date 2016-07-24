@@ -9,7 +9,7 @@ if(!defined('DC_RC_PATH')) { return; }
 # common (public & admin)
 
 # loading of plugin class
-$__autoload['dcPluginHelper029'] = dirname(__FILE__).'/inc/class.dcPluginHelper.php';
+$__autoload['dcPluginHelper29c'] = dirname(__FILE__).'/inc/class.dcPluginHelper.php';
 $__autoload['dcScript'] = dirname(__FILE__).'/inc/class.dcScript.php';
 
 # initialization
