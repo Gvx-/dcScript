@@ -15,10 +15,10 @@ Le plugin met a disposition 2 editeurs de code HTML:
 * Un editeur pour inserer du code dans le footer de la page
 
 ## Téléchargements ##
-Vous pouvez télécharger les packages [ici](https://bitbucket.org/Gvx_/dcscript/downloads)
+Vous pouvez télécharger les packages [ici](https://github.com/Gvx-/dcScript/releases)
 
 ## Signaler un dysfonctionnement ##
-Vous pouvez signaler un dysfonctionnement ou faire une demande d’amélioration [ici](https://bitbucket.org/Gvx_/dcscript/issues/new)
+Vous pouvez signaler un dysfonctionnement ou faire une demande d’amélioration [ici](https://github.com/Gvx-/dcScript/issues/new)
 
 ## Licence ##
 Ce code est sous licence [GPL version 2.0](http://www.gnu.org/licenses/old-licenses/gpl-2.0.html)
