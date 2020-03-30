@@ -9,7 +9,7 @@ if(!defined('DC_RC_PATH')) { return; }
 # common (public & admin)
 
 # loading of plugin class
-$__autoload['dcPluginHelper024'] = dirname(__FILE__).'/inc/class.dcPluginHelper.php';
+$__autoload['dcPluginHelper024b'] = dirname(__FILE__).'/inc/class.dcPluginHelper.php';
 $__autoload['dcScript'] = dirname(__FILE__).'/inc/class.dcScript.php';
 
 # initialization
@@ -17,8 +17,8 @@ $core->dcScript = new dcScript(basename(dirname(__FILE__)));
 
 if(defined('DC_CONTEXT_ADMIN')) {
 	# admin only
-	
+
 } else {
 	# public only
-	
+
 }

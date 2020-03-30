@@ -1,15 +1,15 @@
 # Language: Français
-# Module: dcScript - 2.0.0-r0142
-# Date: 2016-02-27 11:16:12
+# Module: dcScript - 2.0.2-r0001
+# Date: 2020-03-27 12:49:48
 # Translated with translater 2013.05.11
 
 msgid ""
 msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
-"Project-Id-Version: dcScript 2.0.0-r0142\n"
+"Project-Id-Version: dcScript 2.0.2-r0001\n"
 "POT-Creation-Date: \n"
-"PO-Revision-Date: 2016-02-27T11:16:12+00:00\n"
-"Last-Translator: Gvx\n"
+"PO-Revision-Date: 2020-03-27T12:49:48+00:00\n"
+"Last-Translator: Gilles Grandveaux\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -39,7 +39,7 @@ msgid "Active codes"
 msgstr "Codes actifs"
 
 #: _config.php:49
-#: inc/class.dcScript.php:50
+#: inc/class.dcScript.php:88
 msgid "Enable header code"
 msgstr "Activer le code du header"
 
@@ -48,7 +48,7 @@ msgid "Enable public header code."
 msgstr "Activer le code du header public"
 
 #: _config.php:56
-#: inc/class.dcScript.php:51
+#: inc/class.dcScript.php:89
 msgid "Enable footer code"
 msgstr "Activer le code du footer"
 
@@ -57,7 +57,7 @@ msgid "Enable public footer code."
 msgstr "Activer le code du footer public"
 
 #: _config.php:66
-#: inc/class.dcScript.php:54
+#: inc/class.dcScript.php:92
 msgid "Extension Backup Files"
 msgstr "Extension des fichiers de sauvegarde"
 
@@ -67,7 +67,7 @@ msgstr "Extension par defaut des fichiers de sauvegarde"
 
 #: inc/class.dcPluginHelper.php:23
 #: inc/class.dcPluginHelper.php:26
-#: inc/class.dcScript.php:49
+#: inc/class.dcScript.php:87
 msgid "Enable plugin"
 msgstr "Activer le plugin"
 
@@ -103,54 +103,109 @@ msgstr "dcScript"
 msgid "Add script for DC 2.8+"
 msgstr "Ajouter des scripts a doctlear v2.8+"
 
-#: inc/class.dcScript.php:52
-#: index.php:81
+#: inc/class.dcScript.php:40
+#: inc/class.dcScript.php:55
+msgid "Encryption incompatible with PHP 7.2 and more"
+msgstr "Cryptage incompatible avec PHP 7.2 et plus"
+
+#: inc/class.dcScript.php:90
+#: index_std.php:51
+#: index_warning.php:42
 msgid "Header code"
 msgstr "Code du header"
 
-#: inc/class.dcScript.php:53
-#: index.php:96
+#: inc/class.dcScript.php:91
+#: index_std.php:66
+#: index_warning.php:44
 msgid "Footer code"
 msgstr "Code du footer"
 
-#: inc/class.dcScript.php:76
+#: inc/class.dcScript.php:93
+#: inc/class.dcScript.php:134
+msgid "Encryption library"
+msgstr "Bibliothèque de chiffrement"
+
+#: inc/class.dcScript.php:117
 msgid "Default settings update."
 msgstr "les paramètres par défaut ont été mis a jour"
 
-#: index.php:18
+#: index.php:19
 msgid "%s plugin is not configured."
 msgstr "Le plugin %s n'est pas configuré"
 
-#: index.php:29
-#: index.php:37
+#: index.php:38
+#: index.php:46
+#: index.php:54
 msgid "Code successfully updated."
 msgstr "Mise à jour du code avec succès"
 
-#: index.php:42
+#: index.php:59
 msgid "Unable to save the code"
 msgstr "Impossible de sauver le code"
 
-#: index.php:56
+#: index.php:75
 msgid "Unable to save the file"
 msgstr "Impossible de sauver le fichier"
 
-#: index.php:81
-#: index.php:96
+#: index_std.php:51
+#: index_std.php:66
 msgid "Enabled"
 msgstr "Activé"
 
-#: index.php:81
-#: index.php:96
+#: index_std.php:51
+#: index_std.php:66
 msgid "Disabled"
 msgstr "Désactivé"
 
-#: index.php:87
-#: index.php:102
+#: index_std.php:57
+#: index_std.php:72
 msgid "Save the configuration"
 msgstr "Sauver la configuration"
 
-#: index.php:88
-#: index.php:103
+#: index_std.php:58
+#: index_std.php:73
 msgid "Undo changes"
 msgstr "Annuler les changements"
+
+#: index_warning.php:17
+msgid "See help for the procedure"
+msgstr "Voir l'aide pour la procedure"
+
+#: index_warning.php:31
+msgid "Convert fields to new encryption format"
+msgstr "Convertir les champs au nouveau format de cryptage"
+
+#: index_warning.php:33
+msgid "Copy key"
+msgstr "Copier la clé"
+
+#: index_warning.php:34
+msgid "Copy header code"
+msgstr "Copier le code du Header"
+
+#: index_warning.php:35
+msgid "Copy footer code"
+msgstr "Copier le code du footer"
+
+#: index_warning.php:36
+msgid "Decryption page"
+msgstr "Page de décryptage"
+
+#: index_warning.php:43
+#: index_warning.php:45
+msgid "Paste the code here"
+msgstr "Coller le code ici"
+
+#: index_warning.php:47
+#: index_warning.php:47
+msgid "later"
+msgstr "Plus tard"
+
+#: index_warning.php:48
+msgid "Convert the configuration"
+msgstr "Convertir la configuration"
+
+#: index_warning.php:48
+msgid "Convert"
+msgstr "Convertir"
 

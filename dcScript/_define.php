@@ -1,7 +1,7 @@
 <?php
 /* -- BEGIN LICENSE BLOCK -----------------------------------------------------
  * This file is part of plugin dcScript for Dotclear 2.
- * Copyright © 2014-2016 Gvx
+ * Copyright © 2014-2020 Gvx
  * Licensed under the GPL version 2.0 license.
  * (http://www.gnu.org/licenses/old-licenses/gpl-2.0.html)
  * -- END LICENSE BLOCK -----------------------------------------------------*/
@@ -11,7 +11,7 @@ $this->registerModule(
 	/* Name */			'dcScript',
 	/* Description*/	'Add script for DC 2.8+',
 	/* Author */		'Gvx',
-	/* Version */		'2.0.2',
+	/* Version */		'2.1.0',
 	array(
 		/* standard plugin options dotclear */
 		'permissions' 				=>	'dcScript.edit'
@@ -29,6 +29,6 @@ $this->registerModule(
 );
 
 # ---------------------------------------------------------
-# use codemirror version 5.12
+# use codemirror version 5.52.0
 # see: http://codemirror.net/
 # ---------------------------------------------------------
