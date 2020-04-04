@@ -15,13 +15,14 @@
 	function encrypt($str, $key, $cryptLib=OPENSSL) {
 		//$key = pack('H*', hash('sha256', $key));
 		$key = pack('H*', $key);
-		if($cryptLib = MCRYPT) { // REMOVED in PHP 7.2
+		if($cryptLib == MCRYPT) { // REMOVED in PHP 7.2
 			if(version_compare(PHP_VERSION, '7.2', '>=')) { throw new Exception('Encryption incompatible with PHP 7.2 and more'); }
 			$iv = mcrypt_create_iv(mcrypt_get_iv_size(MCRYPT_RIJNDAEL_256, MCRYPT_MODE_ECB), MCRYPT_RAND);
 			return trim(base64_encode(mcrypt_encrypt(MCRYPT_RIJNDAEL_256, $key, $str, MCRYPT_MODE_ECB, $iv)));
-		} elseif($cryptLib = OPENSSL) {
-			$iv = openssl_random_pseudo_bytes(openssl_cipher_iv_length(OPENSSL_METHOD));
-			return trim(base64_encode(openssl_encrypt(base64_decode($str), OPENSSL_METHOD, $key, OPENSSL_RAW_DATA, $iv)));
+		} elseif($cryptLib == OPENSSL) {
+			$ivlen = openssl_cipher_iv_length(OPENSSL_METHOD);
+			$iv = openssl_random_pseudo_bytes($ivlen);
+			return trim(base64_encode($iv.openssl_encrypt($str, OPENSSL_METHOD, $key, OPENSSL_RAW_DATA, $iv)));
 		} else {
 			// unknown cryptLib
 		}
@@ -30,13 +31,14 @@
 	function decrypt($str, $key, $cryptLib=MCRYPT) {
 		//$key = pack('H*', hash('sha256', $key));
 		$key = pack('H*', $key);
-		if($cryptLib = MCRYPT) { // REMOVED in PHP 7.2
+		if($cryptLib == MCRYPT) { // REMOVED in PHP 7.2
 			if(version_compare(PHP_VERSION, '7.2', '>=')) { throw new Exception('Encryption incompatible with PHP 7.2 and more'); }
 			$iv = mcrypt_create_iv(mcrypt_get_iv_size(MCRYPT_RIJNDAEL_256, MCRYPT_MODE_ECB), MCRYPT_RAND);
 			return trim(mcrypt_decrypt(MCRYPT_RIJNDAEL_256, $key, base64_decode($str), MCRYPT_MODE_ECB, $iv));
-		} elseif($cryptLib = OPENSSL) {
-			$iv = openssl_random_pseudo_bytes(openssl_cipher_iv_length(OPENSSL_METHOD));
-			return trim(openssl_decrypt(base64_decode($str), OPENSSL_METHOD, $key, OPENSSL_RAW_DATA, $iv));
+		} elseif($cryptLib == OPENSSL) {
+			$ivlen = openssl_cipher_iv_length(OPENSSL_METHOD);
+			$str = base64_decode($str);
+			return trim(openssl_decrypt(substr($str, $ivlen), OPENSSL_METHOD, $key, OPENSSL_RAW_DATA, substr($str, 0, $ivlen)));
 		} else {
 			// unknown cryptLib
 		}
@@ -101,7 +103,7 @@
 		</script>
 	</head>
 	<body>
-		<div class="right"><p><small>v1.1.3</small></p></div>
+		<div class="right"><p><small>v1.2.0</small></p></div>
 		<h1>Décryptage pour dcScript / Decryption for dcScript</h1>
 		<?php
 			if(version_compare(PHP_VERSION, '5.3.3', '<') || version_compare(PHP_VERSION, '7.2', '>=')) {

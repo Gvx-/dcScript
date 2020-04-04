@@ -36,13 +36,14 @@ class dcScript extends dcPluginHelper024b {
 	public static function encrypt($str, $key, $cryptLib=self::OPENSSL) {
 		global $core;
 		$key = pack('H*', hash('sha256', $key));
-		if($cryptLib = self::MCRYPT) { // REMOVED in PHP 7.2
+		if($cryptLib == self::MCRYPT) { // REMOVED in PHP 7.2
 			if(version_compare(PHP_VERSION, '7.2', '>=')) { throw new Exception(__('Encryption incompatible with PHP 7.2 and more')); }
 			$iv = mcrypt_create_iv(mcrypt_get_iv_size(MCRYPT_RIJNDAEL_256, MCRYPT_MODE_ECB), MCRYPT_RAND);
 			return trim(base64_encode(mcrypt_encrypt(MCRYPT_RIJNDAEL_256, $key, $str, MCRYPT_MODE_ECB, $iv)));
-		} elseif($cryptLib = self::OPENSSL) {
-			$iv = openssl_random_pseudo_bytes(openssl_cipher_iv_length(self::OPENSSL_METHOD));
-			return trim(base64_encode(openssl_encrypt(base64_decode($str), self::OPENSSL_METHOD, $key, OPENSSL_RAW_DATA, $iv)));
+		} elseif($cryptLib == self::OPENSSL) {
+			$ivlen = openssl_cipher_iv_length(self::OPENSSL_METHOD);
+			$iv = openssl_random_pseudo_bytes($ivlen);
+			return trim(base64_encode($iv.openssl_encrypt($str, self::OPENSSL_METHOD, $key, OPENSSL_RAW_DATA, $iv)));
 		} else { // unknown cryptLib
 			return self::encrypt($str, $key, $core->dcScript->getCryptLib());
 		}
@@ -51,13 +52,14 @@ class dcScript extends dcPluginHelper024b {
 	public static function decrypt($str, $key, $cryptLib=self::MCRYPT) {
 		global $core;
 		$key = pack('H*', hash('sha256', $key));
-		if($cryptLib = self::MCRYPT) { // REMOVED in PHP 7.2
+		if($cryptLib == self::MCRYPT) { // REMOVED in PHP 7.2
 			if(version_compare(PHP_VERSION, '7.2', '>=')) { throw new Exception(__('Encryption incompatible with PHP 7.2 and more')); }
 			$iv = mcrypt_create_iv(mcrypt_get_iv_size(MCRYPT_RIJNDAEL_256, MCRYPT_MODE_ECB), MCRYPT_RAND);
 			return trim(mcrypt_decrypt(MCRYPT_RIJNDAEL_256, $key, base64_decode($str), MCRYPT_MODE_ECB, $iv));
-		} elseif($cryptLib = self::OPENSSL) {
-			$iv = openssl_random_pseudo_bytes(openssl_cipher_iv_length(self::OPENSSL_METHOD));
-			return trim(openssl_decrypt(base64_decode($str), self::OPENSSL_METHOD, $key, OPENSSL_RAW_DATA, $iv));
+		} elseif($cryptLib == self::OPENSSL) {
+			$ivlen = openssl_cipher_iv_length(self::OPENSSL_METHOD);
+			$str = base64_decode($str);
+			return trim(openssl_decrypt(substr($str, $ivlen), self::OPENSSL_METHOD, $key, OPENSSL_RAW_DATA, substr($str, 0, $ivlen)));
 		} else { // unknown cryptLib
 			return self::decrypt($str, $key, $core->dcScript->getCryptLib());
 		}
@@ -131,8 +133,8 @@ class dcScript extends dcPluginHelper024b {
 				}
 			}
 
-			# version < 2.1.0
-			if(version_compare($old_version, '2.1.0', '<')) {		// /!\ timeout possible for a lot of blogs
+			# version < 2.1.1-dev-r0001
+			if(version_compare($old_version, '2.1.1-dev-r0001', '<')) {		// /!\ timeout possible for a lot of blogs
 				$this->core->blog->settings->{$this->plugin_id}->put('crypt_lib', self::OPENSSL, 'string', __('Encryption library'), false, true);
 				# upgrade all blogs settings
 				$rs = $this->core->getBlogs();
@@ -140,8 +142,8 @@ class dcScript extends dcPluginHelper024b {
 					$settings = new dcSettings($this->core, $rs->blog_id);
 					$settings->addNamespace($this->plugin_id);
 					if(version_compare(PHP_VERSION, '7.2', '<')) {
-						$settings->{$this->plugin_id}->put('header_code', self::encrypt(self::decrypt($settings->{$this->plugin_id}->get('header_code'), $this->getCryptKey()), $this->getCryptKey(),self::OPENSSL_METHOD));
-						$settings->{$this->plugin_id}->put('footer_code', self::encrypt(self::decrypt($settings->{$this->plugin_id}->get('footer_code'), $this->getCryptKey()), $this->getCryptKey(),self::OPENSSL_METHOD));
+						$settings->{$this->plugin_id}->put('header_code', self::encrypt(self::decrypt($settings->{$this->plugin_id}->get('header_code'), $this->getCryptKey()), $this->getCryptKey(),self::OPENSSL));
+						$settings->{$this->plugin_id}->put('footer_code', self::encrypt(self::decrypt($settings->{$this->plugin_id}->get('footer_code'), $this->getCryptKey()), $this->getCryptKey(),self::OPENSSL));
 						$settings->{$this->plugin_id}->put('crypt_lib', self::OPENSSL);
 					} else {
 						$settings->{$this->plugin_id}->put('crypt_lib', '');
@@ -149,7 +151,6 @@ class dcScript extends dcPluginHelper024b {
 					unset($settings);
 				}
 			}
-
 		}
 	}
 

@@ -29,18 +29,15 @@ if (!empty($_POST)) {
 		}
 		# submit convert (warning page)
 		if (isset($_POST['convert'])) {
-			//* désactivé pour tests
 			$core->dcScript->settings('header_code', dcScript::encrypt(trim($_POST['header_code']), $core->dcScript->getCryptKey(), dcScript::OPENSSL));
 			$core->dcScript->settings('footer_code', dcScript::encrypt(trim($_POST['footer_code']), $core->dcScript->getCryptKey(), dcScript::OPENSSL));
 			$core->dcScript->settings('crypt_lib', dcScript::OPENSSL);
-			//*/
 			$core->blog->triggerBlog();
 			dcPage::addSuccessNotice(__('Code successfully updated.'));
 			$core->adminurl->redirect($core->dcScript->info('adminUrl'), array(), '#tab-1');
 		}
 		# submit tab 1 (standard page)
 		if (isset($_POST['update_header'])) {
-			//$core->dcScript->settings('header_code', base64_encode(trim($_POST['header_code'])));
 			$core->dcScript->settings('header_code', dcScript::encrypt(trim($_POST['header_code'])."\n", $core->dcScript->getCryptKey(), dcScript::OPENSSL));
 			$core->blog->triggerBlog();
 			dcPage::addSuccessNotice(__('Code successfully updated.'));
@@ -48,7 +45,6 @@ if (!empty($_POST)) {
 		}
 		# submit tab 2 (standard page)
 		if (isset($_POST['update_footer'])) {
-			//$core->dcScript->settings('footer_code', base64_encode(trim($_POST['footer_code'])));
 			$core->dcScript->settings('footer_code', dcScript::encrypt(trim($_POST['footer_code'])."\n", $core->dcScript->getCryptKey(), dcScript::OPENSSL));
 			$core->blog->triggerBlog();
 			dcPage::addSuccessNotice(__('Code successfully updated.'));
@@ -80,5 +76,4 @@ if(version_compare(PHP_VERSION, '7.2', '>=') && ($core->dcScript->settings('cryp
 	require_once 'index_warning.php';
 } else {
 	require_once 'index_std.php';
-	//*/
 }

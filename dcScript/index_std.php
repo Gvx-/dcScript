@@ -7,7 +7,11 @@
  * -- END LICENSE BLOCK -----------------------------------------------------*/
 if(!defined('DECRYPTION_PAGE')) { return; }
 
-if($core->dcScript->settings('crypt_lib') != dcScript::OPENSSL) { $core->dcScript->settings('crypt_lib', dcScript::OPENSSL); }
+$header = html::escapeHTML(dcScript::decrypt($core->dcScript->settings('header_code'), $core->dcScript->getCryptKey(), $core->dcScript->getCryptLib()));
+$footer = html::escapeHTML(dcScript::decrypt($core->dcScript->settings('footer_code'), $core->dcScript->getCryptKey(), $core->dcScript->getCryptLib()));
+$formAction = html::escapeHTML($core->adminurl->get($core->dcScript->info('adminUrl')));
+$downloadHeader = $core->adminurl->get($core->dcScript->info('adminUrl'), array('download' => 'header'));
+$downloadFooter = $core->adminurl->get($core->dcScript->info('adminUrl'), array('download' => 'footer'));
 
 ?>
 <html>
@@ -51,14 +55,14 @@ if($core->dcScript->settings('crypt_lib') != dcScript::OPENSSL) { $core->dcScrip
 			# Tab 1
 			echo
 				'<div class="multi-part" id="tab-1" title="'.__('Header code').' - ('.($core->dcScript->settings('header_code_enabled') ? __('Enabled') : __('Disabled')).')">
-					<form action="'.html::escapeHTML($core->adminurl->get($core->dcScript->info('adminUrl'))).'" method="post" id="'.html::escapeHTML($core->dcScript->info('id')).'-form-header">
+					<form action="'.$formAction.'" method="post" id="'.html::escapeHTML($core->dcScript->info('id')).'-form-header">
 						<p>'.$core->formNonce().'</p>
-						<p>'.form::hidden('change_header','')/*for check change in CodeMirror => jsConfirmClose()*/.'</p>
-						<p>'.form::textArea('header_code',120,25,html::escapeHTML(dcScript::decrypt($core->dcScript->settings('header_code'), $core->dcScript->getCryptKey(), $core->dcScript->getCryptLib()))."\n",'maximal',0).'</p>
+						<p>'.form::hidden('change_header', '')/*for check change in CodeMirror => jsConfirmClose()*/.'</p>
+						<p>'.form::textArea('header_code', 120, 25, $header."\n", 'maximal', 0).'</p>
 						<p class="button-bar clear">
 							<input type="submit" id="update_header" name="update_header" title="'.__('Save the configuration').'" value="'.__('Save').'" />
 							<input type="reset" id="reset_header" name="reset_header" title="'.__('Undo changes').'" value="'.__('Cancel').'" />
-							<a id="export_header" class="button" title="'.__('Export').'" href="'.$core->adminurl->get($core->dcScript->info('adminUrl'), array('download' => 'header')).'">'.__('Download').'</a>
+							<a id="export_header" class="button" title="'.__('Export').'" href="'.$downloadHeader.'">'.__('Download').'</a>
 						</p>
 					</form>
 				</div>
@@ -66,14 +70,14 @@ if($core->dcScript->settings('crypt_lib') != dcScript::OPENSSL) { $core->dcScrip
 			# Tab 2
 			echo
 				'<div class="multi-part" id="tab-2" title="'.__('Footer code').' - ('.($core->dcScript->settings('footer_code_enabled') ? __('Enabled') : __('Disabled')).')">
-					<form action="'.html::escapeHTML($core->adminurl->get($core->dcScript->info('adminUrl'))).'" method="post" id="'.html::escapeHTML($core->dcScript->info('id')).'-form-footer">
+					<form action="'.$formAction.'" method="post" id="'.html::escapeHTML($core->dcScript->info('id')).'-form-footer">
 						<p>'.$core->formNonce().'</p>
-						<p>'.form::hidden('change_footer','')/*for check change in CodeMirror => jsConfirmClose()*/.'</p>
-						<p>'.form::textArea('footer_code',120,25,html::escapeHTML(dcScript::decrypt($core->dcScript->settings('footer_code'), $core->dcScript->getCryptKey(), $core->dcScript->getCryptLib()))."\n",'maximal',0).'</p>
+						<p>'.form::hidden('change_footer', '')/*for check change in CodeMirror => jsConfirmClose()*/.'</p>
+						<p>'.form::textArea('footer_code', 120, 25, $footer."\n", 'maximal', 0).'</p>
 						<p class="button-bar clear">
 							<input type="submit" id="update_footer" name="update_footer" title="'.__('Save the configuration').'" value="'.__('Save').'" />
 							<input type="reset" id="reset_footer" name="reset_footer" title="'.__('Undo changes').'" value="'.__('Cancel').'" />
-							<a id="export_footer" class="button" title="'.__('Export').'" href="'.$core->adminurl->get($core->dcScript->info('adminUrl'), array('download' => 'footer')).'">'.__('Download').'</a>
+							<a id="export_footer" class="button" title="'.__('Export').'" href="'.$downloadFooter.'">'.__('Download').'</a>
 						</p>
 					</form>
 				</div>
