@@ -1,6 +1,12 @@
 Changelog
 =========
 
+Version 2.1.2 (2020-04-07)
+--------------------------
+
+* Correctif insertion cote public
+* Sauvegarde settings
+
 Version 2.1.1 (2020-04-04)
 --------------------------
 

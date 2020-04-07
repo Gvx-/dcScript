@@ -12,9 +12,9 @@ dcPage::checkSuper();
 if (isset($_POST['save'])) {
 	try {
 		$core->dcScript->settings('enabled', !empty($_POST['enabled']), true);
-		$core->dcScript->settings('header_code_enabled', !empty($_POST['header_code_enabled']), true);
-		$core->dcScript->settings('footer_code_enabled', !empty($_POST['footer_code_enabled']), true);
-		$core->dcScript->settings('backup_ext', html::escapeHTML($_POST['backup']), true);
+		$core->dcScript->settings('header_code_enabled', !empty($_POST['header_code_enabled']), false);
+		$core->dcScript->settings('footer_code_enabled', !empty($_POST['footer_code_enabled']), false);
+		$core->dcScript->settings('backup_ext', html::escapeHTML($_POST['backup']), false);
 		$core->blog->triggerBlog();
 		dcPage::addSuccessNotice(__('Configuration successfully updated.'));
 	} catch(exception $e) {

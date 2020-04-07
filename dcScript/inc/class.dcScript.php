@@ -19,7 +19,7 @@ class dcScript extends dcPluginHelper024b {
 
 	public static function publicHeadContent($core, $_ctx) {
 		if(version_compare(PHP_VERSION, '7.2', '>=') && ($core->dcScript->settings('crypt_lib') != self::OPENSSL)) { return; }
-		$html = self::decrypt($core->dcScript->settings('header_code'), $core->dcScript->getCryptKey());
+		$html = self::decrypt($core->dcScript->settings('header_code'), $core->dcScript->getCryptKey(), $core->dcScript->settings('crypt_lib'));
 		if($core->dcScript->settings('enabled') && $core->dcScript->settings('header_code_enabled') && !empty($html)) {
 			echo "<!-- dcScript header begin -->\n".$html."\n<!-- dcScript header end -->\n";
 		}
@@ -27,7 +27,7 @@ class dcScript extends dcPluginHelper024b {
 
 	public static function publicFooterContent($core, $_ctx) {
 		if(version_compare(PHP_VERSION, '7.2', '>=') && ($core->dcScript->settings('crypt_lib') != self::OPENSSL)) { return; }
-		$html = self::decrypt($core->dcScript->settings('footer_code'), $core->dcScript->getCryptKey());
+		$html = self::decrypt($core->dcScript->settings('footer_code'), $core->dcScript->getCryptKey(), $core->dcScript->settings('crypt_lib'));
 		if($core->dcScript->settings('enabled') && $core->dcScript->settings('footer_code_enabled') && !empty($html)) {
 			echo "<!-- dcScript footer begin -->\n".$html."\n<!-- dcScript footer end -->\n";
 		}
