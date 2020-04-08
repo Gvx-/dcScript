@@ -1,11 +1,18 @@
 Changelog
 =========
 
+Version 2.2.0 (2020-04-xx)
+--------------------------
+
+* Correctifs divers
+* Mise a niveau dcPluginHelper 216
+* Version mini dc 2.16
+
 Version 2.1.2 (2020-04-07)
 --------------------------
 
 * Correctif insertion cote public
-* Sauvegarde settings
+* Correctif sauvegarde settings
 
 Version 2.1.1 (2020-04-04)
 --------------------------

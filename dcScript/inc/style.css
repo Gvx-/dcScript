@@ -1,105 +1,142 @@
-/* -- BEGIN LICENSE BLOCK -----------------------------------------------------
- * This file is part of plugin dcScript for Dotclear 2.
- * Copyright © 2014-2020 Gvx
- * Licensed under the GPL version 2.0 license.
- * (http://www.gnu.org/licenses/old-licenses/gpl-2.0.html)
- * -- END LICENSE BLOCK -----------------------------------------------------*/
+/**
+  * This file is part of dcScript plugin for Dotclear 2.
+  *
+  * @package Dotclear\plungin\dcScript
+  *
+  * @author Gvx <g.gvx@free.fr>
+  * @copyright © 2014-2020 Gvx
+  * @license http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+ */
+
 
 /* --== Code mirror ==-- */
+
 .CodeMirror {
-	font-size: 1.3em;
-	/*height: auto;*/
-	height: 32em;
-	border: thin solid silver;
-	margin-bottom: 1em;
-}
-.cm-trailingspace {
-	background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAACCAYAAAB/qH1jAAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH3QUXCToH00Y1UgAAACFJREFUCNdjPMDBUc/AwNDAAAFMTAwMDA0OP34wQgX/AQBYgwYEx4f9lQAAAABJRU5ErkJggg==);
-	background-position: bottom left;
-	background-repeat: repeat-x;
-}
-div.CodeMirror span.CodeMirror-matchingbracket {
-	color: #f00; font-weight: bold;
-}
-/* addon foldgutter.js */
-.CodeMirror-foldmarker {
-  color: blue;
-  text-shadow: #b9f 1px 1px 2px, #b9f -1px -1px 2px, #b9f 1px -1px 2px, #b9f -1px 1px 2px;
-  font-family: arial;
-  line-height: .3;
-  cursor: pointer;
-}
-.CodeMirror-foldgutter {
-  width: .7em;
-}
-.CodeMirror-foldgutter-open,
-.CodeMirror-foldgutter-folded {
-  cursor: pointer;
-}
-.CodeMirror-foldgutter-open:after {
-  content: "\25BE";
-}
-.CodeMirror-foldgutter-folded:after {
-  content: "\25B8";
-}
-/* addon fullscreen */
-.CodeMirror-fullscreen {
-  position: fixed;
-  top: 0; left: 0; right: 0; bottom: 0;
-  height: auto;
-  z-index: 9;
-}
-/* addon dialog.js */
-.CodeMirror-dialog {
-  position: absolute;
-  left: 0; right: 0;
-  background: inherit;
-  z-index: 15;
-  padding: .1em .8em;
-  overflow: hidden;
-  color: inherit;
-}
-.CodeMirror-dialog-top {
-  border-bottom: 1px solid #eee;
-  top: 0;
-}
-.CodeMirror-dialog-bottom {
-  border-top: 1px solid #eee;
-  bottom: 0;
-}
-.CodeMirror-dialog input {
-  border: none;
-  outline: none;
-  background: transparent;
-  width: 20em;
-  color: inherit;
-  font-family: monospace;
-}
-.CodeMirror-dialog button {
-  font-size: 70%;
+    font-size: 1.3em;
+    /*height: auto;*/
+    height: 32em;
+    border: thin solid silver;
+    margin-bottom: 1em;
 }
 
+.cm-trailingspace {
+    background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAACCAYAAAB/qH1jAAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH3QUXCToH00Y1UgAAACFJREFUCNdjPMDBUc/AwNDAAAFMTAwMDA0OP34wQgX/AQBYgwYEx4f9lQAAAABJRU5ErkJggg==);
+    background-position: bottom left;
+    background-repeat: repeat-x;
+}
+
+div.CodeMirror span.CodeMirror-matchingbracket {
+    color: #f00;
+    font-weight: bold;
+}
+
+
+/* addon foldgutter.js */
+
+.CodeMirror-foldmarker {
+    color: blue;
+    text-shadow: #b9f 1px 1px 2px, #b9f -1px -1px 2px, #b9f 1px -1px 2px, #b9f -1px 1px 2px;
+    font-family: arial;
+    line-height: .3;
+    cursor: pointer;
+}
+
+.CodeMirror-foldgutter {
+    width: .7em;
+}
+
+.CodeMirror-foldgutter-open,
+.CodeMirror-foldgutter-folded {
+    cursor: pointer;
+}
+
+.CodeMirror-foldgutter-open:after {
+    content: "\25BE";
+}
+
+.CodeMirror-foldgutter-folded:after {
+    content: "\25B8";
+}
+
+
+/* addon fullscreen */
+
+.CodeMirror-fullscreen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: auto;
+    z-index: 9;
+}
+
+
+/* addon dialog.js */
+
+.CodeMirror-dialog {
+    position: absolute;
+    left: 0;
+    right: 0;
+    background: inherit;
+    z-index: 15;
+    padding: .1em .8em;
+    overflow: hidden;
+    color: inherit;
+}
+
+.CodeMirror-dialog-top {
+    border-bottom: 1px solid #eee;
+    top: 0;
+}
+
+.CodeMirror-dialog-bottom {
+    border-top: 1px solid #eee;
+    bottom: 0;
+}
+
+.CodeMirror-dialog input {
+    border: none;
+    outline: none;
+    background: transparent;
+    width: 20em;
+    color: inherit;
+    font-family: monospace;
+}
+
+.CodeMirror-dialog button {
+    font-size: 70%;
+}
+
+
 /* --== dcScript ==-- */
+
 input[disabled],
 a.button.disabled {
-	opacity: 0.5; cursor: default;
+    opacity: 0.5;
+    cursor: default;
 }
+
 input[type="submit"],
 input[type="reset"],
 input[type="button"],
- a.button {
-	margin: 0.5em;
+a.button {
+    margin: 0.5em;
 }
+
 
 /* --== warning-index ==-- */
+
 #datas-deliver {
-	/* https://toscaconsultants.fr/accessibilite-numerique/notes-techniques/techniques-css-pour-cacher-du-texte */
-	position: absolute;
-	left: -10000em;
-	top: auto;
-	width: 1px;
-	height: 1px;
-	overflow: hidden;
+    /* https://toscaconsultants.fr/accessibilite-numerique/notes-techniques/techniques-css-pour-cacher-du-texte */
+    position: absolute;
+    left: -10000em;
+    top: auto;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
 }
 
-button.copy_done { color: green; }
+button.copy_done {
+    color: green;
+}

@@ -1,11 +1,14 @@
 <?php
-/* -- BEGIN LICENSE BLOCK -----------------------------------------------------
- * This file is part of plugin dcScript for Dotclear 2.
- * Copyright © 2014-2016 Gvx
- * Licensed under the GPL version 2.0 license.
- * (http://www.gnu.org/licenses/old-licenses/gpl-2.0.html)
- * -- END LICENSE BLOCK -----------------------------------------------------*/
+/**
+  * This file is part of dcScript plugin for Dotclear 2.
+  *
+  * @package Dotclear\plungin\dcScript
+  *
+  * @author Gvx <g.gvx@free.fr>
+  * @copyright © 2014-2020 Gvx
+  * @license http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+ */
+
 if(!defined('DC_RC_PATH')) { return; }
 
-$core->addBehavior('publicHeadContent', array('dcScript', 'publicHeadContent'));
-$core->addBehavior('publicFooterContent', array('dcScript', 'publicFooterContent'));
+$core->dcScript->_public();

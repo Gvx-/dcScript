@@ -1,23 +1,17 @@
-/* -- BEGIN LICENSE BLOCK -----------------------------------------------------
- * This file is part of dcScript for Dotclear 2.
- * Copyright © 2014-2020 Gvx
- * Licensed under the GPL version 2.0 license.
- * (http://www.gnu.org/licenses/old-licenses/gpl-2.0.html)
- * -- END LICENSE BLOCK -----------------------------------------------------*/
+/**
+ * This file is part of dcScript plugin for Dotclear 2.
+ *
+ * @package Dotclear\plungin\dcScript
+ *
+ * @author Gvx <g.gvx@free.fr>
+ * @copyright © 2014-2020 Gvx
+ * @license http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+ */
+
+/** @version 0.2.0 */
 
 (function(undefined) {
     'use strict';
-    // -- INFORMATIONS BLOCK BEGIN ----------------------------------------------------
-    var informations = {
-        name: 'dcScriptIndexWarning',
-        description: 'dcScript for dotclear version 2.7+',
-        version: '0.1.0',
-        author: 'Gvx',
-        copyright: '© 2020 Gvx',
-        support: '',
-        license: 'http://www.gnu.org/licenses/old-licenses/gpl-2.0.html'
-    };
-    // -- INFORMATIONS BLOCK END ------------------------------------------------------
 
     function copy(element, button) {
         if (element) {
