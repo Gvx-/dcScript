@@ -16,7 +16,7 @@ if(!isset($__autoload['dcPluginHelper216'])) { $__autoload['dcPluginHelper216'] 
 define('DECRYPTION_PAGE', 'http://promenade.temporelle.free.fr/tools/decrypt.php');
 
 __('dcScript');						// plugin name
-__('Add script for DC 2.8+');		// description plugin
+__('Add script for DC');			// description plugin
 
 //class dcScript extends dcPluginHelper024b {
 class dcScript extends dcPluginHelper216 {
@@ -269,11 +269,8 @@ class dcScript extends dcPluginHelper216 {
 		}
 
 		if(version_compare(PHP_VERSION, '7.2', '>=') && ($this->settings('crypt_lib') != dcScript::OPENSSL)) {
-			//require_once 'index_warning.php';
 			$this->indexWarning();
 		} else {
-			//require_once 'index_warning.php';		// for testing
-			//require_once 'index_std.php';
 			$this->indexStandard();
 		}
 	}
@@ -498,4 +495,11 @@ class dcScript extends dcPluginHelper216 {
 		dcPage::helpBlock('dcScript-config');
 	}
 
+	public function resources($path) {
+		if(!defined('DC_CONTEXT_ADMIN')) { return; }
+		global $__resources;
+		if(!isset($__resources['help']['dcScript-config'])) { $__resources['help']['dcScript-config'] = $path.'/help/config.html'; }
+		if(!isset($__resources['help']['dcScript-edit'])) { $__resources['help']['dcScript-edit'] = $path.'/help/edit.html'; }
+		if(!isset($__resources['help']['dcScript-warning'])) { $__resources['help']['dcScript-warning'] = $path.'/help/warning.html'; }
+	}
 }
