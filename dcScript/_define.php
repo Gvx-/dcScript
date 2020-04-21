@@ -15,7 +15,7 @@ $this->registerModule(
 	/* Name */			'dcScript',
 	/* Description*/	'Add script for DC',
 	/* Author */		'Gvx',
-	/* Version */		'2.2.0-dev-r0010',
+	/* Version */		'2.2.0-dev-r0011',
 	array(
 		/* standard plugin options dotclear */
 		'permissions' 				=>	'dcScript.edit',

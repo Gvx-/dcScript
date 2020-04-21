@@ -210,7 +210,7 @@ class dcScript extends dcPluginHelper216 {
 		if(!$this->settings('enabled') && is_file(path::real($this->info('root').'/_config.php'))) {
 			if($this->auth->check('admin', $this->blog->id)) {
 				$this->core->adminurl->redirect('admin.plugins', array(
-					'module' => $this->info('id'),'conf' => 1, 'redir' => $this->adminurl->get($this->info('adminUrl'))
+					'module' => $this->info('id'),'conf' => 1, 'redir' => $this->core->adminurl->get($this->info('adminUrl'))
 				));
 			} else {
 				$this->notices->addNotice('message', sprintf(__('%s plugin is not configured.'), $this->info('name')));
@@ -230,21 +230,21 @@ class dcScript extends dcPluginHelper216 {
 					$this->settings('crypt_lib', dcScript::OPENSSL);
 					$this->blog->triggerBlog();
 					dcPage::addSuccessNotice(__('Code successfully updated.'));
-					$this->adminurl->redirect($this->info('adminUrl'), array(), '#tab-1');
+					$this->core->adminurl->redirect($this->info('adminUrl'), array(), '#tab-1');
 				}
 				# submit tab 1 (standard page)
 				if (isset($_POST['update_header'])) {
 					$this->settings('header_code', dcScript::encrypt(trim($_POST['header_code'])."\n", $this->getCryptKey(), dcScript::OPENSSL));
 					$this->blog->triggerBlog();
 					dcPage::addSuccessNotice(__('Code successfully updated.'));
-					$this->adminurl->redirect($this->info('adminUrl'), array(), '#tab-1');
+					$this->core->adminurl->redirect($this->info('adminUrl'), array(), '#tab-1');
 				}
 				# submit tab 2 (standard page)
 				if (isset($_POST['update_footer'])) {
 					$this->settings('footer_code', dcScript::encrypt(trim($_POST['footer_code'])."\n", $this->getCryptKey(), dcScript::OPENSSL));
 					$this->blog->triggerBlog();
 					dcPage::addSuccessNotice(__('Code successfully updated.'));
-					$this->adminurl->redirect($this->info('adminUrl'), array(), '#tab-2');
+					$this->core->adminurl->redirect($this->info('adminUrl'), array(), '#tab-2');
 				}
 			} catch(exception $e) {
 				//$this->error->add($e->getMessage());
@@ -279,8 +279,8 @@ class dcScript extends dcPluginHelper216 {
 		echo '<html>'.NL;
 		echo '<head>'.NL;
 		echo '<title>'.html::escapeHTML($this->info('name')).'</title>'.NL;
-		echo $this->cssLoad('/inc/style.css');
-		echo $this->jsLoad('/inc/index_warning.js');
+		echo $this->cssLoad('/inc/css/index.css');
+		echo $this->jsLoad('/inc/js/index_warning.js');
 		dcPage::addNotice('message', __('See help for the procedure'));
 		echo '</head>'.NL;
 
@@ -356,8 +356,8 @@ class dcScript extends dcPluginHelper216 {
 		echo $this->jsLoad('/codemirror/addon/search/searchcursor.js');
 		echo $this->jsLoad('/codemirror/addon/selection/active-line.js');
 		// End CodeMirror
-		echo $this->jsLoad('/inc/admin.js');
-		echo $this->cssLoad('/inc/style.css');
+		echo $this->jsLoad('/inc/js/index.js');
+		echo $this->cssLoad('/inc/css/index.css');
 		echo dcPage::jsConfirmClose('dcScript-form-tab-1','dcScript-form-tab-2');
 		echo dcPage::jsPageTabs(isset($_REQUEST['tab']) ? $_REQUEST['tab'] : 'tab-1');
 		echo '</head>'.NL;
@@ -415,7 +415,7 @@ class dcScript extends dcPluginHelper216 {
 
 		# menu & dashboard
 		$this->core->addBehavior('adminDashboardFavorites', array($this->core->dcScript, 'adminDashboardFavs'));
-		$this->core->dcScript->adminMenu('System');
+		$this->adminMenu('System');
 
 		if(!$this->core->auth->check('admin', $this->core->blog->id)) { return; }
 		# admin only
@@ -436,15 +436,15 @@ class dcScript extends dcPluginHelper216 {
 				$this->settings('header_code_enabled', !empty($_POST['header_code_enabled']));
 				$this->settings('footer_code_enabled', !empty($_POST['footer_code_enabled']));
 				$this->settings('backup_ext', html::escapeHTML($_POST['backup']));
-				$core->blog->triggerBlog();
+				$this->core->blog->triggerBlog();
 				dcPage::addSuccessNotice(__('Configuration successfully updated.'));
 			} catch(exception $e) {
-				//$core->error->add($e->getMessage());
-				$core->error->add(__('Unable to save the configuration'));
+				//$this->core->error->add($e->getMessage());
+				$this->core->error->add(__('Unable to save the configuration'));
 			}
 			if(!empty($_GET['redir']) && strpos($_GET['redir'], 'p='.$this->info('id')) === false) {
-				$core->error->add(__('Redirection not found'));
-				$core->adminurl->redirect('admin.home');
+				$this->core->error->add(__('Redirection not found'));
+				$this->core->adminurl->redirect('admin.home');
 			}
 			http::redirect($_REQUEST['redir']);
 		}
