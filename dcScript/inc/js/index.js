@@ -7,6 +7,7 @@
  * @copyright © 2014-2020 Gvx
  * @license http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
  */
+'use strict';
 
 /** @version 0.27.0 */
 

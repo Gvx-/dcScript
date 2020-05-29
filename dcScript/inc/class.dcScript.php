@@ -208,12 +208,12 @@ class dcScript extends dcPluginHelper216 {
 		if(!defined('DC_CONTEXT_ADMIN')) { return; }
 		dcPage::check('dcScript.edit');
 		if(!$this->settings('enabled') && is_file(path::real($this->info('root').'/_config.php'))) {
-			if($this->auth->check('admin', $this->blog->id)) {
+			if($this->core->auth->check('admin', $this->core->blog->id)) {
 				$this->core->adminurl->redirect('admin.plugins', array(
 					'module' => $this->info('id'),'conf' => 1, 'redir' => $this->core->adminurl->get($this->info('adminUrl'))
 				));
 			} else {
-				$this->notices->addNotice('message', sprintf(__('%s plugin is not configured.'), $this->info('name')));
+				$this->core->notices->addNotice('message', sprintf(__('%s plugin is not configured.'), $this->info('name')));
 				$this->core->adminurl->redirect('admin.home');
 			}
 		}
@@ -228,27 +228,27 @@ class dcScript extends dcPluginHelper216 {
 					$this->settings('header_code', dcScript::encrypt(trim($_POST['header_code']), $this->getCryptKey(), dcScript::OPENSSL));
 					$this->settings('footer_code', dcScript::encrypt(trim($_POST['footer_code']), $this->getCryptKey(), dcScript::OPENSSL));
 					$this->settings('crypt_lib', dcScript::OPENSSL);
-					$this->blog->triggerBlog();
+					$this->core->blog->triggerBlog();
 					dcPage::addSuccessNotice(__('Code successfully updated.'));
 					$this->core->adminurl->redirect($this->info('adminUrl'), array(), '#tab-1');
 				}
 				# submit tab 1 (standard page)
 				if (isset($_POST['update_header'])) {
 					$this->settings('header_code', dcScript::encrypt(trim($_POST['header_code'])."\n", $this->getCryptKey(), dcScript::OPENSSL));
-					$this->blog->triggerBlog();
+					$this->core->blog->triggerBlog();
 					dcPage::addSuccessNotice(__('Code successfully updated.'));
 					$this->core->adminurl->redirect($this->info('adminUrl'), array(), '#tab-1');
 				}
 				# submit tab 2 (standard page)
 				if (isset($_POST['update_footer'])) {
 					$this->settings('footer_code', dcScript::encrypt(trim($_POST['footer_code'])."\n", $this->getCryptKey(), dcScript::OPENSSL));
-					$this->blog->triggerBlog();
+					$this->core->blog->triggerBlog();
 					dcPage::addSuccessNotice(__('Code successfully updated.'));
 					$this->core->adminurl->redirect($this->info('adminUrl'), array(), '#tab-2');
 				}
 			} catch(exception $e) {
-				//$this->error->add($e->getMessage());
-				$this->error->add(__('Unable to save the code'));
+				//$this->core->error->add($e->getMessage());
+				$this->core->error->add(__('Unable to save the code'));
 			}
 		}
 
@@ -256,15 +256,15 @@ class dcScript extends dcPluginHelper216 {
 			try {
 				# download code (standard page)
 				if(isset($_GET['download']) && in_array($_GET['download'], array('header', 'footer'), true)) {
-					$filename = '"'.trim($this->blog->name).'_'.date('Y-m-d').'_'.$_GET['download'].'.'.trim($this->settings('backup_ext'),'.').'"';
+					$filename = '"'.trim($this->core->blog->name).'_'.date('Y-m-d').'_'.$_GET['download'].'.'.trim($this->settings('backup_ext'),'.').'"';
 					header('Content-Disposition: attachment;filename='.$filename);
 					header('Content-Type: text/plain; charset=UTF-8');
 					echo dcScript::decrypt($this->settings($_GET['download'].'_code'), $this->getCryptKey(), $this->getCryptLib());
 					exit;
 				}
 			} catch(exception $e) {
-				//$this->error->add($e->getMessage());
-				$this->error->add(__('Unable to save the file'));
+				//$this->core->error->add($e->getMessage());
+				$this->core->error->add(__('Unable to save the file'));
 			}
 		}
 
@@ -414,7 +414,7 @@ class dcScript extends dcPluginHelper216 {
 		$this->core->auth->setPermissionType('dcScript.edit',__('Edit public scripts'));
 
 		# menu & dashboard
-		$this->core->addBehavior('adminDashboardFavorites', array($this->core->dcScript, 'adminDashboardFavs'));
+		$this->core->addBehavior('adminDashboardFavorites', array($this, 'adminDashboardFavs'));
 		$this->adminMenu('System');
 
 		if(!$this->core->auth->check('admin', $this->core->blog->id)) { return; }

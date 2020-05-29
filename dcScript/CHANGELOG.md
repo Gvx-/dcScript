@@ -1,7 +1,7 @@
 Changelog
 =========
 
-Version 2.2.0 (2020-04-xx)
+Version 2.2.0 (2020-05-xx)
 --------------------------
 
 * Correctifs divers
