@@ -1,12 +1,14 @@
 Changelog
 =========
 
-Version 2.2.0 (2020-05-xx)
+Version 2.3.0 (2022-11-14)
 --------------------------
 
+* Mise a niveau dcPluginHelper pour dc 2.24
+* Version mini dc 2.24
+* Ajout d'un depot alternatif
+* Passage a la version 5.65.9 de CodeMirror
 * Correctifs divers
-* Mise a niveau dcPluginHelper 216
-* Version mini dc 2.16
 
 Version 2.1.2 (2020-04-07)
 --------------------------

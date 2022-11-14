@@ -5,21 +5,21 @@
   * @package Dotclear\plungin\dcScript
   *
   * @author Gvx <g.gvx@free.fr>
-  * @copyright © 2014-2020 Gvx
+  * @copyright © 2014-2022 Gvx
   * @license http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
  */
 
 if(!defined('DC_RC_PATH')) { return; }
 
-if(!isset($__autoload['dcPluginHelper216'])) { $__autoload['dcPluginHelper216'] = dirname(__FILE__).'/class.dcPluginHelper.php'; }
+if(Clearbricks::lib()->autoloadSource('dcPluginHelper224') == false) { Clearbricks::lib()->autoload(['dcPluginHelper224' => __DIR__ . '/_dcPluginHelper/class.dcPluginHelper224.php']); }
 
 define('DECRYPTION_PAGE', 'http://promenade.temporelle.free.fr/tools/decrypt.php');
 
 __('dcScript');						// plugin name
 __('Add script for DC');			// description plugin
 
-//class dcScript extends dcPluginHelper024b {
-class dcScript extends dcPluginHelper216 {
+//class dcScript extends dcPluginHelper224 {
+class dcScript extends dcPluginHelper224 {
 
 	### Constants ###
 	const MCRYPT = 'mcrypt';
@@ -34,9 +34,9 @@ class dcScript extends dcPluginHelper216 {
 	 * @return void
 	 */
 	public static function publicHeadContent($core, $_ctx) {
-		if(version_compare(PHP_VERSION, '7.2', '>=') && ($core->dcScript->settings('crypt_lib') != self::OPENSSL)) { return; }
-		$html = self::decrypt($core->dcScript->settings('header_code'), $core->dcScript->getCryptKey(), $core->dcScript->settings('crypt_lib'));
-		if($core->dcScript->settings('enabled') && $core->dcScript->settings('header_code_enabled') && !empty($html)) {
+		if(dcCore::app()->dcScript->settings('crypt_lib') != self::OPENSSL) { return; }
+		$html = self::decrypt(dcCore::app()->dcScript->settings('header_code'), dcCore::app()->dcScript->getCryptKey(), dcCore::app()->dcScript->settings('crypt_lib'));
+		if(dcCore::app()->dcScript->settings('enabled') && dcCore::app()->dcScript->settings('header_code_enabled') && !empty($html)) {
 			echo "<!-- dcScript header begin -->\n".$html."\n<!-- dcScript header end -->\n";
 		}
 	}
@@ -49,9 +49,9 @@ class dcScript extends dcPluginHelper216 {
 	 * @return void
 	 */
 	public static function publicFooterContent($core, $_ctx) {
-		if(version_compare(PHP_VERSION, '7.2', '>=') && ($core->dcScript->settings('crypt_lib') != self::OPENSSL)) { return; }
-		$html = self::decrypt($core->dcScript->settings('footer_code'), $core->dcScript->getCryptKey(), $core->dcScript->settings('crypt_lib'));
-		if($core->dcScript->settings('enabled') && $core->dcScript->settings('footer_code_enabled') && !empty($html)) {
+		if(dcCore::app()->dcScript->settings('crypt_lib') != self::OPENSSL) { return; }
+		$html = self::decrypt(dcCore::app()->dcScript->settings('footer_code'), dcCore::app()->dcScript->getCryptKey(), dcCore::app()->dcScript->settings('crypt_lib'));
+		if(dcCore::app()->dcScript->settings('enabled') && dcCore::app()->dcScript->settings('footer_code_enabled') && !empty($html)) {
 			echo "<!-- dcScript footer begin -->\n".$html."\n<!-- dcScript footer end -->\n";
 		}
 	}
@@ -67,16 +67,12 @@ class dcScript extends dcPluginHelper216 {
 	public static function encrypt($str, $key, $cryptLib=self::OPENSSL) {
 		global $core;
 		$key = pack('H*', hash('sha256', $key));
-		if($cryptLib == self::MCRYPT) { // REMOVED in PHP 7.2
-			if(version_compare(PHP_VERSION, '7.2', '>=')) { throw new Exception(__('Encryption incompatible with PHP 7.2 and more')); }
-			$iv = mcrypt_create_iv(mcrypt_get_iv_size(MCRYPT_RIJNDAEL_256, MCRYPT_MODE_ECB), MCRYPT_RAND);
-			return trim(base64_encode(mcrypt_encrypt(MCRYPT_RIJNDAEL_256, $key, $str, MCRYPT_MODE_ECB, $iv)));
-		} elseif($cryptLib == self::OPENSSL) {
+		if($cryptLib == self::OPENSSL) {
 			$ivlen = openssl_cipher_iv_length(self::OPENSSL_METHOD);
 			$iv = openssl_random_pseudo_bytes($ivlen);
 			return trim(base64_encode($iv.openssl_encrypt($str, self::OPENSSL_METHOD, $key, OPENSSL_RAW_DATA, $iv)));
 		} else { // unknown cryptLib
-			return self::encrypt($str, $key, $core->dcScript->getCryptLib());
+			return self::encrypt($str, $key, dcCore::app()->dcScript->getCryptLib());
 		}
 	}
 
@@ -88,19 +84,15 @@ class dcScript extends dcPluginHelper216 {
 	 * @param  string $cryptLib
 	 * @return string
 	 */
-	public static function decrypt($str, $key, $cryptLib=self::MCRYPT) {
+	public static function decrypt($str, $key, $cryptLib=self::OPENSSL) {
 		global $core;
 		$key = pack('H*', hash('sha256', $key));
-		if($cryptLib == self::MCRYPT) { // REMOVED in PHP 7.2
-			if(version_compare(PHP_VERSION, '7.2', '>=')) { throw new Exception(__('Encryption incompatible with PHP 7.2 and more')); }
-			$iv = mcrypt_create_iv(mcrypt_get_iv_size(MCRYPT_RIJNDAEL_256, MCRYPT_MODE_ECB), MCRYPT_RAND);
-			return trim(mcrypt_decrypt(MCRYPT_RIJNDAEL_256, $key, base64_decode($str), MCRYPT_MODE_ECB, $iv));
-		} elseif($cryptLib == self::OPENSSL) {
+		if($cryptLib == self::OPENSSL) {
 			$ivlen = openssl_cipher_iv_length(self::OPENSSL_METHOD);
 			$str = base64_decode($str);
 			return trim(openssl_decrypt(substr($str, $ivlen), self::OPENSSL_METHOD, $key, OPENSSL_RAW_DATA, substr($str, 0, $ivlen)));
 		} else { // unknown cryptLib
-			return self::decrypt($str, $key, $core->dcScript->getCryptLib());
+			return self::decrypt($str, $key, dcCore::app()->dcScript->getCryptLib());
 		}
 	}
 
@@ -121,7 +113,7 @@ class dcScript extends dcPluginHelper216 {
 	 */
 	Public function getCryptLib() {
 		$lib =  $this->settings('crypt_lib');
-		return (empty($lib) ? (version_compare(PHP_VERSION, '7.2', '>=')? self::OPENSSL : self::MCRYPT) : $lib);
+		return (empty($lib) ? self::OPENSSL : $lib);
 	}
 
 	Public function debugGetinfos() {
@@ -135,14 +127,14 @@ class dcScript extends dcPluginHelper216 {
 
 	protected function setDefaultSettings() {
 		# create config plugin
-		$this->core->blog->settings->addNamespace($this->plugin_id);
-		$this->core->blog->settings->{$this->plugin_id}->put('enabled', false, 'boolean', __('Enable plugin'), false, true);
-		$this->core->blog->settings->{$this->plugin_id}->put('header_code_enabled', false, 'boolean', __('Enable header code'), false, true);
-		$this->core->blog->settings->{$this->plugin_id}->put('footer_code_enabled', false, 'boolean', __('Enable footer code'), false, true);
-		$this->core->blog->settings->{$this->plugin_id}->put('header_code', self::encrypt('', $this->getCryptKey()), 'string', __('Header code'), false, true);
-		$this->core->blog->settings->{$this->plugin_id}->put('footer_code', self::encrypt('', $this->getCryptKey()), 'string', __('Footer code'), false, true);
-		$this->core->blog->settings->{$this->plugin_id}->put('backup_ext', '.html.txt', 'string', __('Extension Backup Files'), false, true);
-		$this->core->blog->settings->{$this->plugin_id}->put('crypt_lib', self::OPENSSL, 'string', __('Encryption library'), false, true);	// add v2.1.0
+		dcCore::app()->blog->settings->addNamespace($this->plugin_id);
+		dcCore::app()->blog->settings->{$this->plugin_id}->put('enabled', false, 'boolean', __('Enable plugin'), false, true);
+		dcCore::app()->blog->settings->{$this->plugin_id}->put('header_code_enabled', false, 'boolean', __('Enable header code'), false, true);
+		dcCore::app()->blog->settings->{$this->plugin_id}->put('footer_code_enabled', false, 'boolean', __('Enable footer code'), false, true);
+		dcCore::app()->blog->settings->{$this->plugin_id}->put('header_code', self::encrypt('', $this->getCryptKey()), 'string', __('Header code'), false, true);
+		dcCore::app()->blog->settings->{$this->plugin_id}->put('footer_code', self::encrypt('', $this->getCryptKey()), 'string', __('Footer code'), false, true);
+		dcCore::app()->blog->settings->{$this->plugin_id}->put('backup_ext', '.html.txt', 'string', __('Extension Backup Files'), false, true);
+		dcCore::app()->blog->settings->{$this->plugin_id}->put('crypt_lib', self::OPENSSL, 'string', __('Encryption library'), false, true);	// add v2.1.0
 	}
 
 	protected function installActions($old_version) {
@@ -152,12 +144,12 @@ class dcScript extends dcPluginHelper216 {
 			# version < 2
 			if(version_compare($old_version, '2', '<')) {		// /!\ timeout possible for a lot of blogs
 				# upgrade global settings
-				$this->core->blog->settings->{$this->plugin_id}->dropAll(true);
+				dcCore::app()->blog->settings->{$this->plugin_id}->dropAll(true);
 				$this->setDefaultSettings();
 				# upgrade all blogs settings
-				$rs = $this->core->getBlogs();
+				$rs = dcCore::app()->getBlogs();
 				while ($rs->fetch()) {
-					$settings = new dcSettings($this->core, $rs->blog_id);
+					$settings = new dcSettings($rs->blog_id);
 					$settings->addNamespace($this->plugin_id);
 					$settings->{$this->plugin_id}->put('enabled', $settings->{$this->plugin_id}->get('enabled'));
 					$settings->{$this->plugin_id}->put('header_code_enabled', $settings->{$this->plugin_id}->get('header_code_enabled'));
@@ -167,15 +159,15 @@ class dcScript extends dcPluginHelper216 {
 					$settings->{$this->plugin_id}->put('backup_ext', $settings->{$this->plugin_id}->get('backup_ext'));
 					unset($settings);
 				}
-				dcPage::addWarningNotice(__('Default settings update.'));
+				dcAdminNotices::addWarningNotice(__('Default settings update.'));
 			}
 
 			# version < 2.0.0-r0143
 			if(version_compare($old_version, '2.0.0-r0143', '<')) {		// /!\ timeout possible for a lot of blogs
 				# upgrade all blogs settings
-				$rs = $this->core->getBlogs();
+				$rs = dcCore::app()->getBlogs();
 				while ($rs->fetch()) {
-					$settings = new dcSettings($this->core, $rs->blog_id);
+					$settings = new dcSettings($rs->blog_id);
 					$settings->addNamespace($this->plugin_id);
 					$settings->{$this->plugin_id}->put('header_code', self::encrypt(self::decrypt($settings->{$this->plugin_id}->get('header_code'), DC_MASTER_KEY), $this->getCryptKey()));
 					$settings->{$this->plugin_id}->put('footer_code', self::encrypt(self::decrypt($settings->{$this->plugin_id}->get('footer_code'), DC_MASTER_KEY), $this->getCryptKey()));
@@ -185,11 +177,11 @@ class dcScript extends dcPluginHelper216 {
 
 			# version < 2.1.1-dev-r0001
 			if(version_compare($old_version, '2.1.1-dev-r0001', '<')) {		// /!\ timeout possible for a lot of blogs
-				$this->core->blog->settings->{$this->plugin_id}->put('crypt_lib', self::OPENSSL, 'string', __('Encryption library'), false, true);
+				dcCore::app()->blog->settings->{$this->plugin_id}->put('crypt_lib', self::OPENSSL, 'string', __('Encryption library'), false, true);
 				# upgrade all blogs settings
-				$rs = $this->core->getBlogs();
+				$rs = dcCore::app()->getBlogs();
 				while ($rs->fetch()) {
-					$settings = new dcSettings($this->core, $rs->blog_id);
+					$settings = new dcSettings($rs->blog_id);
 					$settings->addNamespace($this->plugin_id);
 					if(version_compare(PHP_VERSION, '7.2', '<')) {
 						$settings->{$this->plugin_id}->put('header_code', self::encrypt(self::decrypt($settings->{$this->plugin_id}->get('header_code'), $this->getCryptKey()), $this->getCryptKey(),self::OPENSSL));
@@ -206,49 +198,49 @@ class dcScript extends dcPluginHelper216 {
 
 	public function index() {
 		if(!defined('DC_CONTEXT_ADMIN')) { return; }
-		dcPage::check('dcScript.edit');
+		dcPage::check(dcCore::app()->auth->makePermissions([dcScriptPerms::EDIT]));
 		if(!$this->settings('enabled') && is_file(path::real($this->info('root').'/_config.php'))) {
-			if($this->core->auth->check('admin', $this->core->blog->id)) {
-				$this->core->adminurl->redirect('admin.plugins', array(
-					'module' => $this->info('id'),'conf' => 1, 'redir' => $this->core->adminurl->get($this->info('adminUrl'))
+			if(dcCore::app()->auth->check(dcCore::app()->auth->makePermissions([dcAuth::PERMISSION_ADMIN]), dcCore::app()->blog->id)) {
+				dcCore::app()->adminurl->redirect('admin.plugins', array(
+					'module' => $this->info('id'),'conf' => 1, 'redir' => dcCore::app()->adminurl->get($this->info('adminUrl'))
 				));
 			} else {
-				$this->core->notices->addNotice('message', sprintf(__('%s plugin is not configured.'), $this->info('name')));
-				$this->core->adminurl->redirect('admin.home');
+				dcAdminNotices::addMessageNotice(sprintf(__('%s plugin is not configured.'), $this->info('name')));
+				dcCore::app()->adminurl->redirect('admin.home');
 			}
 		}
 		if (!empty($_POST)) {
 			try {
 				# submit later (warning page)
 				if (isset($_POST['later'])) {
-					$this->core->adminurl->redirect('admin.home');
+					dcCore::app()->adminurl->redirect('admin.home');
 				}
 				# submit convert (warning page)
 				if (isset($_POST['convert'])) {
 					$this->settings('header_code', dcScript::encrypt(trim($_POST['header_code']), $this->getCryptKey(), dcScript::OPENSSL));
 					$this->settings('footer_code', dcScript::encrypt(trim($_POST['footer_code']), $this->getCryptKey(), dcScript::OPENSSL));
 					$this->settings('crypt_lib', dcScript::OPENSSL);
-					$this->core->blog->triggerBlog();
-					dcPage::addSuccessNotice(__('Code successfully updated.'));
-					$this->core->adminurl->redirect($this->info('adminUrl'), array(), '#tab-1');
+					dcCore::app()->blog->triggerBlog();
+					dcAdminNotices::addSuccessNotice(__('Code successfully updated.'));
+					dcCore::app()->adminurl->redirect($this->info('adminUrl'), array(), '#tab-1');
 				}
 				# submit tab 1 (standard page)
 				if (isset($_POST['update_header'])) {
 					$this->settings('header_code', dcScript::encrypt(trim($_POST['header_code'])."\n", $this->getCryptKey(), dcScript::OPENSSL));
-					$this->core->blog->triggerBlog();
-					dcPage::addSuccessNotice(__('Code successfully updated.'));
-					$this->core->adminurl->redirect($this->info('adminUrl'), array(), '#tab-1');
+					dcCore::app()->blog->triggerBlog();
+					dcAdminNotices::addSuccessNotice(__('Code successfully updated.'));
+					dcCore::app()->adminurl->redirect($this->info('adminUrl'), array(), '#tab-1');
 				}
 				# submit tab 2 (standard page)
 				if (isset($_POST['update_footer'])) {
 					$this->settings('footer_code', dcScript::encrypt(trim($_POST['footer_code'])."\n", $this->getCryptKey(), dcScript::OPENSSL));
-					$this->core->blog->triggerBlog();
-					dcPage::addSuccessNotice(__('Code successfully updated.'));
-					$this->core->adminurl->redirect($this->info('adminUrl'), array(), '#tab-2');
+					dcCore::app()->blog->triggerBlog();
+					dcAdminNotices::addSuccessNotice(__('Code successfully updated.'));
+					dcCore::app()->adminurl->redirect($this->info('adminUrl'), array(), '#tab-2');
 				}
 			} catch(exception $e) {
-				//$this->core->error->add($e->getMessage());
-				$this->core->error->add(__('Unable to save the code'));
+				//dcCore::app()->error->add($e->getMessage());
+				dcCore::app()->error->add(__('Unable to save the code'));
 			}
 		}
 
@@ -256,79 +248,23 @@ class dcScript extends dcPluginHelper216 {
 			try {
 				# download code (standard page)
 				if(isset($_GET['download']) && in_array($_GET['download'], array('header', 'footer'), true)) {
-					$filename = '"'.trim($this->core->blog->name).'_'.date('Y-m-d').'_'.$_GET['download'].'.'.trim($this->settings('backup_ext'),'.').'"';
+					$filename = '"'.trim(dcCore::app()->blog->name).'_'.date('Y-m-d').'_'.$_GET['download'].'.'.trim($this->settings('backup_ext'),'.').'"';
 					header('Content-Disposition: attachment;filename='.$filename);
 					header('Content-Type: text/plain; charset=UTF-8');
 					echo dcScript::decrypt($this->settings($_GET['download'].'_code'), $this->getCryptKey(), $this->getCryptLib());
 					exit;
 				}
 			} catch(exception $e) {
-				//$this->core->error->add($e->getMessage());
-				$this->core->error->add(__('Unable to save the file'));
+				//dcCore::app()->error->add($e->getMessage());
+				dcCore::app()->error->add(__('Unable to save the file'));
 			}
 		}
 
-		if(version_compare(PHP_VERSION, '7.2', '>=') && ($this->settings('crypt_lib') != dcScript::OPENSSL)) {
-			$this->indexWarning();
-		} else {
-			$this->indexStandard();
-		}
-	}
-
-	private function indexWarning() {
-		echo '<html>'.NL;
-		echo '<head>'.NL;
-		echo '<title>'.html::escapeHTML($this->info('name')).'</title>'.NL;
-		echo $this->cssLoad('/inc/css/index.css');
-		echo $this->jsLoad('/inc/js/index_warning.js');
-		dcPage::addNotice('message', __('See help for the procedure'));
-		echo '</head>'.NL;
-
-		echo '<body class="dcscript no-js">'.NL;
-		// Baseline
-		echo $this->adminBaseline();
-		// datas
-		echo '<div id="datas-deliver">'.NL;
-		echo '<p id="key_crypt" class="copy-element">'.hash('sha256', $this->getCryptKey()).'</p>'.NL;
-		echo '<p id="header_code" class="copy-element">'.$this->settings('header_code').'</p>'.NL;
-		echo '<p id="footer_code" class="copy-element">'.$this->settings('footer_code').'</p>'.NL;
-		echo '</div>'.NL;
-		// admin forms
-		echo '<div>'.NL;
-		echo '<h3>'.__('Convert fields to new encryption format').'</h3>'.NL;
-		echo '<p>'.NL;
-		echo '<button type="button" id="copy_key_crypt">'.__('Copy key').'</button>'.NL;
-		echo '<button type="button" id="copy_header_code">'.__('Copy header code').'</button>'.NL;
-		echo '<button type="button" id="copy_footer_code">'.__('Copy footer code').'</button>'.NL;
-		echo '<a href="'.DECRYPTION_PAGE.'" class="button" id="decrypt">'.__('Decryption page').'</a>'.NL;
-		echo '</p>'.NL;
-		echo
-			'<form action="'.html::escapeHTML($this->core->adminurl->get($this->info('adminUrl'))).'" method="post">
-				<p>'.$this->core->formNonce().'</p>
-				<h4>'.__('Header code').'</h4>
-				<p>'.form::textArea('header_code',120,9,'','maximal',0,false,'placeholder="'.__('Paste the code here').'"').'</p>
-				<h4>'.__('Footer code').'</h4>
-				<p>'.form::textArea('footer_code',120,9,'','maximal',0,false,'placeholder="'.__('Paste the code here').'"').'</p>
-				<p class="button-bar clear">
-					<input type="submit" id="later" name="later" title="'.__('later').'" value="'.__('later').'" />
-					<input type="submit" id="convert" name="convert" title="'.__('Convert the configuration').'" value="'.__('Convert').'" />
-				</p>
-			</form>'.NL;
-		echo '</div>'.NL;
-		// Footer plugin
-		echo $this->adminFooterInfo();
-		// helpBlock
-		dcPage::helpBlock('dcScript-warning');
-		echo NL.'</body>'.NL;
-		echo '</html>'.NL;
-	}
-
-	private function indexStandard() {
 		$header = html::escapeHTML(dcScript::decrypt($this->settings('header_code'), $this->getCryptKey(), $this->getCryptLib()));
 		$footer = html::escapeHTML(dcScript::decrypt($this->settings('footer_code'), $this->getCryptKey(), $this->getCryptLib()));
-		$formAction = html::escapeHTML($this->core->adminurl->get($this->info('adminUrl')));
-		$downloadHeader = $this->core->adminurl->get($this->info('adminUrl'), array('download' => 'header'));
-		$downloadFooter = $this->core->adminurl->get($this->info('adminUrl'), array('download' => 'footer'));
+		$formAction = html::escapeHTML(dcCore::app()->adminurl->get($this->info('adminUrl')));
+		$downloadHeader = dcCore::app()->adminurl->get($this->info('adminUrl'), array('download' => 'header'));
+		$downloadFooter = dcCore::app()->adminurl->get($this->info('adminUrl'), array('download' => 'footer'));
 
 		echo '<html>'.NL;
 		echo '<head>'.NL;
@@ -370,9 +306,9 @@ class dcScript extends dcPluginHelper216 {
 		echo
 			'<div class="multi-part" id="tab-1" title="'.__('Header code').' - ('.($this->settings('header_code_enabled') ? __('Enabled') : __('Disabled')).')">
 				<form action="'.$formAction.'" method="post" id="'.html::escapeHTML($this->info('id')).'-form-header">
-					<p>'.$this->core->formNonce().'</p>
+					<p>'.dcCore::app()->formNonce().'</p>
 					<p>'.form::hidden('change_header', '')/*for check change in CodeMirror => jsConfirmClose()*/.'</p>
-					<p>'.form::textArea('header_code', 120, 25, $header."\n", 'maximal', 0).'</p>
+					<p>'.form::textArea('header_code', 120, 25, $header."\n", 'maximal', '0').'</p>
 					<p class="button-bar clear">
 						<input type="submit" id="update_header" name="update_header" title="'.__('Save the configuration').'" value="'.__('Save').'" />
 						<input type="reset" id="reset_header" name="reset_header" title="'.__('Undo changes').'" value="'.__('Cancel').'" />
@@ -384,9 +320,9 @@ class dcScript extends dcPluginHelper216 {
 		echo
 			'<div class="multi-part" id="tab-2" title="'.__('Footer code').' - ('.($this->settings('footer_code_enabled') ? __('Enabled') : __('Disabled')).')">
 				<form action="'.$formAction.'" method="post" id="'.html::escapeHTML($this->info('id')).'-form-footer">
-					<p>'.$this->core->formNonce().'</p>
+					<p>'.dcCore::app()->formNonce().'</p>
 					<p>'.form::hidden('change_footer', '')/*for check change in CodeMirror => jsConfirmClose()*/.'</p>
-					<p>'.form::textArea('footer_code', 120, 25, $footer."\n", 'maximal', 0).'</p>
+					<p>'.form::textArea('footer_code', 120, 25, $footer."\n", 'maximal', '0').'</p>
 					<p class="button-bar clear">
 						<input type="submit" id="update_footer" name="update_footer" title="'.__('Save the configuration').'" value="'.__('Save').'" />
 						<input type="reset" id="reset_footer" name="reset_footer" title="'.__('Undo changes').'" value="'.__('Cancel').'" />
@@ -404,23 +340,23 @@ class dcScript extends dcPluginHelper216 {
 	}
 
 	public function _public() {
-		$this->core->addBehavior('publicHeadContent', array('dcScript', 'publicHeadContent'));
-		$this->core->addBehavior('publicFooterContent', array('dcScript', 'publicFooterContent'));
+		dcCore::app()->addBehavior('publicHeadContent', array('dcScript', 'publicHeadContent'));
+		dcCore::app()->addBehavior('publicFooterContent', array('dcScript', 'publicFooterContent'));
 	}
 
 	public function _admin() {
 		if(!defined('DC_CONTEXT_ADMIN')) { return; }
 		# define new permissions
-		$this->core->auth->setPermissionType('dcScript.edit',__('Edit public scripts'));
+		dcCore::app()->auth->setPermissionType(dcCore::app()->auth->makePermissions([dcScriptPerms::EDIT]), __('Edit public scripts'));
 
 		# menu & dashboard
-		$this->core->addBehavior('adminDashboardFavorites', array($this, 'adminDashboardFavs'));
+		dcCore::app()->addBehavior('adminDashboardFavorites', array($this, 'adminDashboardFavs'));
 		$this->adminMenu('System');
 
-		if(!$this->core->auth->check('admin', $this->core->blog->id)) { return; }
+		if(!dcCore::app()->auth->check(dcCore::app()->auth->makePermissions([dcAuth::PERMISSION_ADMIN]), dcCore::app()->blog->id)) { return; }
 		# admin only
 
-		if(!$this->core->auth->isSuperAdmin()) { return; }
+		if(!dcCore::app()->auth->isSuperAdmin()) { return; }
 		# super admin only
 
 	}
@@ -436,15 +372,15 @@ class dcScript extends dcPluginHelper216 {
 				$this->settings('header_code_enabled', !empty($_POST['header_code_enabled']));
 				$this->settings('footer_code_enabled', !empty($_POST['footer_code_enabled']));
 				$this->settings('backup_ext', html::escapeHTML($_POST['backup']));
-				$this->core->blog->triggerBlog();
-				dcPage::addSuccessNotice(__('Configuration successfully updated.'));
+				dcCore::app()->blog->triggerBlog();
+				dcAdminNotices::addSuccessNotice(__('Configuration successfully updated.'));
 			} catch(exception $e) {
-				//$this->core->error->add($e->getMessage());
-				$this->core->error->add(__('Unable to save the configuration'));
+				//dcCore::app()->error->add($e->getMessage());
+				dcCore::app()->error->add(__('Unable to save the configuration'));
 			}
 			if(!empty($_GET['redir']) && strpos($_GET['redir'], 'p='.$this->info('id')) === false) {
-				$this->core->error->add(__('Redirection not found'));
-				$this->core->adminurl->redirect('admin.home');
+				dcCore::app()->error->add(__('Redirection not found'));
+				dcCore::app()->adminurl->redirect('admin.home');
 			}
 			http::redirect($_REQUEST['redir']);
 		}
@@ -497,9 +433,8 @@ class dcScript extends dcPluginHelper216 {
 
 	public function resources($path) {
 		if(!defined('DC_CONTEXT_ADMIN')) { return; }
-		global $__resources;
-		if(!isset($__resources['help']['dcScript-config'])) { $__resources['help']['dcScript-config'] = $path.'/help/config.html'; }
-		if(!isset($__resources['help']['dcScript-edit'])) { $__resources['help']['dcScript-edit'] = $path.'/help/edit.html'; }
-		if(!isset($__resources['help']['dcScript-warning'])) { $__resources['help']['dcScript-warning'] = $path.'/help/warning.html'; }
+		if(!isset(dcCore::app()->resources['help']['dcScript-config'])) { dcCore::app()->resources['help']['dcScript-config'] = $path.'/help/config.html'; }
+		if(!isset(dcCore::app()->resources['help']['dcScript-edit'])) { dcCore::app()->resources['help']['dcScript-edit'] = $path.'/help/edit.html'; }
+		if(!isset(dcCore::app()->resources['help']['dcScript-warning'])) { dcCore::app()->resources['help']['dcScript-warning'] = $path.'/help/warning.html'; }
 	}
 }

@@ -1,0 +1,6 @@
+\build-tools\
+.git
+.vscode
+.debug.php
+*.bck.zip
+

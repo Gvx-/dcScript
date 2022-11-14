@@ -1,11 +1,11 @@
 <?php
 /**
-  * Plugin dcHelper for dotclear version 2.16 or hegher
+  * Plugin dcHelper for dotclear version 2.24 or hegher
   *
-  * @package Dotclear\plungin\dcPluginHelper
+  * @package Dotclear\plugin\dcPluginHelper
   *
   * @author Gvx <g.gvx@free.fr>
-  * @copyright © 2008-2020 Gvx
+  * @copyright © 2008-2022 Gvx
   * @license http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
  */
 
@@ -13,18 +13,24 @@ if(!defined('DC_RC_PATH')) { return; }
 
 if(!defined('NL')) { define('NL', "\n"); }									# New Line
 
-
-if(!function_exists('getInstance')) {										# get class instance in $core
-	function getInstance($plugin) { return $GLOBALS['core']->{$plugin}; }
+if(!function_exists('getInstance')) {										# get class instance in dcCore::app()
+	function getInstance($plugin) { return dcCore::app()->{$plugin}; }
 }
 
 /**
- * dcPluginHelper216
+ * dcPluginHelper224
  */
-abstract class dcPluginHelper216 {
+abstract class dcPluginHelper224 {
 
-	/** @var string version  */
-	const VERSION = '216-r2020.04.25';											# class version
+	/** @var string VERSION  */
+	const VERSION = '224-r2022.11.13';										# class version
+	
+	/** @var string FILE_DIR_SEPARATOR  */
+	const FILE_DIR_SEPARATOR = DIRECTORY_SEPARATOR;
+	/** @var string URL_DIR_SEPARATOR  */
+	const URL_DIR_SEPARATOR = '/';
+	/** @var string ZIP_DIR_SEPARATOR  */
+	const ZIP_DIR_SEPARATOR = '/';
 
 	/**
 	 * setDefaultSettings
@@ -35,7 +41,7 @@ abstract class dcPluginHelper216 {
 	 */
 	protected function setDefaultSettings() {
 		# debug mode
-		$this->debugDisplay('Not default settings for this plugin.');
+		$this->debugDisplay('Not default settings for '.$this->plugin_id.' ('.get_class($this).') plugin.');
 	}
 
 	/**
@@ -49,7 +55,7 @@ abstract class dcPluginHelper216 {
 	 */
 	protected function installActions($old_version) {
 		# debug mode
-		$this->debugDisplay('Not install actions for this plugin.');
+		$this->debugDisplay('Not install actions for '.$this->plugin_id.' ('.get_class($this).') plugin.');
 	}
 
 	/**
@@ -61,7 +67,7 @@ abstract class dcPluginHelper216 {
 	 */
 	protected function uninstallActions() {
 		# debug mode
-		$this->debugDisplay('Not uninstall actions for this plugin.');
+		$this->debugDisplay('Not uninstall actions for '.$this->plugin_id.' ('.get_class($this).') plugin.');
 		return true;
 	}
 
@@ -73,25 +79,28 @@ abstract class dcPluginHelper216 {
 	 * @return void
 	 */
 	public function _config() {
-		if(!defined('DC_CONTEXT_ADMIN') || !$this->core->auth->check('admin', $this->core->blog->id)) { return; }
+		if(!defined('DC_CONTEXT_ADMIN') || !dcCore::app()->auth->check(dcCore::app()->auth->makePermissions([dcAuth::PERMISSION_ADMIN]), dcCore::app()->blog->id)) { return; }
 		$scope = $this->configScope();
 		if (isset($_POST['save'])) {
 			try {
 				//$this->settings('enabled', !empty($_POST['enabled']), $scope);
-				$this->core->blog->triggerBlog();
-				$this->core->notices->addSuccessNotice( __('Configuration successfully updated.'));
+				dcCore::app()->blog->triggerBlog();
+				dcAdminNotices::addSuccessNotice( __('Configuration successfully updated.'));
 			} catch(exception $e) {
-				//$this->core->error->add($e->getMessage());
-				$this->core->error->add(__('Unable to save the configuration'));
+				//dcCore::app()->error->add($e->getMessage());
+				dcCore::app()->error->add(__('Unable to save the configuration'));
 			}
 			if(!empty($_GET['redir']) && strpos($_GET['redir'], 'p='.$this->info('id')) === false) {
-				$this->core->error->add(__('Redirection not found'));
-				$this->core->adminurl->redirect('admin.home');
+				dcCore::app()->error->add(__('Redirection not found'));
+				dcCore::app()->adminurl->redirect('admin.home');
 			}
 			http::redirect($_REQUEST['redir']);
 		}
+
+		// TODO: HERE display
+
 		# debug mode
-		$this->debugDisplay('Not config page for this plugin.');
+		$this->debugDisplay('Not config page for '.$this->plugin_id.' ('.get_class($this).') plugin.');
 	}
 
 	/**
@@ -104,25 +113,29 @@ abstract class dcPluginHelper216 {
 	public function index() {
 		if(!defined('DC_CONTEXT_ADMIN')) { return; }
 		if(!$this->settings('enabled') && is_file(path::real($this->info('root').'/_config.php'))) {
-			if($this->core->auth->check('admin', $this->core->blog->id)) {
-				$this->core->adminurl->redirect('admin.plugins', array(
-					'module' => $this->info('id'),'conf' => 1, 'redir' => $this->core->adminurl->get($this->info('adminUrl'))
+			if(dcCore::app()->auth->check(dcCore::app()->auth->makePermissions([dcAuth::PERMISSION_ADMIN]), dcCore::app()->blog->id)) {
+				dcCore::app()->adminurl->redirect('admin.plugins', array(
+					'module' => $this->info('id'),'conf' => 1, 'redir' => dcCore::app()->adminurl->get($this->info('adminUrl'))
 				));
 			} else {
-				$this->core->notices->addNotice('message', sprintf(__('%s plugin is not configured.'), $this->info('name')));
-				$this->core->adminurl->redirect('admin.home');
+				dcAdminNotices::addMessageNotice(sprintf(__('%s plugin is not configured.'), $this->info('name')));
+				dcCore::app()->adminurl->redirect('admin.home');
 			}
 		}
 		try {
 			if (isset($_POST['save'])) {
-				// TODO HERE inputs check
+				// TODO: HERE inputs check
 			}
+			/** @phpstan-ignore-next-line */
 		} catch(exception $e) {
-			//$this->core->error->add($e->getMessage());
-			$this->core->error->add(__('Unable to save the code'));
+			//dcCore::app()->error->add($e->getMessage());
+			dcCore::app()->error->add(__('Unable to save the code'));
 		}
+
+		// TODO: HERE display
+
 		# debug mode
-		$this->debugDisplay('Not index page for this plugin.');
+		$this->debugDisplay('Not index page for '.$this->plugin_id.' ('.get_class($this).') plugin.');
 	}
 
 	/**
@@ -133,7 +146,6 @@ abstract class dcPluginHelper216 {
 	 * @return void
 	 */
 	protected function _prepend() {
-		global $__autoload;
 		# common (public & admin)
 
 		if(defined('DC_CONTEXT_ADMIN')) {
@@ -145,6 +157,8 @@ abstract class dcPluginHelper216 {
 			# public only
 
 		}
+		# debug mode
+		$this->debugDisplay('Not _prepend actions for '.$this->plugin_id.' ('.get_class($this).') plugin.');
 	}
 
 	/**
@@ -158,7 +172,7 @@ abstract class dcPluginHelper216 {
 		if(!defined('DC_CONTEXT_ADMIN')) { return; }
 
 		# debug mode
-		$this->debugDisplay('Not _admin actions for this plugin.');
+		$this->debugDisplay('Not _admin actions for '.$this->plugin_id.' ('.get_class($this).') plugin.');
 	}
 
 	/**
@@ -170,20 +184,8 @@ abstract class dcPluginHelper216 {
 	 */
 	public function _public() {
 
-	}
-
-	/**
-	 * _xmlrpc
-	 *
-	 * @todo overloaded
-	 *
-	 * @return void
-	 */
-	public function _xmlrpc() {
-		if(!defined('DC_CONTEXT_ADMIN')) { return; }
-
 		# debug mode
-		$this->debugDisplay('Not _xmlrpc actions for this plugin.');
+		$this->debugDisplay('Not _public page for '.$this->plugin_id.' ('.get_class($this).') plugin.');
 	}
 
 	/**
@@ -195,11 +197,10 @@ abstract class dcPluginHelper216 {
 	 * @return void
 	 */
 	public function resources($path) {
-		global $__resources;
 		/*
-		if(!isset($__resources['help']['dcScript-config'])) { $__resources['help']['dcScript-config'] = $path.'/help/config.html'; }
-		if(!isset($__resources['help']['dcScript-edit'])) { $__resources['help']['dcScript-edit'] = $path.'/help/edit.html'; }
-		if(!isset($__resources['help']['dcScript-warning'])) { $__resources['help']['dcScript-warning'] = $path.'/help/warning.html'; }
+		if(!isset(dcCore::app()->resources['help']['dcScript-config'])) { dcCore::app()->resources['help']['dcScript-config'] = $path.'/help/config.html'; }
+		if(!isset(dcCore::app()->resources['help']['dcScript-edit'])) { dcCore::app()->resources['help']['dcScript-edit'] = $path.'/help/edit.html'; }
+		if(!isset(dcCore::app()->resources['help']['dcScript-warning'])) { dcCore::app()->resources['help']['dcScript-warning'] = $path.'/help/warning.html'; }
 		*/
 
 		# debug mode
@@ -212,7 +213,6 @@ abstract class dcPluginHelper216 {
 	protected $admin_url;													# admin url plugin
 	protected $icon_small;													# small icon file
 	protected $icon_large;													# large icon file
-	protected $core;														# dcCore instance
 
 	private $debug_mode = false;											# debug mode for plugin
 	private $debug_log = false;												# debug Log for plugin
@@ -222,13 +222,11 @@ abstract class dcPluginHelper216 {
 	/**
 	 * __construct
 	 *
-	 * @param object $core
 	 * @param string $id
 	 *
 	 * @return void
 	 */
-	public function __construct($core, $id) {
-		$this->core =& $core;
+	public function __construct($id) {
 
 		# set plugin id and admin url
 		$this->plugin_id = $id;
@@ -240,20 +238,20 @@ abstract class dcPluginHelper216 {
 
 		# start logfile
 		$this->debugLog('START_DEBUG');
-		$this->debugLog('Version', $this->core->getVersion($this->plugin_id));
+		$this->debugLog('Version', dcCore::app()->getVersion($this->plugin_id));
 		$this->debugLog('Helper version', self::VERSION);
 		$this->debugLog('Page', $_SERVER['REQUEST_URI']);
 
 		# Set admin context
 		if(defined('DC_CONTEXT_ADMIN')) {
 			# register self url
-			$urls = $this->core->adminurl->dumpUrls();
-			if(!array_key_exists('admin.self', $urls)) {
+			$urls = dcCore::app()->adminurl->dumpUrls();
+			if(!$urls->offsetExists('admin.self')) {
 				$url = http::getSelfURI();
 				$url = str_replace('?'.parse_url($url, PHP_URL_QUERY), '', $url);		// delete query
-				$url = substr($url, 1 + strrpos($url, '/'));							// keep page name
+				$url = substr($url, 1 + strrpos($url, self::URL_DIR_SEPARATOR));		// keep page name
 				if(in_array($url, array_column((array)$urls, 'url'))) {					// Register checked
-					$this->core->adminurl->register('admin.self', $url, (empty($_GET) ? array(): $_GET));
+					dcCore::app()->adminurl->register('admin.self', $url, ($_GET ?: array()));
 				}
 			}
 
@@ -262,7 +260,7 @@ abstract class dcPluginHelper216 {
 			$this->icon_large = $this->plugin_id.$this->info('_icon_large');
 
 			# uninstall plugin procedure
-			if($this->core->auth->isSuperAdmin()) { $this->core->addBehavior('pluginBeforeDelete', array($this, 'uninstall')); }
+			if(dcCore::app()->auth->isSuperAdmin()) { dcCore::app()->addBehavior('pluginBeforeDelete', array($this, 'uninstall')); }
 		}
 
 		# set default settings if empty
@@ -283,30 +281,30 @@ abstract class dcPluginHelper216 {
 		# end logfile
 		$this->debugLog('END_DEBUG');
 	}
-
+	
 	### Admin functions ###
 
 	/**
 	 * _install
 	 *
-	 * @return void
+	 * @return Boolean
 	 */
 	public final function _install() {
-		if(!defined('DC_CONTEXT_ADMIN')) { return; }
+		if(!defined('DC_CONTEXT_ADMIN')) { return; }	/** @phpstan-ignore-line */
 		try {
 			# check plugin versions
 			$new_version = $this->info('version');
-			$old_version = $this->core->getVersion($this->plugin_id);
-			if (version_compare($old_version, $new_version, '>=')) { return; }
+			$old_version = dcCore::app()->getVersion($this->plugin_id);
+			if (version_compare($old_version, $new_version, '>=')) { return; }		/** @phpstan-ignore-line */
 			# specifics install actions
 			$this->installActions($old_version);
 			# valid install
-			$this->core->setVersion($this->plugin_id, $new_version);
+			dcCore::app()->setVersion($this->plugin_id, $new_version);
 			$this->debugLog('Update', 'version '.$new_version);
 			return true;
 		} catch (Exception $e) {
 			$this->debugDisplay('[Install] : '.$e->getMessage());
-			$this->core->error->add($e->getMessage());
+			dcCore::app()->error->add($e->getMessage());
 		}
 		return false;
 	}
@@ -316,21 +314,21 @@ abstract class dcPluginHelper216 {
 	 *
 	 * @param object $plugin
 	 *
-	 * @return void
+     * @return void
 	 */
 	public final function uninstall($plugin) {
-		$this->debugLog('uninstall', 'version '.$this->core->getVersion($this->plugin_id));
+		$this->debugLog('uninstall', 'version '.dcCore::app()->getVersion($this->plugin_id));
 		# specifics uninstall actions
 		if($plugin['id'] == $this->plugin_id) {
 			if($this->uninstallActions()) {
 				# clean DC_VAR
 				if(self::getVarDir($this->plugin_id)) { files::deltree(self::getVarDir($this->plugin_id)); }
 				# delete all users prefs
-				$this->core->auth->user_prefs->delWorkSpace($this->plugin_id);
+				dcCore::app()->auth->user_prefs->delWorkSpace($this->plugin_id);
 				# delete all blogs settings
-				$this->core->blog->settings->delNamespace($this->plugin_id);
+				dcCore::app()->blog->settings->delNamespace($this->plugin_id);
 				# delete version
-				$this->core->delVersion($this->plugin_id);
+				dcCore::app()->delVersion($this->plugin_id);
 			}
 		}
 	}
@@ -341,7 +339,7 @@ abstract class dcPluginHelper216 {
 	 * @return string
 	 */
 	protected final function configScope() {
-		return (isset($_POST['scope']) ? $_POST['scope'] : ($this->core->auth->isSuperAdmin() ? 'global' : 'default'));
+		return (isset($_POST['scope']) ? $_POST['scope'] : (dcCore::app()->auth->isSuperAdmin() ? 'global' : 'default'));
 	}
 
 	/**
@@ -354,11 +352,12 @@ abstract class dcPluginHelper216 {
 	 */
 	protected function configBaseline($scope=null, $activate=true) {
 		$html = '';
-		if($this->core->auth->isSuperAdmin()) {
+		if(dcCore::app()->auth->isSuperAdmin()) {
 			if(empty($scope)) { $scope = $this->configScope(); }
-			$html .=	'<p class="anchor-nav">
+			$html .= '
+					<p class="anchor-nav">
 						<label class="classic">'.__('Scope').'&nbsp;:&nbsp;
-							'.form::combo('scope', array(__('Global settings') => 'global', sprintf(__('Settings for %s'), html::escapeHTML($this->core->blog->name)) => 'default'), 'default').'
+							'.form::combo('scope', array(__('Global settings') => 'global', sprintf(__('Settings for %s'), html::escapeHTML(dcCore::app()->blog->name)) => 'default'), 'default').'
 							<input id="scope_go" name="scope_go" type="submit" value="'.__('Go').'" />
 						</label>
 						&nbsp;&nbsp;<span class="form-note">'.__('Select the blog in which parameters apply').'</span>
@@ -386,44 +385,43 @@ abstract class dcPluginHelper216 {
 	 *
 	 * @param string $menu
 	 *
-	 * @return void
+     * @return object $this
 	 */
-	public function adminMenu($menu='Plugins') {
-		if(!defined('DC_CONTEXT_ADMIN')) { return; }
-		global $_menu;
-		if(array_key_exists($menu, $_menu)) {
-			$_menu[$menu]->addItem(
+	public function adminMenu($menu=dcAdmin::MENU_PLUGINS) {
+		if(!defined('DC_CONTEXT_ADMIN')) { return; }	/** @phpstan-ignore-line */
+		if(dcCore::app()->menu->offsetExists($menu)) {
+			dcCore::app()->menu[$menu]->addItem(
 				html::escapeHTML(__($this->info('name'))),									# Item menu
-				$this->core->adminurl->get($this->admin_url),								# Page admin url
+				dcCore::app()->adminurl->get($this->admin_url),								# Page admin url
 				dcPage::getPF($this->icon_small),											# Icon menu
 				preg_match(																	# Pattern url
-					'/'.$this->core->adminurl->get($this->admin_url).'(&.*)?$/',
+					self::URL_DIR_SEPARATOR.dcCore::app()->adminurl->get($this->admin_url).'(&.*)?$/',
 					$_SERVER['REQUEST_URI']
 				),
-				$this->core->auth->check($this->info('permissions'), $this->core->blog->id)	# Permissions minimum
+				dcCore::app()->auth->check($this->info('permissions'), dcCore::app()->blog->id)	# Permissions minimum
 			);
 		} else {
 			$this->debugDisplay('menu not present.');
-			throw new ErrorException(sprinf(__('%s menu not present.'), $menu), 0, E_USER_NOTICE, __FILE__, __LINE__);
+			throw new ErrorException(sprintf(__('%s menu not present.'), $menu), 0, E_USER_NOTICE, __FILE__, __LINE__);
 		}
+		return $this;
 	}
 
 	/**
-	 * adminDashboardFavs
+	 * adminDashboardFavsV2
 	 *
-	 * @param object $core
 	 * @param object $favs
 	 *
-	 * @return void
+     * @return void
 	 */
-	public function adminDashboardFavs($core, $favs) {
+	public function adminDashboardFavsV2($favs) {
 		if(!defined('DC_CONTEXT_ADMIN')) { return; }
 		$favs->register($this->plugin_id, array(
-			'title'			=> $core->plugins->moduleInfo($this->plugin_id, 'name'),
-			'url'			=> $core->adminurl->get($this->admin_url),
+			'title'			=> dcCore::app()->plugins->moduleInfo($this->plugin_id, 'name'),
+			'url'			=> dcCore::app()->adminurl->get($this->admin_url),
 			'small-icon'	=> dcPage::getPF($this->icon_small),
 			'large-icon'	=> dcPage::getPF($this->icon_large),
-			'permissions'	=> $core->plugins->moduleInfo($this->plugin_id, 'permissions')
+			'permissions'	=> dcCore::app()->plugins->moduleInfo($this->plugin_id, 'permissions')
 		));
 	}
 
@@ -436,7 +434,7 @@ abstract class dcPluginHelper216 {
 	 */
 	protected function adminBaseline($items=array()) {
 		if(empty($items)) { $items = array( $this->info('name') => ''); }
-		return dcPage::breadcrumb(array_merge(array(html::escapeHTML($this->core->blog->name) => ''), $items)).$this->core->notices->getNotices()."\n";
+		return dcPage::breadcrumb(array_merge(array(html::escapeHTML(dcCore::app()->blog->name) => ''), $items)).dcAdminNotices::getNotices().NL;
 	}
 
 	/**
@@ -445,7 +443,7 @@ abstract class dcPluginHelper216 {
 	 * @return string
 	 */
 	public function adminFooterInfo() {
-		if(!defined('DC_CONTEXT_ADMIN')) { return; }
+		if(!defined('DC_CONTEXT_ADMIN')) { return; }	/** @phpstan-ignore-line */
 		$support = $this->info('support');
 		$details = $this->info('details');
 		return '<p class="right">
@@ -495,7 +493,7 @@ abstract class dcPluginHelper216 {
 	 * @param object $w
 	 * @param string $id
 	 * @param string $name
-	 * @param callback $callback
+	 * @param callable $callback
 	 * @param mixed $help
 	 * @param string $title
 	 *
@@ -518,9 +516,8 @@ abstract class dcPluginHelper216 {
 	 * @return string
 	 */
 	protected static function widgetRender($w, $content, $class='', $attr='') {
-		global $core;
-		if (($w->homeonly == 1 && $core->url->type != 'default') || ($w->homeonly == 2 && $core->url->type == 'default') || $w->offline || empty($content)) {
-			return;
+		if (($w->homeonly == 1 && dcCore::app()->url->type != 'default') || ($w->homeonly == 2 && dcCore::app()->url->type == 'default') || $w->offline || empty($content)) {
+			return;		/** @phpstan-ignore-line */
 		}
 		$content = ($w->title ? $w->renderTitle(html::escapeHTML($w->title)) : '').$content;
 		return $w->renderDiv($w->content_only, trim(trim($class).' '.$w->class), trim($attr), $content);
@@ -533,7 +530,7 @@ abstract class dcPluginHelper216 {
 	 *
 	 * @param string $key
 	 * @param mixed $value
-	 * @param string $scope
+	 * @param mixed $scope
 	 *
 	 * @return mixed
 	 */
@@ -541,15 +538,15 @@ abstract class dcPluginHelper216 {
 		if(is_null($value)) {
 			try {
 				if($scope == 'global' || $scope === true) {
-					$value = $this->core->blog->settings->{$this->plugin_id}->getGlobal($key);
+					$value = dcCore::app()->blog->settings->{$this->plugin_id}->getGlobal($key);
 					$v = json_decode($value, true);
 					return is_array($v) ? $v : $value;
 				} elseif($scope == 'local') {
-					$value = $this->core->blog->settings->{$this->plugin_id}->getLocal($key);
+					$value = dcCore::app()->blog->settings->{$this->plugin_id}->getLocal($key);
 					$v = json_decode($value, true);
 					return is_array($v) ? $v : $value;
 				}
-				$value = $this->core->blog->settings->{$this->plugin_id}->$key;
+				$value = dcCore::app()->blog->settings->{$this->plugin_id}->$key;
 				$v = json_decode($value, true);
 				return is_array($v) ? $v : $value;
 			} catch(Exception $e) {
@@ -557,14 +554,14 @@ abstract class dcPluginHelper216 {
 				return null;
 			}
 		} else {
+            $global = ($scope == 'global' || $scope === true);
 			try {
 				if(is_array($value) || is_object($value)) { $value = json_encode($value); }
-				$global = ($scope == 'global' || $scope === true);
-				$this->core->blog->settings->{$this->plugin_id}->put($key, $value, null, null, true, $global);
+				dcCore::app()->blog->settings->{$this->plugin_id}->put($key, $value, null, null, true, $global);
 			} catch(Exception $e) {
 				$this->debugDisplay('Blog settings write error (namespace not exist).('.$key.')');
-				$this->core->blog->settings->addNamespace($this->plugin_id);
-				$this->core->blog->settings->{$this->plugin_id}->put($key, $value, null, null, true, $global);
+				dcCore::app()->blog->settings->addNamespace($this->plugin_id);
+				dcCore::app()->blog->settings->{$this->plugin_id}->put($key, $value, null, null, true, $global);
 			}
 		}
 	}
@@ -574,7 +571,7 @@ abstract class dcPluginHelper216 {
 	 *
 	 * @param string $key
 	 * @param mixed $value
-	 * @param string $scope
+	 * @param mixed $scope
 	 *
 	 * @return mixed
 	 */
@@ -582,15 +579,15 @@ abstract class dcPluginHelper216 {
 		if(is_null($value)) {
 			try {
 				if($scope == 'global' || $scope === true) {
-					$value = $this->core->auth->user_prefs->{$this->plugin_id}->getGlobal($key);
+					$value = dcCore::app()->auth->user_prefs->{$this->plugin_id}->getGlobal($key);
 					$v = json_decode($value, true);
 					return is_array($v) ? $v : $value;
 				} elseif($scope == 'local') {
-					$value = $this->core->auth->user_prefs->{$this->plugin_id}->getLocal($key);
+					$value = dcCore::app()->auth->user_prefs->{$this->plugin_id}->getLocal($key);
 					$v = json_decode($value, true);
 					return is_array($v) ? $v : $value;
 				}
-				$value = $this->core->auth->user_prefs->{$this->plugin_id}->$key;
+				$value = dcCore::app()->auth->user_prefs->{$this->plugin_id}->$key;
 				$v = json_decode($value, true);
 				return is_array($v) ? $v : $value;
 			} catch(Exception $e) {
@@ -598,14 +595,14 @@ abstract class dcPluginHelper216 {
 				return null;
 			}
 		} else {
+            $global = ($scope == 'global' || $scope === true);
 			try {
 				if(is_array($value) || is_object($value)) { $value = json_encode($value); }
-				$global = ($scope == 'global' || $scope === true);
-				$this->core->auth->user_prefs->{$this->plugin_id}->put($key,$value, null, null, true, $global);
+				dcCore::app()->auth->user_prefs->{$this->plugin_id}->put($key,$value, null, null, true, $global);
 			} catch(Exception $e) {
 				$this->debugDisplay('User settings write error (namespace not exist).('.$key.')');
-				$this->core->auth->user_prefs->addWorkSpace($this->plugin_id);
-				$this->core->auth->user_prefs->{$this->plugin_id}->put($key,$value, null, null, true, $global);
+				dcCore::app()->auth->user_prefs->addWorkSpace($this->plugin_id);
+				dcCore::app()->auth->user_prefs->{$this->plugin_id}->put($key,$value, null, null, true, $global);
 			}
 		}
 	}
@@ -615,12 +612,13 @@ abstract class dcPluginHelper216 {
 	 *
 	 * @param mixed $key
 	 *
-	 * @return void
+     * @return object $this
 	 */
 	protected final function settingDrop($key) {
-		$s = new dcNamespace($this->core, null, $this->plugin_id);
+		$s = new dcNamespace(dcCore::app(), null, $this->plugin_id);		/** @phpstan-ignore-line */
 		$s->drop($key);
 		unset($s);
+		return $this;
 	}
 
 	/**
@@ -628,12 +626,14 @@ abstract class dcPluginHelper216 {
 	 *
 	 * @param mixed $key
 	 *
-	 * @return void
+     * @return object $this
 	 */
 	protected final function userSettingDrop($key) {
-		$s = new dcWorkspace($this->core, $this->core->auth->userID(), $this->plugin_id);
+		//$s = new dcWorkspace(dcCore::app(), dcCore::app()->auth->userID(), $this->plugin_id);
+		$s = new dcWorkspace(dcCore::app()->auth->userID(), $this->plugin_id);
 		$s->drop($key);
 		unset($s);
+		return $this;
 	}
 
 	/**
@@ -652,7 +652,7 @@ abstract class dcPluginHelper216 {
 		} elseif($item == 'helperVersion') {
 			return self::VERSION;
 		} else {
-			$res = $this->core->plugins->moduleInfo($this->plugin_id, $item);
+			$res = dcCore::app()->plugins->moduleInfo($this->plugin_id, $item);
 			return $res === null ? $default : $res;
 		}
 	}
@@ -660,7 +660,7 @@ abstract class dcPluginHelper216 {
 	/**
 	 * nextStep
 	 *
-	 * @param string $step
+	 * @param mixed $step
 	 * @param integer $delay
 	 *
 	 * @return void
@@ -671,8 +671,8 @@ abstract class dcPluginHelper216 {
 		if($delay > 0 && ($timeout - $delay) < time()) { return; }					# if timeout > next task delay
 		if($delay < 0 && ($timeout + $delay) > time()) { return; }					# if timeout - delay < now
 
-		# --BEHAVIOR-- beforeNextStep
-		if($this->core->callBehavior('beforeNextStep', $this->core, $this->plugin_id, $step) === false) { return; }
+		# --BEHAVIOR-- beforeNextStepV2
+		if(dcCore::app()->callBehavior('beforeNextStepV2', $this->plugin_id, $step) === false) { return; }
 
 		if(is_array($step)) {
 			foreach($step as $k => $v) { $_GET[$k] = $v; }
@@ -690,16 +690,16 @@ abstract class dcPluginHelper216 {
 	 * @param string $dir
 	 * @param boolean $create
 	 *
-	 * @return string
+	 * @return mixed
 	 */
 	public static function getVarDir($dir='', $create=false) {
 		$dir = trim($dir, '\\/');
-		$var_dir = path::real(DC_VAR.(empty($dir) ? '' : '/'.$dir), false);
-		if(strpos($var_dir, path::real(DC_VAR, false)) === false) { $GLOBALS['core']->error->add(__('The folder is not in the var directory')); }
+		$var_dir = path::real(DC_VAR.(empty($dir) ? '' : self::FILE_DIR_SEPARATOR.$dir), false);
+		if(strpos($var_dir, path::real(DC_VAR, false)) === false) { dcCore::app()->error->add(__('The folder is not in the var directory')); }
 		if(!is_dir($var_dir)) {
 			if(!$create) { return false; }
 			@files::makeDir($var_dir, true);
-			if(!is_dir($var_dir)) { $GLOBALS['core']->error->add(__('Creating a var directory failed')); }
+			if(!is_dir($var_dir)) { dcCore::app()->error->add(__('Creating a var directory failed')); }
 		}
 		return $var_dir;
 	}
@@ -715,7 +715,7 @@ abstract class dcPluginHelper216 {
 		if(defined('DC_CONTEXT_ADMIN')) {
 			return dcPage::getVF($file);
 		} else {
-			return $this->core->blog->getVF($file);
+			return dcCore::app()->blog->getVF($file);
 		}
 	}
 
@@ -727,15 +727,16 @@ abstract class dcPluginHelper216 {
 	 * @return string
 	 */
 	public final function jsLoad($src) {
-		if(is_file($this->info('root').'/'.ltrim($src, '/'))) {
-			$file = $this->plugin_id.'/'.ltrim($src, '/');
+		if(is_file($this->info('root').self::FILE_DIR_SEPARATOR.ltrim($src, self::FILE_DIR_SEPARATOR))) {
+			$file = $this->plugin_id.self::URL_DIR_SEPARATOR.ltrim($src, self::URL_DIR_SEPARATOR);
 			$version = $this->info('version');
 			if(defined('DC_CONTEXT_ADMIN')) {
 				return dcPage::jsLoad(dcPage::getPF($file), $version);
 			} else {
-				return dcUtils::jsLoad($this->core->blog->getPF($file), $version);
+				return dcUtils::jsLoad(dcCore::app()->blog->getPF($file), $version);
 			}
 		}
+        return '';
 	}
 
 	/**
@@ -748,8 +749,8 @@ abstract class dcPluginHelper216 {
 	 * @return string
 	 */
 	public final function cssLoad($src, $media='all', $import=false) {
-		if(is_file($this->info('root').'/'.ltrim($src, '/'))) {
-			$file = $this->plugin_id.'/'.ltrim($src, '/');
+		if(is_file($this->info('root').self::FILE_DIR_SEPARATOR.ltrim($src, self::FILE_DIR_SEPARATOR))) {
+			$file = $this->plugin_id.self::URL_DIR_SEPARATOR.ltrim($src, self::URL_DIR_SEPARATOR);
 			$version = $this->info('version');
 			if(defined('DC_CONTEXT_ADMIN')) {
 				if($import) {
@@ -759,12 +760,13 @@ abstract class dcPluginHelper216 {
 				}
 			} else {
 				if($import) {
-					return	'<style type="text/css">@import url('.$this->core->blog->getPF($file).') '.$media.';</style>'.NL;
+					return	'<style type="text/css">@import url('.dcCore::app()->blog->getPF($file).') '.$media.';</style>'.NL;
 				} else {
-					return dcUtils::cssLoad($this->core->blog->getPF($file), $media, $version);
+					return dcUtils::cssLoad(dcCore::app()->blog->getPF($file), $media, $version);
 				}
 			}
 		}
+        return '';
 	}
 
 	/**
@@ -791,13 +793,14 @@ abstract class dcPluginHelper216 {
 	 *
 	 * @param string $msg
 	 *
-	 * @return void
+     * @return object $this
 	 */
 	protected final function debugDisplay($msg) {
 		if($this->debug_mode && !empty($msg)) {
-			if(defined('DC_CONTEXT_ADMIN')) { $this->core->notices->addWarningNotice('<strong>DEBUG - '.$this->plugin_id.'</strong>&nbsp;:&nbsp;'.$msg); }
+			if(defined('DC_CONTEXT_ADMIN')) { dcAdminNotices::addWarningNotice('<strong>DEBUG - '.$this->plugin_id.'</strong>&nbsp;:&nbsp;'.$msg); }
 			$this->debugLog('[Debug display]', $msg);
 		}
+		return $this;
 	}
 
 	/**
@@ -806,7 +809,7 @@ abstract class dcPluginHelper216 {
 	 * @param string $text
 	 * @param mixed $value
 	 *
-	 * @return void
+     * @return object $this
 	 */
 	public final function debugLog($text, $value=null) {
 		if($this->debug_log && !empty($text)) {
@@ -831,8 +834,9 @@ abstract class dcPluginHelper216 {
 			} else {
 				$text .= ' :'.NL.print_r($value, true).NL.str_pad('END_VALUE', 66, '*');
 			}
-			@file_put_contents ($this->debug_logfile, NL.'['.date('YmdHis').'-'.$this->plugin_id.'-'.$this->core->blog->id.'] '.$text, FILE_APPEND);
+			@file_put_contents ($this->debug_logfile, NL.'['.date('YmdHis').'-'.$this->plugin_id.'-'.dcCore::app()->blog->id.'] '.$text, FILE_APPEND);
 		}
+		return $this;
 	}
 
 	/**
@@ -841,7 +845,7 @@ abstract class dcPluginHelper216 {
 	 * @param mixed $filename
 	 * @param boolean $reset_file
 	 *
-	 * @return void
+     * @return object $this
 	 */
 	public final function setDebugFilename($filename=null, $reset_file=false) {
 		if(empty($filename)) { $filename = self::getVarDir('logs', true).'/log_'.$this->plugin_id.'.txt'; }
@@ -849,7 +853,7 @@ abstract class dcPluginHelper216 {
 		if(is_dir(dirname($filename))) {
 			$this->debug_logfile = $filename;
 		} else {
-			$this->debug_logfile = self::getVarDir('logs', true).'/'.basename($filename);
+			$this->debug_logfile = self::getVarDir('logs', true).self::FILE_DIR_SEPARATOR.basename($filename);
 		}
 		if($this->debug_log) {
 			if($this->debug_log_reset && $reset_file && is_file($this->debug_logfile)) {
@@ -858,6 +862,7 @@ abstract class dcPluginHelper216 {
 				@file_put_contents ($this->debug_logfile, NL, FILE_APPEND);
 			}
 		}
+		return $this;
 	}
 
 }
