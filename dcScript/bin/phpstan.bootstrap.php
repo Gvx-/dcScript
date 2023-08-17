@@ -40,3 +40,5 @@ define('DC_VENDOR_NAME', '');
 define('DC_VERSION', '');
 define('DC_XMLRPC_URL', '');
 define('NL', "\n");
+define('SETTINGS_GLOBAL', 'global');
+define('SETTINGS_LOCAL', 'default');

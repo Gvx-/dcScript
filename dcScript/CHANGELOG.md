@@ -1,12 +1,27 @@
 Changelog
 =========
 
+Version 4.0.0 (2023-08-17)
+--------------------------
+
+* Mise a niveau pour dc 2.27 (refonte)
+* Version mini dc 2.27
+* Passage des icônes de "png" a "svg"
+* Passage a la version 5.65.14 de CodeMirror
+* Suppression du cryptage
+* Suppression de la gestion des options globales
+* Suppression de la dépendance a dcPluginHelper
+* Correctifs divers
+
+Version 3.0.0 Version abandonnée
+--------------------------------
+
 Version 2.3.0 (2022-11-14)
 --------------------------
 
 * Mise a niveau dcPluginHelper pour dc 2.24
 * Version mini dc 2.24
-* Ajout d'un depot alternatif
+* Ajout d'un dépôt alternatif
 * Passage a la version 5.65.9 de CodeMirror
 * Correctifs divers
 

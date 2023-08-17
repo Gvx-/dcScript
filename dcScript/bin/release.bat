@@ -6,6 +6,11 @@
 ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 :: Changelog
 ::
+::	* 15/08/2023	V0.1.4.5
+::		Suppression de la copie du fchiers README
+::	* 13/08/2023	V0.1.3.4
+::		Changement de repertoire de destination
+::		Ajout la copie des fichiers README, CHANGELOG, LICENCE, dcstore
 ::	* 21/04/2020	V0.1.2.3
 ::		Correction repertoire de destination
 ::	* 18/04/2020	V0.1.1.2
@@ -18,7 +23,7 @@
 
 setlocal enabledelayedexpansion
 :: Version script
-set VERSION=0.1.2.3
+set VERSION=0.1.4.5
 
 if /I "%~1"=="-h" goto :help
 if /I "%~1"=="--help" goto :help
@@ -29,7 +34,7 @@ if NOT [%1]==[] goto :help
 :: TODO: initialiser <source> et <dest>
 set source=%~dp0..
 call :parsePath nx %source% plugin
-set dest=%USERPROFILE%\Documents\__mesDocs\Git\%plugin%\%plugin%\
+set dest=%USERPROFILE%\Documents\_mesDocs\Repositories\GitHub\%plugin%\%plugin%\
 
 call :parsePath f %source% source
 call :parsePath f %dest% dest
@@ -39,6 +44,10 @@ if not exist %dest% call :fileError %dest%
 
 del /f /s /q "%dest%" >NUL
 xcopy "%source%" "%dest%" /q /s /e /y /exclude:.\excludes.txt
+
+xcopy "%source%\CHANGELOG.md" "%dest%\..\" /q /y
+xcopy "%source%\LICENCE" "%dest%\..\" /q /y
+xcopy "%source%\dcstore.xml" "%dest%\..\" /q /y
 
 endlocal
 exit /b

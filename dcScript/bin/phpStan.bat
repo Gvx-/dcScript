@@ -1,10 +1,12 @@
 @echo off
 set errorCode=0
 
+set phpPath=C:\wamp64\bin\php\php8.1.13\php
+
 set project=%~dp0..\phpStan.neon
 if not exist %project% goto :error
 echo phpStan analyse en cours...
-php %userprofile%\vendor\phpstan\phpstan\phpstan analyse -c "%project%"
+%phpPath% %userprofile%\vendor\phpstan\phpstan\phpstan analyse -c "%project%"
 goto :endBatch
 
 :error
