@@ -11,9 +11,9 @@
 
 $this->registerModule(
 	/* Name */			'dcScript',
-	/* Description*/	'Add script for DC',
+	/* Description*/	'Add public script for DC',
 	/* Author */		'Gvx',
-	/* Version */		'4.0.0',
+	/* Version */		'4.1.0',
 	[
 		/* standard plugin options dotclear */
 		'permissions' 				=>	dcCore::app()->auth->makePermissions([initDcScript::EDIT]),

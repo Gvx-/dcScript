@@ -19,7 +19,16 @@ use Dotclear\Core\Backend\Notices;
 use Dotclear\Core\Backend\Page;
 use Dotclear\Core\Process;
 use Dotclear\Helper\Html\Html;
-use form;
+use Dotclear\Helper\Html\Form\{
+    Div,
+	Form,
+	Hidden,
+	Input,
+	Link,
+    Para,
+	Submit,
+	Textarea
+};
 
 class Manage extends Process {
 	
@@ -109,40 +118,40 @@ class Manage extends Process {
 		echo My::jsLoad('/codemirror/addon/search/searchcursor');
 		echo My::jsLoad('/codemirror/addon/selection/active-line');
 		// End CodeMirror
-		echo My::jsLoad('index');
-		echo My::cssLoad('index');
+		echo My::jsLoad('Manage');
+		echo My::cssLoad('Manage');
 		echo Page::jsConfirmClose($idFormHeader, $idFormFooter);
 		echo Page::jsPageTabs($_REQUEST['tab'] ?? 'tab-header');
 
-		// admin forms
-		# Tab 1
-		echo
-			'<div class="multi-part" id="tab-header" title="'.__('Header code').' - ('.((string) My::settings()?->get('header_code_enabled') ? __('Enabled') : __('Disabled')).')">
-				 <form action="'.$urlFormAction.'" method="post" id="'.$idFormHeader.'">
-					<p>'.dcCore::app()->formNonce().'</p>
-					<p>'.form::hidden('change_header', '')/*for check change in CodeMirror => jsConfirmClose()*/.'</p>
-					<p>'.form::textArea('header_code', 120, 25, $header."\n", 'maximal', '0').'</p>
-					<p class="button-bar clear">
-						<input type="submit" id="update_header" name="update_header" title="'.__('Save the configuration').'" value="'.__('Save').'" />
-						<input type="reset" id="reset_header" name="reset_header" title="'.__('Undo changes').'" value="'.__('Cancel').'" />
-						<a id="export_header" class="button" title="'.__('Export').'" href="'.$urlDownloadHeader.'">'.__('Download').'</a>
-					</p>
-				</form>
-			</div>';
-		# Tab 2
-		echo
-			'<div class="multi-part" id="tab-footer" title="'.__('Footer code').' - ('.((string) My::settings()?->get('footer_code_enabled') ? __('Enabled') : __('Disabled')).')">
-				 <form action="'.$urlFormAction.'" method="post" id="'.$idFormFooter.'">
-					<p>'.dcCore::app()->formNonce().'</p>
-					<p>'.form::hidden('change_footer', '')/*for check change in CodeMirror => jsConfirmClose()*/.'</p>
-					<p>'.form::textArea('footer_code', 120, 25, $footer."\n", 'maximal', '0').'</p>
-					<p class="button-bar clear">
-						<input type="submit" id="update_footer" name="update_footer" title="'.__('Save the configuration').'" value="'.__('Save').'" />
-						<input type="reset" id="reset_footer" name="reset_footer" title="'.__('Undo changes').'" value="'.__('Cancel').'" />
-						<a id="export_footer" class="button" title="'.__('Export').'" href="'.$urlDownloadFooter.'">'.__('Download').'</a>
-					</p>
-				</form>
-			</div>';
+		# tab header
+        echo
+        (new Div('tab-header'))->class('multi-part')->title(__('Header code').' - ('.((string) My::settings()?->get('header_code_enabled') ? __('Enabled') : __('Disabled')).')')->items([
+			(new Form($idFormHeader))->method('post')->action($urlFormAction)->items([
+				dcCore::app()->formNonce(false),
+				(new Hidden('change_header', '')),														// for check change in CodeMirror => jsConfirmClose()
+				(new Textarea("header_code", $header."\n"))->class('maximal')->cols(120)->rows(25),		// para??
+				(new Para())->class('button-bar clear')->items([
+					(new Submit('update_header', __('Save')))->title(__('Save header script')),
+					(new Input('reset_header', 'reset'))->value(__('Cancel'))->title(__('Undo header changes')),
+					(new Link('export_header'))->class('button')->title(__('Export header script'))->text(__('Download'))->href($urlDownloadHeader)
+				])
+			])
+		])->render();
+
+		# tab footer
+        echo
+        (new Div('tab-footer'))->class('multi-part')->title(__('Footer code').' - ('.((string) My::settings()?->get('footer_code_enabled') ? __('Enabled') : __('Disabled')).')')->items([
+			(new Form($idFormFooter))->method('post')->action($urlFormAction)->items([
+				dcCore::app()->formNonce(false),
+				(new Hidden('change_footer', '')),														// for check change in CodeMirror => jsConfirmClose()
+				(new Textarea("footer_code", $footer."\n"))->class('maximal')->cols(120)->rows(25),		// para??
+				(new Para())->class('button-bar clear')->items([
+					(new Submit('update_footer', __('Save')))->title(__('Save footer script')),
+					(new Input('reset_footer', 'reset'))->value(__('Cancel'))->title(__('Undo footer changes')),
+					(new Link('export_footer'))->class('button')->title(__('Export footer script'))->text(__('Download'))->href($urlDownloadFooter)
+				])
+			])
+		])->render();
 
 		Page::helpBlock(My::id());			// On ajoute l'aide de la page
 		Page::closeModule();				// On ferme la page

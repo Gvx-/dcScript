@@ -1,6 +1,15 @@
 Changelog
 =========
 
+Version 4.1.0 (2023-08-23)
+--------------------------
+
+* Déplacement dans le menu Blog
+* Modernisation code config.php
+* Modernisation code manage.php
+* Correctif régression définition des permissions d’édition de scripts
+* Correctifs divers
+
 Version 4.0.0 (2023-08-17)
 --------------------------
 

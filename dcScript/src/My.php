@@ -27,5 +27,6 @@ class My extends MyPlugin {
             && dcCore::app()->auth->check(dcCore::app()->auth->makePermissions([initDcScript::EDIT]), dcCore::app()->blog->id)
 			&& My::settings()->get('enabled')
             : null;
-    }	
+    }
+
 }

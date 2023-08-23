@@ -1,14 +1,20 @@
 msgid ""
 msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
-"Project-Id-Version: dcScript 4.0.0-dev-r0024\n"
+"Project-Id-Version: dcScript 4.1.0-dev-r0010\n"
 "POT-Creation-Date: \n"
-"PO-Revision-Date: 2023-08-14T14:15:53+00:00\n"
+"PO-Revision-Date: 2023-08-23T06:12:23+00:00\n"
 "Last-Translator: Gilles\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+msgid "Add public script for DC"
+msgstr "Ajout de script public pour Dotclear"
+
+msgid "Edit public scripts"
+msgstr "Editer les scripts public"
 
 msgid "Unable to save the configuration"
 msgstr "Impossible de sauver la configuration"
@@ -35,10 +41,10 @@ msgid "Enable public footer code."
 msgstr "Activer le code du footer public"
 
 msgid "Extension Backup Files"
-msgstr "Extension des fichiers de sauvegarde"
+msgstr "Extension des fichiers de sauvegardes"
 
 msgid "Default extension backup files."
-msgstr "Extension par defaut des fichiers de sauvegarde"
+msgstr "Extension par defaut des fichiers de sauvegardes"
 
 msgid "Enable plugin"
 msgstr "Activer le plugin"
@@ -72,6 +78,24 @@ msgstr "Activé"
 
 msgid "Disabled"
 msgstr "Désactivé"
+
+msgid "Save header script"
+msgstr "Enregistrer le script d'entete"
+
+msgid "Undo header changes"
+msgstr "Annuler les modifications de l'entete"
+
+msgid "Export header script"
+msgstr "Exporter le script d'entete"
+
+msgid "Save footer script"
+msgstr "Enregistrer le script du pied de page"
+
+msgid "Undo footer changes"
+msgstr "Annuler les modifications du pied de page"
+
+msgid "Export footer script"
+msgstr "Exporter le script du pied de page"
 
 msgid "Save the configuration"
 msgstr "Sauver la configuration"
