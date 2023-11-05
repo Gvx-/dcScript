@@ -11,35 +11,39 @@
 
 namespace Dotclear\Plugin\dcScript;
 
-use dcCore;
+use Dotclear\App;
 use Dotclear\Core\Backend\Notices;
 use Dotclear\Core\Backend\Page;
 use Dotclear\Core\Process;
-use Dotclear\Helper\File\Path;
 use Dotclear\Helper\Html\Html;
-use Dotclear\Helper\L10n;
 use Exception;
 use Dotclear\Helper\Html\Form\{
     Checkbox,
     Div,
     Fieldset,
-	Input,
+    Input,
     Label,
     Legend,
-	Note,
+    Note,
     Para
 };
 
-class Config extends Process {
-
-    public static function init(): bool {
+class Config extends Process
+{
+    public static function init(): bool
+    {
         return self::status(My::checkContext(My::CONFIG));
     }
 
-    public static function process(): bool {
-        if (!self::status()) { return false; }
+    public static function process(): bool
+    {
+        if (!self::status()) {
+            return false;
+        }
 
-        if (empty($_POST['save'])) { return true; }
+        if (empty($_POST['save'])) {
+            return true;
+        }
 
         try {
             My::settings()->put('enabled', !empty($_POST['enabled']));
@@ -49,56 +53,58 @@ class Config extends Process {
 
             Notices::addSuccessNotice(__('Configuration successfully updated'));
 
-			My::redirect(['conf' => 1, 'redir' => dcCore::app()->admin->__get('list')->getRedir()]);
-			
+            My::redirect(['conf' => 1, 'redir' => App::Backend()->__get('list')->getRedir()]);
         } catch(exception $e) {
-            //dcCore::app()->error->add($e->getMessage());
-            dcCore::app()->error->add(__('Unable to save the configuration'));
+            //App::error()->add($e->getMessage());
+            App::error()->add(__('Unable to save the configuration'));
         }
 
         return true;
     }
 
-    public static function render(): void {
-        if (!self::status()) { return; }
+    public static function render(): void
+    {
+        if (!self::status()) {
+            return;
+        }
 
-		echo Page::jsConfirmClose('module_config');
+        echo Page::jsConfirmClose('module_config');
 
         echo
         (new Div())->items([
             (new Fieldset())->class('fieldset')->legend(new Legend(__('Activation')))->fields([
                 (new Para())->items([
-                    (new Checkbox('enabled', (bool) My::settings()?->get('enabled')))->value('1'),
-                    (new Label(sprintf(__('Enable %s on this blog'), Html::escapeHTML((string)__(My::name()))), Label::OUTSIDE_LABEL_AFTER))->class('classic')->for('enabled')
+                    (new Checkbox('enabled', (bool) My::settings()->get('enabled')))->value('1'),
+                    (new Label(sprintf(__('Enable %s on this blog'), Html::escapeHTML((string) __(My::name()))), Label::OUTSIDE_LABEL_AFTER))->class('classic')->for('enabled'),
                 ]),
-				(new Note())->text(__('Enable the plugin on this blog.'))->class('form-note')
+                (new Note())->text(__('Enable the plugin on this blog.'))->class('form-note'),
             ]),
             (new Fieldset())->class('fieldset two-cols')->legend(new Legend(__('Active codes')))->fields([
-				(new Div())->class('col')->items([
-					(new Para())->items([
-						(new Checkbox('header_code_enabled', (bool) My::settings()?->get('header_code_enabled')))->value('1'),
-						(new Label(__('Enable header code'), Label::OUTSIDE_LABEL_AFTER))->class('classic')->for('header_code_enabled')
-					]),
-					(new Note())->text(__('Enable public header code.'))->class('form-note')
-				]),
-				(new Div())->class('col')->items([
-					(new Para())->items([
-						(new Checkbox('footer_code_enabled', (bool) My::settings()?->get('footer_code_enabled')))->value('1'),
-						(new Label(__('Enable footer code'), Label::OUTSIDE_LABEL_AFTER))->class('classic')->for('footer_code_enabled')
-					]),
-					(new Note())->text(__('Enable public footer code.'))->class('form-note')
-				])
+                (new Div())->class('col')->items([
+                    (new Para())->items([
+                        (new Checkbox('header_code_enabled', (bool) My::settings()->get('header_code_enabled')))->value('1'),
+                        (new Label(__('Enable header code'), Label::OUTSIDE_LABEL_AFTER))->class('classic')->for('header_code_enabled'),
+                    ]),
+                    (new Note())->text(__('Enable public header code.'))->class('form-note'),
+                ]),
+                (new Div())->class('col')->items([
+                    (new Para())->items([
+                        (new Checkbox('footer_code_enabled', (bool) My::settings()->get('footer_code_enabled')))->value('1'),
+                        (new Label(__('Enable footer code'), Label::OUTSIDE_LABEL_AFTER))->class('classic')->for('footer_code_enabled'),
+                    ]),
+                    (new Note())->text(__('Enable public footer code.'))->class('form-note'),
+                ]),
             ]),
             (new Fieldset())->class('fieldset')->legend(new Legend(__('Options')))->fields([
                 (new Para())->items([
-                    (new Label(__('Extension Backup Files').' :', Label::OUTSIDE_LABEL_BEFORE))->class('classic')->for('backup'),
-					(new Input('backup'))->size(25)->maxlenght(255)->value(My::settings()?->get('backup_ext'))
+                    (new Label(__('Extension Backup Files') . ' :', Label::OUTSIDE_LABEL_BEFORE))->class('classic')->for('backup'),
+                    (new Input('backup'))->size(25)->maxlength(255)->value(My::settings()->get('backup_ext')),
                 ]),
-				(new Note())->text(__('Default extension backup files.'))->class('form-note')
-            ])
+                (new Note())->text(__('Default extension backup files.'))->class('form-note'),
+            ]),
         ])->render();
-		
-		echo Page::helpBlock(My::id().'-config');
-		
+
+        //echo Page::helpBlock(My::id().'-config');
+        Page::helpBlock(My::id() . '-config');
     }
 }

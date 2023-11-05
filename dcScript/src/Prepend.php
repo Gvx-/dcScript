@@ -13,17 +13,20 @@ declare(strict_types=1);
 
 namespace Dotclear\Plugin\dcScript;
 
-use dcCore;
 use Dotclear\Core\Process;
 
-class Prepend extends Process {
-	
-    public static function init(): bool {
+class Prepend extends Process
+{
+    public static function init(): bool
+    {
         return self::status(My::checkContext(My::PREPEND));
     }
 
-    public static function process(): bool {
-        if (!self::status()) { return false; }
+    public static function process(): bool
+    {
+        if (!self::status()) {
+            return false;
+        }
 
         return true;
     }

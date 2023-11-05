@@ -2,7 +2,7 @@
 /**
   * This file is part of dcScript plugin for Dotclear 2.
   *
-  * @package Dotclear\plungin\dcScript
+  * @package Dotclear\plugin\dcScript
   *
   * @author Gvx <g.gvx@free.fr>
   * @copyright © 2014-2023 Gvx
@@ -11,9 +11,10 @@
 
 declare(strict_types=1);
 
-class initDcScript {
-    // Constants
+namespace Dotclear\Plugin\dcScript;
 
+class dcScript
+{
     /**
      * dcScript permission
      *

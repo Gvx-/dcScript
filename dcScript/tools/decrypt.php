@@ -10,54 +10,62 @@
   * @license http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
  */
 
-	### Constants ###
-	define('MCRYPT', 'mcrypt');
-	define('OPENSSL', 'openssl');
-	define('OPENSSL_METHOD', 'AES-256-CBC');
+    ### Constants ###
+    define('MCRYPT', 'mcrypt');
+define('OPENSSL', 'openssl');
+define('OPENSSL_METHOD', 'AES-256-CBC');
 
-	function encrypt($str, $key, $cryptLib=OPENSSL) {
-		//$key = pack('H*', hash('sha256', $key));
-		$key = pack('H*', $key);
-		if($cryptLib == MCRYPT) { // REMOVED in PHP 7.2
-			if(version_compare(PHP_VERSION, '7.2', '>=')) { throw new Exception('Encryption incompatible with PHP 7.2 and more'); }
-			$iv = mcrypt_create_iv(mcrypt_get_iv_size(MCRYPT_RIJNDAEL_256, MCRYPT_MODE_ECB), MCRYPT_RAND);
-			return trim(base64_encode(mcrypt_encrypt(MCRYPT_RIJNDAEL_256, $key, $str, MCRYPT_MODE_ECB, $iv)));
-		} elseif($cryptLib == OPENSSL) {
-			$ivlen = openssl_cipher_iv_length(OPENSSL_METHOD);
-			$iv = openssl_random_pseudo_bytes($ivlen);
-			return trim(base64_encode($iv.openssl_encrypt($str, OPENSSL_METHOD, $key, OPENSSL_RAW_DATA, $iv)));
-		} else {
-			// unknown cryptLib
-		}
-	}
+function encrypt($str, $key, $cryptLib = OPENSSL)
+{
+    //$key = pack('H*', hash('sha256', $key));
+    $key = pack('H*', $key);
+    if ($cryptLib == MCRYPT) { // REMOVED in PHP 7.2
+        if (version_compare(PHP_VERSION, '7.2', '>=')) {
+            throw new Exception('Encryption incompatible with PHP 7.2 and more');
+        }
+        $iv = mcrypt_create_iv(mcrypt_get_iv_size(MCRYPT_RIJNDAEL_256, MCRYPT_MODE_ECB), MCRYPT_RAND);
 
-	function decrypt($str, $key, $cryptLib=MCRYPT) {
-		//$key = pack('H*', hash('sha256', $key));
-		$key = pack('H*', $key);
-		if($cryptLib == MCRYPT) { // REMOVED in PHP 7.2
-			if(version_compare(PHP_VERSION, '7.2', '>=')) { throw new Exception('Encryption incompatible with PHP 7.2 and more'); }
-			$iv = mcrypt_create_iv(mcrypt_get_iv_size(MCRYPT_RIJNDAEL_256, MCRYPT_MODE_ECB), MCRYPT_RAND);
-			return trim(mcrypt_decrypt(MCRYPT_RIJNDAEL_256, $key, base64_decode($str), MCRYPT_MODE_ECB, $iv));
-		} elseif($cryptLib == OPENSSL) {
-			$ivlen = openssl_cipher_iv_length(OPENSSL_METHOD);
-			$str = base64_decode($str);
-			return trim(openssl_decrypt(substr($str, $ivlen), OPENSSL_METHOD, $key, OPENSSL_RAW_DATA, substr($str, 0, $ivlen)));
-		} else {
-			// unknown cryptLib
-		}
-	}
+        return trim(base64_encode(mcrypt_encrypt(MCRYPT_RIJNDAEL_256, $key, $str, MCRYPT_MODE_ECB, $iv)));
+    } elseif ($cryptLib == OPENSSL) {
+        $ivlen = openssl_cipher_iv_length(OPENSSL_METHOD);
+        $iv    = openssl_random_pseudo_bytes($ivlen);
 
-	$getKey = empty($_POST['key']) ? '' : $_POST['key'];
-	$getCrypt = empty($_POST['crypte']) ? '' : $_POST['crypte'];
-	$getDecrypte = (empty($_POST['key']) or empty($_POST['crypte'])) ? '' : decrypt($_POST['crypte'] ,$_POST['key'], MCRYPT);
+        return trim(base64_encode($iv . openssl_encrypt($str, OPENSSL_METHOD, $key, OPENSSL_RAW_DATA, $iv)));
+    }
+    // unknown cryptLib
+}
 
-	if(isset($_POST['download']) && $getDecrypte){
-		$filename = '"download.txt"';
-		header('Content-Disposition: attachment;filename='.$filename);
-		header('Content-Type: text/plain; charset=UTF-8');
-		echo $getDecrypte;
-		exit;
-	}
+function decrypt($str, $key, $cryptLib = MCRYPT)
+{
+    //$key = pack('H*', hash('sha256', $key));
+    $key = pack('H*', $key);
+    if ($cryptLib == MCRYPT) { // REMOVED in PHP 7.2
+        if (version_compare(PHP_VERSION, '7.2', '>=')) {
+            throw new Exception('Encryption incompatible with PHP 7.2 and more');
+        }
+        $iv = mcrypt_create_iv(mcrypt_get_iv_size(MCRYPT_RIJNDAEL_256, MCRYPT_MODE_ECB), MCRYPT_RAND);
+
+        return trim(mcrypt_decrypt(MCRYPT_RIJNDAEL_256, $key, base64_decode($str), MCRYPT_MODE_ECB, $iv));
+    } elseif ($cryptLib == OPENSSL) {
+        $ivlen = openssl_cipher_iv_length(OPENSSL_METHOD);
+        $str   = base64_decode($str);
+
+        return trim(openssl_decrypt(substr($str, $ivlen), OPENSSL_METHOD, $key, OPENSSL_RAW_DATA, substr($str, 0, $ivlen)));
+    }
+    // unknown cryptLib
+}
+
+$getKey      = empty($_POST['key']) ? '' : $_POST['key'];
+$getCrypt    = empty($_POST['crypte']) ? '' : $_POST['crypte'];
+$getDecrypte = (empty($_POST['key']) or empty($_POST['crypte'])) ? '' : decrypt($_POST['crypte'], $_POST['key'], MCRYPT);
+
+if (isset($_POST['download']) && $getDecrypte) {
+    $filename = '"download.txt"';
+    header('Content-Disposition: attachment;filename=' . $filename);
+    header('Content-Type: text/plain; charset=UTF-8');
+    echo $getDecrypte;
+    exit;
+}
 
 ?>
 <html>
@@ -109,14 +117,14 @@
 		<div class="right"><p><small>v1.2.0</small></p></div>
 		<h1>Décryptage pour dcScript / Decryption for dcScript</h1>
 		<?php
-			if(version_compare(PHP_VERSION, '5.3.3', '<') || version_compare(PHP_VERSION, '7.2', '>=')) {
-				echo '<div class="warning">
+            if (version_compare(PHP_VERSION, '5.3.3', '<') || version_compare(PHP_VERSION, '7.2', '>=')) {
+                echo '<div class="warning">
 					<p><strong>ERREUR FATALE :</strong> La version PHP doit être comprise entre 5.3.3 <= PHP <7.2</p>
 					<p><strong> FATAL ERROR: </strong> The PHP version must be between 5.3.3 <= PHP <7.2</p>
 					</div>';
-				exit;
-			}
-		?>
+                exit;
+            }
+?>
 		<form action="#" method="post">
 			<p class="right"><button type="button" id="clear">Vider / clean</button></p>
 			<!-- Entrées -->
@@ -136,7 +144,7 @@
 				<textarea id="decrypte" name="decrypte" placeholder="Résultat du décryptage / Decryption result" rows="10" cols="100" spellcheck="true" wrap="off" readonly="true"><?php echo $getDecrypte; ?></textarea>
 			</p>
 			<!-- Download / copy -->
-			<p class="right"><input type="submit" name="download" <?php echo ($getDecrypte ? '' : 'disabled="disabled"'); ?> value="Sauvegarder / Save" />&nbsp;<button type="button" id="copy_result">Copier / Copy</button></p>
+			<p class="right"><input type="submit" name="download" <?php echo($getDecrypte ? '' : 'disabled="disabled"'); ?> value="Sauvegarder / Save" />&nbsp;<button type="button" id="copy_result">Copier / Copy</button></p>
 		</form>
 	</body>
 </html>

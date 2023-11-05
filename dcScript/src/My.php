@@ -13,20 +13,18 @@ declare(strict_types=1);
 
 namespace Dotclear\Plugin\dcScript;
 
-use dcCore;
+use Dotclear\App;
 use Dotclear\Module\MyPlugin;
 
-use initDcScript;
-
-class My extends MyPlugin {
-	
-	protected static function checkCustomContext(int $context): ?bool {
-		return in_array($context, [self::MANAGE, self::MENU, self::BACKEND]) ? 
-            defined('DC_CONTEXT_ADMIN')
-            && !is_null(dcCore::app()->blog)
-            && dcCore::app()->auth->check(dcCore::app()->auth->makePermissions([initDcScript::EDIT]), dcCore::app()->blog->id)
-			&& My::settings()->get('enabled')
+class My extends MyPlugin
+{
+    protected static function checkCustomContext(int $context): ?bool
+    {
+        return in_array($context, [self::MANAGE, self::MENU, self::BACKEND]) ?
+            App::task()->checkContext('BACKEND')
+            && App::blog()->isDefined()
+            && App::auth()->check(App::auth()->makePermissions([dcScript::EDIT]), App::blog()->id())
+            && My::settings()->get('enabled')
             : null;
     }
-
 }

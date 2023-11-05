@@ -1,13 +1,13 @@
 ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 :: Release plugin dotclear
 :: Author	: Gilles Grandveaux
-:: Copyright: (c)2020 Gilles Grandveaux
+:: Copyright: (c)2020-2023 Gilles Grandveaux
 :: License	: http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
 ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 :: Changelog
 ::
 ::	* 15/08/2023	V0.1.4.5
-::		Suppression de la copie du fchiers README
+::		Suppression de la copie du fichiers README
 ::	* 13/08/2023	V0.1.3.4
 ::		Changement de repertoire de destination
 ::		Ajout la copie des fichiers README, CHANGELOG, LICENCE, dcstore

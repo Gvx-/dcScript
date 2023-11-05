@@ -13,28 +13,31 @@ declare(strict_types=1);
 
 namespace Dotclear\Plugin\dcScript;
 
-use dcCore;
+use Dotclear\App;
 use Dotclear\Core\Backend\Menus;
 use Dotclear\Core\Process;
-use initDcScript;
 
-class Backend extends Process {
-	
-    public static function init(): bool {
-		__('Add public script for DC');		// for L10n
-		
+class Backend extends Process
+{
+    public static function init(): bool
+    {
+        __('Add public script for DC');		// for L10n
+
         return self::status(My::checkContext(My::BACKEND));
     }
 
-    public static function process(): bool {
-        if (!self::status()) { return false; }
+    public static function process(): bool
+    {
+        if (!self::status()) {
+            return false;
+        }
 
-		// Ajout des permissions
-		dcCore::app()->auth->setPermissionType(initDcScript::EDIT, __('Edit public scripts'));
-        
-		// Ajout du menu
-		My::addBackendMenuItem(Menus::MENU_BLOG);
-		
+        // Ajout des permissions
+        App::auth()->setPermissionType(dcScript::EDIT, __('Edit public scripts'));
+
+        // Ajout du menu
+        My::addBackendMenuItem(Menus::MENU_BLOG);
+
         return self::status();
     }
 }

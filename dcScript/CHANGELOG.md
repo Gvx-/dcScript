@@ -1,6 +1,15 @@
 Changelog
 =========
 
+Version 4.2.0 (2023-11-05)
+--------------------------
+
+* Mise a niveau pour dc 2.28
+* Ajout d'une procédure de désinstallation
+* Passage a la version 5.65.15 de CodeMirror
+* Correctif regression de l’accès a l'aide
+* Correctifs divers
+
 Version 4.1.0 (2023-08-23)
 --------------------------
 
