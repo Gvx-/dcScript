@@ -8,7 +8,7 @@ L'éditeur de code utilise la coloration syntaxique de [CodeMirror](https://code
 
 ## Pré-requis ##
 
-* Dotclear 2.27 ou plus
+* Dotclear 2.28 ou plus
 
 ## Utilisation ##
 
