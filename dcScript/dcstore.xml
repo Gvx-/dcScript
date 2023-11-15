@@ -2,7 +2,7 @@
 <modules xmlns:da="http://dotaddict.org/da/">
   <module id="dcScript">
     <name>dcScript</name>
-    <version>4.3.0-dev-r0001</version>
+    <version>4.2.0</version>
     <author>Gvx</author>
     <desc>Add public script for DC</desc>
     <file>https://github.com/Gvx-/dcScript/releases/download/v4.2.0/plugin-dcScript-4.2.0.zip</file>
