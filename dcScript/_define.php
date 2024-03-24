@@ -12,7 +12,7 @@ $this->registerModule(
     'dcScript',							// Name
     'Add public script for DC',			// Description
     'Gvx',								// Author
-    '4.2.0',							// Version
+    '4.3.0-dev-r0001',					// Version
     [
         'permissions'			=> 'My',
         'type'                 	=> 'plugin',
