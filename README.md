@@ -1,5 +1,12 @@
 # README #
 
+## CHANGEMENT DE DEPOT ##
+
+A compter du 2 Janvier 2026 le depot est déplacé sur [codeberg.org](https://codeberg.org/Gvx/dcScript)
+
+Ce depot ne sera plus mis a jour
+
+
 Ce plugin pour [Dotclear](https://fr.dotclear.org/) permet d'insérer du code HTML dans les pages publiques depuis un éditeur de code interne.
 
 ## Caractéristiques ##
@@ -19,11 +26,15 @@ Le plugin met a disposition 2 éditeurs de code HTML:
 
 ## Téléchargements ##
 
-Vous pouvez télécharger les packages [ici](https://github.com/Gvx-/dcScript/releases)
+~~Vous pouvez télécharger les packages [ici](https://github.com/Gvx-/dcScript/releases)~~
+
+Utilisez le nouveau depot [codeberg.org](https://codeberg.org/Gvx/dcScript/releases)
 
 ## Signaler un dysfonctionnement ##
 
-Vous pouvez signaler un dysfonctionnement ou faire une demande d’amélioration [ici](https://github.com/Gvx-/dcScript/issues/new)
+~~Vous pouvez signaler un dysfonctionnement ou faire une demande d’amélioration [ici](https://github.com/Gvx-/dcScript/issues/new)~~
+
+Utilisez le nouveau depot [codeberg.org](https://codeberg.org/Gvx/dcScript)
 
 ## Licence ##
 

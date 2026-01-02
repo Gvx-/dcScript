@@ -2,12 +2,12 @@
 <modules xmlns:da="http://dotaddict.org/da/">
   <module id="dcScript">
     <name>dcScript</name>
-    <version>4.2.0</version>
+    <version>4.2.1</version>
     <author>Gvx</author>
     <desc>Add public script for DC</desc>
-    <file>https://github.com/Gvx-/dcScript/releases/download/v4.2.0/plugin-dcScript-4.2.0.zip</file>
-    <da:dcmin>2.28</da:dcmin>
-    <da:details>https://github.com/Gvx-/dcScript</da:details>
-    <da:support>http://forum.dotclear.org/viewtopic.php?pid=335785#p335785</da:support>
+    <file>https://codeberg.org/Gvx/dcScript/releases/download/v4.2.1/plugin-dcScript-4.2.1.zip</file>
+    <da:dcmin>2.36</da:dcmin>
+    <da:details>https://codeberg.org/Gvx/dcScript</da:details>
+    <da:support>https://codeberg.org/Gvx/dcScript</da:support>
   </module>
 </modules>
