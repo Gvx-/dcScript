@@ -6,6 +6,7 @@ A compter du 2 Janvier 2026 le depot est déplacé sur [codeberg.org](https://co
 
 Ce depot ne sera plus mis a jour
 
+----
 
 Ce plugin pour [Dotclear](https://fr.dotclear.org/) permet d'insérer du code HTML dans les pages publiques depuis un éditeur de code interne.
 
